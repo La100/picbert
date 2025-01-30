@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CreditCardIcon, PlusIcon, Wand2Icon } from "lucide-react";
+import { CreditCardIcon,Wand2Icon } from "lucide-react";
 import Link from "next/link";
 
 export function QuickActions() {
