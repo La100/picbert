@@ -25,10 +25,7 @@ const GeneratedImages = () => {
       <CardContent className="p-1">
         <div
           className="relative flex items-center justify-center rounded-lg overflow-hidden"
-          style={{ 
-            aspectRatio: `${image.width}/${image.height}`,
-            maxHeight: '80vh'
-          }}
+       
         >
           <Image
             src={image.url}

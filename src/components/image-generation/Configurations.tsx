@@ -51,7 +51,7 @@ const Configurations = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       prompt: "",
- 
+      aspect_ratio: "9:16",
       output_format: "jpeg",
       raw: true,
     },
@@ -79,6 +79,7 @@ const Configurations = () => {
         url: image.url,
         width: image.width ?? 0,
         height: image.height ?? 0,
+        safety_checker:true,
         prompt: values.prompt,
         aspect_ratio: values.aspect_ratio,
         raw: values.raw,

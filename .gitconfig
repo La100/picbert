@@ -1,0 +1,1 @@
+git config --global alias.acp '!git add . && git commit -m "auto" && git push'

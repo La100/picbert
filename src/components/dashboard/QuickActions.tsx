@@ -25,12 +25,7 @@ export function QuickActions() {
             Generate Image
           </Button>
         </Link>
-        <Link href="/model-training" className="w-full">
-          <Button variant="destructive" className="w-full">
-            <PlusIcon className="mr-2 h-4 w-4" />
-            Train New Model
-          </Button>
-        </Link>
+        
 
         <Link href="/billing" className="w-full">
           <Button variant="secondary" className="w-full">
