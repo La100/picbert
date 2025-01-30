@@ -1,10 +1,8 @@
 import * as React from "react"
 import {
   CreditCard,
-  Frame,
   Image,
   Images,
-  Layers,
   Settings2,
   Sparkles,
   SquareTerminal,

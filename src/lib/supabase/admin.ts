@@ -308,9 +308,9 @@ const updateUserCredits = async (
 
   const creditsData: TablesInsert<'credits'> = {
     image_generation_count: (metadata as { image_generation_count?: number })?.image_generation_count ?? 0,
-    model_training_count: (metadata as { model_training_count?: number })?.model_training_count ?? 0,
+  
     max_image_generation_count: (metadata as { image_generation_count?: number })?.image_generation_count ?? 0,
-    max_model_training_count: (metadata as { model_training_count?: number })?.model_training_count ?? 0,
+  
   };
 
   const { error: upsertError } = await supabaseAdmin

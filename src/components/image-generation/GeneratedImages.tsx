@@ -3,7 +3,6 @@ import React from "react";
 import useGenerateStore from "@/store/useGenerateStore";
 import Image from "next/image";
 import { Card, CardContent } from "../ui/card";
-import { cn } from "@/lib/utils";
 
 const GeneratedImages = () => {
   const images = useGenerateStore((state) => state.images);

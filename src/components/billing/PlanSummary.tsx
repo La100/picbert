@@ -62,18 +62,6 @@ const PlanSummary = ({
               </div>
             </div>
 
-            <div className="col-span-5 flex flex-col pr-12">
-              <div className="flex-1 text-xs font-normal flex w-full justify-between pb-1">
-                <span className="text-sm font-normal text-muted-foreground ml-1 lowercase">
-                  Model Training credits left
-                </span>
-                <span className="text-sm font-medium">0 remaining</span>
-              </div>
-              <div className="mb-1 flex items-end">
-                <Progress value={0} className="w-full h-2" />
-              </div>
-            </div>
-
             <div className="col-span-full flex flex-col">
               Please upgrade to a plan to continue using the app.
             </div>
@@ -92,9 +80,8 @@ const PlanSummary = ({
     );
   } else {
     const imageGenerationCount = credits.image_generation_count ?? 0;
-    const modelTrainingCount = credits.model_training_count ?? 0;
     const maxImageGenerationCount = credits.max_image_generation_count ?? 0;
-    const maxModelTrainingCount = credits.max_model_training_count ?? 0;
+  
     const priceString = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency!,
@@ -123,24 +110,6 @@ const PlanSummary = ({
               <div className="mb-1 flex items-end">
                 <Progress
                   value={(imageGenerationCount / maxImageGenerationCount) * 100}
-                  className="w-full h-2"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-4 xl:grid-cols-8 mt-4 ">
-            <div className="col-span-full xl:col-span-5 flex flex-col sm:pr-12">
-              <div className="flex-1 pb-2 text-xs font-normal md:pb-0 flex justify-between items-center">
-                <span className="text-base font-semibold">
-                  {modelTrainingCount} / {maxModelTrainingCount}
-                </span>
-                <span className="text-sm font-normal text-muted-foreground ml-1">
-                  model training credits
-                </span>
-              </div>
-              <div className="mb-1 flex items-end">
-                <Progress
-                  value={(modelTrainingCount / maxModelTrainingCount) * 100}
                   className="w-full h-2"
                 />
               </div>

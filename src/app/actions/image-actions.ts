@@ -12,7 +12,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 interface ImageResponse {
   error: string | null;
   success: boolean;
-  data: any | null;
+  data: Record<string, unknown> | null;
 }
 
 type StoreImageInput = {
@@ -204,4 +204,54 @@ export async function deleteImage(id: string, imageName: string) {
   revalidateTag("gallery-images");
 
   return { error: null, success: true, data: data };
+}
+
+export async function checkAndUpdateCredits(): Promise<{ 
+  hasCredits: boolean; 
+  credits: Database["public"]["Tables"]["credits"]["Row"] | null;
+  error: string | null;
+}> {
+  const credits = await getCredits();
+  
+  if (!credits || credits.error || !credits.data) {
+    return { 
+      hasCredits: false, 
+      credits: null, 
+      error: credits?.error || "Failed to fetch credits" 
+    };
+  }
+
+  const currentCount = credits.data.image_generation_count ?? 0;
+  const maxCount = credits.data.max_image_generation_count ?? 0;
+
+  if (currentCount >= maxCount) {
+    return { 
+      hasCredits: false, 
+      credits: credits.data, 
+      error: "No credits remaining" 
+    };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("credits")
+    .update({ 
+      image_generation_count: currentCount + 1 
+    })
+    .eq("user_id", credits.data.user_id);
+
+  if (error) {
+    return { 
+      hasCredits: false, 
+      credits: credits.data, 
+      error: "Failed to update credits" 
+    };
+  }
+
+  revalidateTag("credits");
+  return { 
+    hasCredits: true, 
+    credits: credits.data, 
+    error: null 
+  };
 }

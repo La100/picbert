@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { toast } from 'sonner'
-import { storeImages } from '@/app/actions/image-actions'
+import { checkAndUpdateCredits, storeImages } from '@/app/actions/image-actions'
 
 interface GenerateState {
   loading: boolean
@@ -11,7 +11,7 @@ interface GenerateState {
   } & GenerateFormValues>
   error: string | null
   setLoading: (loading: boolean) => void
-  generateImage: (values: GenerateFormValues & { data: any }) => Promise<void>
+  generateImage: (values: GenerateFormValues & { data: { images: Array<{ url: string; width: number; height: number }> } }) => Promise<void>
 }
 
 interface GenerateFormValues {
@@ -26,12 +26,20 @@ const useGenerateStore = create<GenerateState>((set) => ({
   error: null,
   setLoading: (loading: boolean) => set({ loading }),
 
-  generateImage: async (values: GenerateFormValues & { data: any }) => {
+  generateImage: async (values: GenerateFormValues & { data: { images: Array<{ url: string; width: number; height: number }> } }) => {
     try {
       set({ error: null, images: [] })
       const toastId = toast.loading('Processing generated image...')
 
-      const imageUrls = values.data.images.map((img: { url: string; width: number; height: number }) => ({
+      // Check credits before proceeding
+      const creditCheck = await checkAndUpdateCredits();
+      if (!creditCheck.hasCredits) {
+        toast.error(creditCheck.error || "No credits available", { id: toastId });
+        set({ error: creditCheck.error || "No credits available", loading: false });
+        return;
+      }
+
+      const imageUrls = values.data.images.map((img) => ({
         url: img.url,
         width: img.width,
         height: img.height,
@@ -40,10 +48,10 @@ const useGenerateStore = create<GenerateState>((set) => ({
         raw: values.raw,
       }))
 
-      // Store the generated images first
+      // Store the generated images
       await storeImages(imageUrls)
       
-      // Then update the state with new images
+      // Update the state with new images
       set({ images: imageUrls, loading: false, error: null })
       toast.success("Image processed successfully", { id: toastId })
 

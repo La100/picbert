@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Database } from "@database.types";
-import { ImageIcon, LayersIcon, Wallet, ZapIcon } from "lucide-react";
+import { ImageIcon, ZapIcon } from "lucide-react";
 
 type Credits = Database["public"]["Tables"]["credits"]["Row"];
 

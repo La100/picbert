@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Select,
   SelectContent,
@@ -42,6 +42,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+
 const Configurations = () => {
   const generateImage = useGenerateStore((state) => state.generateImage);
   const loading = useGenerateStore((state) => state.loading);
@@ -76,8 +77,8 @@ const Configurations = () => {
       const image = output.data.images[0];
       const imageData = [{
         url: image.url,
-        width: image.width,
-        height: image.height,
+        width: image.width ?? 0,
+        height: image.height ?? 0,
         prompt: values.prompt,
         aspect_ratio: values.aspect_ratio,
         raw: values.raw,
