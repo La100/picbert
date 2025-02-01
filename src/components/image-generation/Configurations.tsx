@@ -66,6 +66,7 @@ const Configurations = () => {
           num_images: 1,
           aspect_ratio: values.aspect_ratio,
           raw: values.raw,
+          safety_tolerance:4
         },
         logs: true,
       });

@@ -18,6 +18,7 @@ interface ImageDialogProps {
 }
 export function ImageDialog({ image, onClose }: ImageDialogProps) {
   const handleDownload = () => {
+    const fileExtension = image?.output_format?.toLowerCase() || 'png';
     fetch(image.url || "")
       .then((response) => response.blob())
       .then((blob) => {
@@ -26,7 +27,7 @@ export function ImageDialog({ image, onClose }: ImageDialogProps) {
         link.href = url;
         link.setAttribute(
           "download",
-          `generated-image-${Date.now()}.${image?.output_format}`
+          `generated-image-${Date.now()}.${fileExtension}`
         );
 
         // Append to the document and trigger the download
@@ -35,6 +36,7 @@ export function ImageDialog({ image, onClose }: ImageDialogProps) {
 
         // Cleanup
         link.parentNode?.removeChild(link);
+        window.URL.revokeObjectURL(url); // Clean up the URL object
       })
       .catch((error) => console.error("Error downloading the image:", error));
   };
@@ -47,13 +49,15 @@ export function ImageDialog({ image, onClose }: ImageDialogProps) {
 
           <ScrollArea className="flex flex-col h-[100vh]">
             <div className="relative w-fit h-fit ">
-              <Image
-                src={image.url || ""}
-                alt={image.prompt || "Generated image"}
-                width={image.width || 0}
-                height={image.height || 0}
-                className="w-full h-auto flex mb-3 rounded"
-              />
+              <a href={image.url || ""} target="_blank" rel="noopener noreferrer">
+                <Image
+                  src={image.url || ""}
+                  alt={image.prompt || "Generated image"}
+                  width={image.width || 0}
+                  height={image.height || 0}
+                  className="w-full h-auto flex mb-3 rounded"
+                />
+              </a>
               <div className="flex gap-4 absolute bottom-4 right-4">
                 <Button
                   className="w-fit"
@@ -101,6 +105,10 @@ export function ImageDialog({ image, onClose }: ImageDialogProps) {
               </Badge>
 
             
+
+             
+
+             
 
              
 

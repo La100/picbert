@@ -15,6 +15,8 @@ export type Database = {
           id: number
           image_generation_count: number | null
           max_image_generation_count: number | null
+          video_generation_count: number | null
+          max_video_generation_count: number | null
           user_id: string | null
         }
         Insert: {
@@ -22,6 +24,8 @@ export type Database = {
           id?: number
           image_generation_count?: number | null
           max_image_generation_count?: number | null
+          video_generation_count?: number | null
+          max_video_generation_count?: number | null
           user_id?: string | null
         }
         Update: {
@@ -29,6 +33,8 @@ export type Database = {
           id?: number
           image_generation_count?: number | null
           max_image_generation_count?: number | null
+          video_generation_count?: number | null
+          max_video_generation_count?: number | null
           user_id?: string | null
         }
         Relationships: []
@@ -92,6 +98,38 @@ export type Database = {
           width?: number | null
         }
         Relationships: []
+      }
+      generated_videos: {
+        Row: {
+          id: number
+          created_at: string
+          user_id: string
+          prompt: string
+          input_image: string
+          aspect_ratio: string
+          duration: string
+          video_name: string
+        }
+        Insert: {
+          id?: number
+          created_at?: string
+          user_id: string
+          prompt: string
+          input_image: string
+          aspect_ratio: string
+          duration: string
+          video_name: string
+        }
+        Update: {
+          id?: number
+          created_at?: string
+          user_id?: string
+          prompt?: string
+          input_image?: string
+          aspect_ratio?: string
+          duration?: string
+          video_name?: string
+        }
       }
       prices: {
         Row: {

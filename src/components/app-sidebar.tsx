@@ -6,6 +6,8 @@ import {
   Settings2,
   Sparkles,
   SquareTerminal,
+  Megaphone,
+  Video,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -34,11 +36,20 @@ const navMain =  [
       url: "/image-generation",
       icon: Image,
     },
-
+    {
+      title: "Generate Videos",
+      url: "/video-generation",
+      icon: Video,
+    },
     {
       title: "My Images",
       url: "/gallery",
       icon: Images,
+    },
+    {
+      title: "Make Ad",
+      url: "/make-ad",
+      icon: Megaphone,
     },
     {
       title: "Billing",
