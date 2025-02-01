@@ -6,11 +6,18 @@ import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Download } from "lucide-react";
 
+interface GeneratedImage {
+  url: string;
+  width: number;
+  height: number;
+  output_format?: string;
+}
+
 const GeneratedImages = () => {
   const images = useGenerateStore((state) => state.images);
   const loading = useGenerateStore((state) => state.loading);
 
-  const handleDownload = (image: any) => {
+  const handleDownload = (image: GeneratedImage) => {
     const fileExtension = image?.output_format?.toLowerCase() || 'png';
     fetch(image.url)
       .then((response) => response.blob())

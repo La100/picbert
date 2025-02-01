@@ -65,8 +65,8 @@ const Configurations = () => {
           prompt: values.prompt,
           num_images: 1,
           aspect_ratio: values.aspect_ratio,
-          raw: values.raw,
-          safety_tolerance:4
+          raw: true,
+        
         },
         logs: true,
       });
@@ -83,7 +83,7 @@ const Configurations = () => {
         safety_checker:true,
         prompt: values.prompt,
         aspect_ratio: values.aspect_ratio,
-        raw: values.raw,
+   
       }];
 
       await generateImage({

@@ -10,12 +10,18 @@ interface Video {
   duration: "5" | "10";
 }
 
+interface VideoGenerateData {
+  data: {
+    video: Video;
+  };
+}
+
 interface VideoGenerateStore {
   videos: Video[];
   loading: boolean;
   error: string | null;
   setLoading: (loading: boolean) => void;
-  generateVideo: (data: any) => Promise<void>;
+  generateVideo: (data: VideoGenerateData) => Promise<void>;
 }
 
 const useVideoGenerateStore = create<VideoGenerateStore>((set) => ({

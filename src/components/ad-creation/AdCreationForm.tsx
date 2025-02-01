@@ -24,12 +24,16 @@ import * as z from "zod";
 import VideoSelector from "./VideoSelector";
 import { getVideos } from "@/app/actions/video-actions";
 import { Tables } from "@database.types";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const formSchema = z.object({
   videoId: z.string({
     required_error: "Please select a video",
   }),
-  text: z.string().max(150, "Text must be less than 150 characters"),
+  text: z.string().max(90, "Text must be less than 90 characters"),
+  textPosition: z.enum(['top', 'middle', 'bottom'], {
+    required_error: "Please select text position",
+  }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -39,7 +43,7 @@ type VideoProps = {
 } & Tables<"generated_videos">;
 
 interface AdCreationFormProps {
-  onPreview: (values: { videoId: string; text: string }) => void;
+  onPreview: (values: { videoId: string; text: string; textPosition: 'top' | 'middle' | 'bottom' }) => void;
 }
 
 export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
@@ -60,6 +64,7 @@ export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
     defaultValues: {
       videoId: "",
       text: "",
+      textPosition: "bottom",
     },
   });
 
@@ -69,7 +74,8 @@ export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
       const selectedVideo = videos.find(v => v.id.toString() === value.videoId);
       onPreview({
         videoId: selectedVideo?.url || "",
-        text: value.text || ""
+        text: value.text || "",
+        textPosition: value.textPosition || "bottom"
       });
     });
     return () => subscription.unsubscribe();
@@ -128,17 +134,70 @@ export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
                         <Info className="w-4 h-4" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Add text that will appear over your video</p>
+                        <p>Add text that will appear over your video (max 90 characters)</p>
                       </TooltipContent>
                     </Tooltip>
                   </FormLabel>
                   <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Enter text to display over your video..."
-                      className="resize-none"
-                      rows={4}
-                    />
+                    <div className="relative">
+                      <Textarea
+                        {...field}
+                        placeholder="Enter text to display over your video..."
+                        className="resize-none"
+                        rows={4}
+                        maxLength={90}
+                      />
+                      <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+                        {field.value?.length || 0}/90
+                      </div>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="textPosition"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    Text Position{" "}
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="w-4 h-4" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Choose where to display the text on the video</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      className="flex gap-4"
+                    >
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <RadioGroupItem value="top" />
+                        </FormControl>
+                        <FormLabel className="font-normal cursor-pointer">Top</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <RadioGroupItem value="middle" />
+                        </FormControl>
+                        <FormLabel className="font-normal cursor-pointer">Middle</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <RadioGroupItem value="bottom" />
+                        </FormControl>
+                        <FormLabel className="font-normal cursor-pointer">Bottom</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

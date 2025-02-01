@@ -6,7 +6,7 @@ import { revalidateTag } from "next/cache";
 import { getCredits } from "./credit-actions";
 import { createClient } from "@/lib/supabase/server";
 import { createClientWithOptions } from "@/lib/supabase/server-fetch";
-import { supabaseAdmin } from "@/lib/supabase/admin";
+
 
 interface VideoResponse {
   error: string | null;
@@ -90,7 +90,7 @@ export async function storeVideo(
     return {
       error: null,
       success: true,
-      data: dbData,
+      data: dbData[0] || null,
     };
   } catch (error) {
     return {

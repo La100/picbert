@@ -33,7 +33,7 @@ import {
 } from "../ui/select";
 import { createClient } from "@/lib/supabase/client";
 import { GalleryImagePicker } from "../gallery/GalleryImagePicker";
-
+import Image from "next/image";
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
   input_image: z.string().min(1, { message: "Input image is required" }),
@@ -71,7 +71,7 @@ const VideoConfigurations = () => {
       const fileName = `${Date.now()}_${file.name}`;
       const filePath = `${user.id}/${fileName}`;
 
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError} = await supabase.storage
         .from("input_images")
         .upload(filePath, file, {
           cacheControl: "3600",
@@ -180,7 +180,7 @@ const VideoConfigurations = () => {
                   </div>
                   {field.value && (
                     <div className="mt-2">
-                      <img 
+                      <Image
                         src={field.value} 
                         alt="Selected input" 
                         className="max-h-[200px] rounded-md object-contain"

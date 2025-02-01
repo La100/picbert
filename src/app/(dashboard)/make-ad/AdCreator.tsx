@@ -6,12 +6,14 @@ import { useState } from "react";
 interface PreviewData {
   videoId: string;
   text: string;
+  textPosition: 'top' | 'middle' | 'bottom';
 }
 
 export default function AdCreator() {
   const [preview, setPreview] = useState<PreviewData>({
     videoId: "",
     text: "",
+    textPosition: 'bottom'
   });
 
   return (
@@ -32,9 +34,9 @@ export default function AdCreator() {
           <h2 className="text-2xl font-semibold mb-6 self-start">Live Preview</h2>
           
           {/* Phone Frame */}
-          <div className="relative w-[280px] h-[560px] bg-black rounded-[3rem] p-3 shadow-2xl">
+          <div className="relative w-[280px] h-[560px] bg-black rounded-[2.5rem] p-2 shadow-2xl">
             {/* Screen Content */}
-            <div className="relative w-full h-full bg-background rounded-[2.5rem] overflow-hidden">
+            <div className="relative w-full h-full bg-background rounded-[2.2rem] overflow-hidden">
               {/* Video Content */}
               <div className="absolute inset-0">
                 {preview.videoId ? (
@@ -53,24 +55,22 @@ export default function AdCreator() {
                   </div>
                 )}
 
-                {/* Story Progress Bar */}
-                <div className="absolute inset-x-0 top-4 px-4 z-10">
-                  <div className="w-full h-1 bg-white/30 rounded-full">
-                    <div className="w-1/3 h-full bg-white rounded-full"></div>
-                  </div>
-                </div>
-
                 {/* Text Overlay */}
                 {preview.text && (
-                  <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
-                    <p className="text-white text-center text-lg font-medium">{preview.text}</p>
+                  <div 
+                    className={`absolute inset-x-0 p-6 ${
+                      preview.textPosition === 'top' ? 'top-0' :
+                      preview.textPosition === 'middle' ? 'top-1/2 -translate-y-1/2' :
+                      'bottom-0'
+                    }`}
+                  >
+                    <p className="text-white text-center text-lg font-medium [text-shadow:_0_1px_2px_rgb(0_0_0_/_0.9),_0_0_4px_rgb(0_0_0_/_0.4)]">
+                      {preview.text}
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-            
-            {/* Phone Details */}
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 w-16 h-4 bg-black rounded-full"></div>
           </div>
         </div>
       </div>
