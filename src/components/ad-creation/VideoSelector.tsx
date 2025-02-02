@@ -3,43 +3,32 @@
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Tables } from "@database.types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ugcVideos } from "@/data/ugc-videos";
 
-type VideoProps = {
-  url: string | undefined;
-} & Tables<"generated_videos">;
-
 interface VideoSelectorProps {
-  videos: VideoProps[];
+  videos: { url: string }[];
   selectedVideo: string | null;
-  onSelect: (videoId: string) => void;
+  onSelect: (url: string) => void;
 }
 
 export default function VideoSelector({ videos, selectedVideo, onSelect }: VideoSelectorProps) {
   const [activeTab, setActiveTab] = useState<"user" | "ugc">("ugc");
 
-  const handleVideoSelect = (videoId: string) => {
-    onSelect(videoId);
-  };
-
-  type VideoItem = VideoProps | typeof ugcVideos[0];
-
-  const renderVideoGrid = (items: VideoItem[]) => (
+  const renderVideoGrid = (items: string[]) => (
     <div className="grid grid-cols-3 gap-2">
-      {items.map((video) => (
+      {items.map((url, index) => (
         <Card
-          key={video.id}
+          key={index}
           className={cn(
             "relative aspect-[9/16] cursor-pointer overflow-hidden group hover:ring-2 hover:ring-primary transition-all",
-            selectedVideo === video.id.toString() && "ring-2 ring-primary"
+            selectedVideo === url && "ring-2 ring-primary"
           )}
-          onClick={() => handleVideoSelect(video.id.toString())}
+          onClick={() => onSelect(url)}
         >
           {/* Video Preview */}
           <video
-            src={video.url}
+            src={url}
             className="absolute inset-0 w-full h-full object-cover"
             loop
             muted
@@ -77,7 +66,7 @@ export default function VideoSelector({ videos, selectedVideo, onSelect }: Video
 
       <TabsContent value="user" className="p-2 rounded-lg border bg-background max-h-[560px] overflow-y-auto">
         {videos.length > 0 ? (
-          renderVideoGrid(videos)
+          renderVideoGrid(videos.map(v => v.url))
         ) : (
           <div className="text-center py-8 text-muted-foreground">
             No videos generated yet

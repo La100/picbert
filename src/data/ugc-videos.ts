@@ -1,11 +1,5 @@
 export const ugcVideos = [
-  {
-    id: "1",
-    url: "https://example.com/video1.mp4",
-  },
-  {
-    id: "2",
-    url: "https://example.com/video2.mp4",
-  },
+  "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/sign/generated_videos/52438510-0f89-4693-a960-7a267d2b12a1/video_f89d8905-81e0-4bea-8143-20c264dff0ca.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJnZW5lcmF0ZWRfdmlkZW9zLzUyNDM4NTEwLTBmODktNDY5My1hOTYwLTdhMjY3ZDJiMTJhMS92aWRlb19mODlkODkwNS04MWUwLTRiZWEtODE0My0yMGMyNjRkZmYwY2EubXA0IiwiaWF0IjoxNzM4NTE0ODQzLCJleHAiOjE3Mzg1MTg0NDN9.K73l9JY3WtVajcvQa-0nkZXv1BiSzaBp3ylw3OSvKYg",
+  "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/sign/generated_videos/52438510-0f89-4693-a960-7a267d2b12a1/video_f89d8905-81e0-4bea-8143-20c264dff0ca.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJnZW5lcmF0ZWRfdmlkZW9zLzUyNDM4NTEwLTBmODktNDY5My1hOTYwLTdhMjY3ZDJiMTJhMS92aWRlb19mODlkODkwNS04MWUwLTRiZWEtODE0My0yMGMyNjRkZmYwY2EubXA0IiwiaWF0IjoxNzM4NTE0ODQzLCJleHAiOjE3Mzg1MTg0NDN9.K73l9JY3WtVajcvQa-0nkZXv1BiSzaBp3ylw3OSvKYg",
   // Tutaj dodaj swoje linki do filmów
 ]; 

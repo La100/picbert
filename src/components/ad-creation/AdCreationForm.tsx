@@ -23,13 +23,13 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import VideoSelector from "./VideoSelector";
 import { getVideos } from "@/app/actions/video-actions";
-import { Tables } from "@database.types";
+
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const formSchema = z.object({
   videoId: z.string({
     required_error: "Please select a video",
-  }),
+  }).url("Please select a valid video"),
   text: z.string().max(90, "Text must be less than 90 characters"),
   textPosition: z.enum(['top', 'middle', 'bottom'], {
     required_error: "Please select text position",
@@ -39,8 +39,8 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 type VideoProps = {
-  url: string | undefined;
-} & Tables<"generated_videos">;
+  url: string;
+};
 
 interface AdCreationFormProps {
   onPreview: (values: { videoId: string; text: string; textPosition: 'top' | 'middle' | 'bottom' }) => void;
@@ -53,7 +53,8 @@ export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
     const loadVideos = async () => {
       const response = await getVideos();
       if (response.success && response.data) {
-        setVideos(response.data);
+        // Convert to simpler format with just URLs
+        setVideos(response.data.map(video => ({ url: video.url || "" })));
       }
     };
     loadVideos();
@@ -71,15 +72,16 @@ export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
   // Update preview in real-time as form values change
   React.useEffect(() => {
     const subscription = form.watch((value) => {
-      const selectedVideo = videos.find(v => v.id.toString() === value.videoId);
+      if (!value.videoId) return;
+
       onPreview({
-        videoId: selectedVideo?.url || "",
+        videoId: value.videoId, // videoId is now the URL directly
         text: value.text || "",
         textPosition: value.textPosition || "bottom"
       });
     });
     return () => subscription.unsubscribe();
-  }, [form, onPreview, videos]);
+  }, [form, onPreview]);
 
   async function onSubmit(values: FormValues) {
     console.log(values);

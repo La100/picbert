@@ -63,7 +63,7 @@ const Configurations = () => {
       const output = await fal.subscribe("fal-ai/flux-pro/v1.1-ultra", {
         input: {
           prompt: values.prompt,
-          num_images: 1,
+   
           aspect_ratio: values.aspect_ratio,
           raw: true,
         
