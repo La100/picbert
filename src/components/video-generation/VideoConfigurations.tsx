@@ -33,7 +33,7 @@ import {
 } from "../ui/select";
 import { createClient } from "@/lib/supabase/client";
 import { GalleryImagePicker } from "../gallery/GalleryImagePicker";
-import Image from "next/image";
+
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
   input_image: z.string().min(1, { message: "Input image is required" }),
@@ -57,7 +57,7 @@ const VideoConfigurations = () => {
     defaultValues: {
       prompt: "",
       input_image: "",
-      aspect_ratio: "16:9",
+      aspect_ratio: "9:16",
       duration: "5",
     },
   });
@@ -133,7 +133,7 @@ const VideoConfigurations = () => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="grid w-full items-start gap-6"
+          className="grid w-full items-start gap-6 pt-20"
         >
           <fieldset className="grid gap-6 rounded-lg border p-4 bg-background">
             <legend className="-ml-1 px-1 text-sm font-medium">Settings</legend>
@@ -180,7 +180,7 @@ const VideoConfigurations = () => {
                   </div>
                   {field.value && (
                     <div className="mt-2">
-                      <Image
+                      <img
                         src={field.value} 
                         alt="Selected input" 
                         className="max-h-[200px] rounded-md object-contain"
@@ -215,9 +215,9 @@ const VideoConfigurations = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="16:9">16:9</SelectItem>
-                      <SelectItem value="9:16">9:16</SelectItem>
-                      <SelectItem value="1:1">1:1</SelectItem>
+                      <SelectItem value="16:9">Landscape</SelectItem>
+                      <SelectItem value="9:16">Mobile</SelectItem>
+                      <SelectItem value="1:1">Square</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

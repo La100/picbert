@@ -1,9 +1,7 @@
 import * as React from "react"
 import {
-  CreditCard,
   Image,
   Images,
-  Settings2,
   Sparkles,
   SquareTerminal,
   Megaphone,
@@ -42,7 +40,7 @@ const navMain =  [
       icon: Video,
     },
     {
-      title: "My Images",
+      title: "Gallery",
       url: "/gallery",
       icon: Images,
     },
@@ -51,16 +49,7 @@ const navMain =  [
       url: "/make-ad",
       icon: Megaphone,
     },
-    {
-      title: "Billing",
-      url: "/billing",
-      icon: CreditCard,
-    },
-    {
-      title: "Settings",
-      url: "/account-settings",
-      icon: Settings2,
-    },
+
   ]
 
 export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
