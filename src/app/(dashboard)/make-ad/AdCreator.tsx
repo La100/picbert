@@ -103,13 +103,8 @@ export default function AdCreator() {
                     )}
                   </div>
                 ) : (
-                  <div className="w-full h-full bg-muted flex flex-col items-center justify-center gap-2">
-                    <div className="w-16 h-16 rounded-full bg-muted-foreground/10 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
-                        <path d="m7 4 10 8-10 8V4Z"/>
-                      </svg>
-                    </div>
-                    <p className="text-muted-foreground text-sm font-medium">Wybierz wideo do podglądu</p>
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <p className="text-muted-foreground">Select a video to preview</p>
                   </div>
                 )}
 
