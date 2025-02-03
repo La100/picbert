@@ -1,20 +1,59 @@
 "use client";
 
 import AdCreationForm from "@/components/ad-creation/AdCreationForm"
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface PreviewData {
   videoId: string;
-  text: string;
-  textPosition: 'top' | 'middle' | 'bottom';
+  clientVideoId: string;
+  ugcText: string;
+  clientText: string;
+  ugcTextPosition: 'top' | 'middle' | 'bottom';
+  clientTextPosition: 'top' | 'middle' | 'bottom';
 }
 
 export default function AdCreator() {
   const [preview, setPreview] = useState<PreviewData>({
     videoId: "",
-    text: "",
-    textPosition: 'bottom'
+    clientVideoId: "",
+    ugcText: "",
+    clientText: "",
+    ugcTextPosition: 'bottom',
+    clientTextPosition: 'bottom'
   });
+
+  const firstVideoRef = useRef<HTMLVideoElement>(null);
+  const secondVideoRef = useRef<HTMLVideoElement>(null);
+  const [isShowingFirstVideo, setIsShowingFirstVideo] = useState(true);
+
+  // Handle video sequence
+  useEffect(() => {
+    const firstVideo = firstVideoRef.current;
+    const secondVideo = secondVideoRef.current;
+
+    if (firstVideo && secondVideo) {
+      // When first video ends, play second video if it exists
+      firstVideo.onended = () => {
+        if (preview.clientVideoId) {
+          firstVideo.style.display = 'none';
+          secondVideo.style.display = 'block';
+          secondVideo.play();
+          setIsShowingFirstVideo(false);
+        } else {
+          // If no second video, replay first video
+          firstVideo.play();
+        }
+      };
+
+      // When second video ends, go back to first video
+      secondVideo.onended = () => {
+        secondVideo.style.display = 'none';
+        firstVideo.style.display = 'block';
+        firstVideo.play();
+        setIsShowingFirstVideo(true);
+      };
+    }
+  }, [preview.videoId, preview.clientVideoId]);
 
   return (
     <div className="container mx-auto py-8">
@@ -40,15 +79,29 @@ export default function AdCreator() {
               {/* Video Content */}
               <div className="absolute inset-0">
                 {preview.videoId ? (
-                  <video
-                    key={preview.videoId}
-                    src={preview.videoId}
-                    className="w-full h-full object-cover"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                  />
+                  <div className="relative w-full h-full">
+                    {/* First Video (UGC) */}
+                    <video
+                      ref={firstVideoRef}
+                      key={`ugc-${preview.videoId}`}
+                      src={preview.videoId}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      playsInline
+                    />
+                    {/* Second Video (Client) - Only render if exists */}
+                    {preview.clientVideoId && (
+                      <video
+                        ref={secondVideoRef}
+                        key={`client-${preview.clientVideoId}`}
+                        src={preview.clientVideoId}
+                        className="absolute inset-0 w-full h-full object-cover hidden"
+                        muted
+                        playsInline
+                      />
+                    )}
+                  </div>
                 ) : (
                   <div className="w-full h-full bg-muted flex items-center justify-center">
                     <p className="text-muted-foreground">Select a video to preview</p>
@@ -56,18 +109,34 @@ export default function AdCreator() {
                 )}
 
                 {/* Text Overlay */}
-                {preview.text && (
-                  <div 
-                    className={`absolute inset-x-0 p-6 ${
-                      preview.textPosition === 'top' ? 'top-0' :
-                      preview.textPosition === 'middle' ? 'top-1/2 -translate-y-1/2' :
-                      'bottom-0'
-                    }`}
-                  >
-                    <p className="text-white text-center text-lg font-medium [text-shadow:_0_1px_2px_rgb(0_0_0_/_0.9),_0_0_4px_rgb(0_0_0_/_0.4)]">
-                      {preview.text}
-                    </p>
-                  </div>
+                {isShowingFirstVideo ? (
+                  preview.ugcText && (
+                    <div 
+                      className={`absolute inset-x-0 p-6 ${
+                        preview.ugcTextPosition === 'top' ? 'top-0' :
+                        preview.ugcTextPosition === 'middle' ? 'top-1/2 -translate-y-1/2' :
+                        'bottom-0'
+                      }`}
+                    >
+                      <p className="text-white text-center text-lg font-medium [text-shadow:_0_1px_2px_rgb(0_0_0_/_0.9),_0_0_4px_rgb(0_0_0_/_0.4)]">
+                        {preview.ugcText}
+                      </p>
+                    </div>
+                  )
+                ) : (
+                  preview.clientText && (
+                    <div 
+                      className={`absolute inset-x-0 p-6 ${
+                        preview.clientTextPosition === 'top' ? 'top-0' :
+                        preview.clientTextPosition === 'middle' ? 'top-1/2 -translate-y-1/2' :
+                        'bottom-0'
+                      }`}
+                    >
+                      <p className="text-white text-center text-lg font-medium [text-shadow:_0_1px_2px_rgb(0_0_0_/_0.9),_0_0_4px_rgb(0_0_0_/_0.4)]">
+                        {preview.clientText}
+                      </p>
+                    </div>
+                  )
                 )}
               </div>
             </div>

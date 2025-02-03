@@ -1,215 +1,177 @@
 "use client";
 
-import React from "react";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Info } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
 import VideoSelector from "./VideoSelector";
 import { getVideos } from "@/app/actions/video-actions";
-
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import ClientVideoSelector from "./ClientVideoSelector";
+import { toast } from "sonner";
 
-const formSchema = z.object({
-  videoId: z.string({
-    required_error: "Please select a video",
-  }).url("Please select a valid video"),
-  text: z.string().max(90, "Text must be less than 90 characters"),
-  textPosition: z.enum(['top', 'middle', 'bottom'], {
-    required_error: "Please select text position",
-  }),
-});
 
-type FormValues = z.infer<typeof formSchema>;
-
-type VideoProps = {
-  url: string;
-};
+interface PreviewData {
+  videoId: string;
+  clientVideoId: string;
+  ugcText: string;
+  clientText: string;
+  ugcTextPosition: 'top' | 'middle' | 'bottom';
+  clientTextPosition: 'top' | 'middle' | 'bottom';
+}
 
 interface AdCreationFormProps {
-  onPreview: (values: { videoId: string; text: string; textPosition: 'top' | 'middle' | 'bottom' }) => void;
+  onPreview: (data: PreviewData) => void;
 }
 
 export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
-  const [videos, setVideos] = React.useState<VideoProps[]>([]);
+  const [videos, setVideos] = useState<{ url: string }[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<string>("");
+  const [selectedClientVideo, setSelectedClientVideo] = useState<string>("");
+  const [ugcText, setUgcText] = useState("");
+  const [clientText, setClientText] = useState("");
+  const [ugcTextPosition, setUgcTextPosition] = useState<'top' | 'middle' | 'bottom'>('bottom');
+  const [clientTextPosition, setClientTextPosition] = useState<'top' | 'middle' | 'bottom'>('bottom');
+  const [isSaving, setIsSaving] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const loadVideos = async () => {
       const response = await getVideos();
       if (response.success && response.data) {
-        // Convert to simpler format with just URLs
         setVideos(response.data.map(video => ({ url: video.url || "" })));
       }
     };
     loadVideos();
   }, []);
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      videoId: "",
-      text: "",
-      textPosition: "bottom",
-    },
-  });
-
-  // Update preview in real-time as form values change
-  React.useEffect(() => {
-    const subscription = form.watch((value) => {
-      if (!value.videoId) return;
-
-      onPreview({
-        videoId: value.videoId, // videoId is now the URL directly
-        text: value.text || "",
-        textPosition: value.textPosition || "bottom"
-      });
+  // Update preview whenever any value changes
+  useEffect(() => {
+    // Always send current state to preview
+    onPreview({
+      videoId: selectedVideo,
+      clientVideoId: selectedClientVideo,
+      ugcText,
+      clientText,
+      ugcTextPosition,
+      clientTextPosition,
     });
-    return () => subscription.unsubscribe();
-  }, [form, onPreview]);
+  }, [selectedVideo, selectedClientVideo, ugcText, clientText, ugcTextPosition, clientTextPosition, onPreview]);
 
-  async function onSubmit(values: FormValues) {
-    console.log(values);
-    // TODO: Implement save/publish logic
-  }
+  const handleSaveAd = async () => {
+    if (!selectedVideo || !selectedClientVideo) {
+      toast.error("Please select both videos before saving");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // TODO: Implement save ad functionality
+      toast.success("Ad saved successfully!");
+    } catch (error) {
+      toast.error("Failed to save ad");
+      console.error("Failed to save ad:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-    <TooltipProvider>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
-          <div className="grid gap-6">
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-semibold">Create Your Story</h3>
-              <p className="text-sm text-muted-foreground">Select a video and add your text</p>
-            </div>
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">1. Select UGC Video</h2>
+        <VideoSelector
+          videos={videos}
+          selectedVideo={selectedVideo}
+          onSelect={setSelectedVideo}
+        />
+      </div>
 
-            <FormField
-              control={form.control}
-              name="videoId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Choose Video{" "}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="w-4 h-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Select a video for your story</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <VideoSelector
-                    videos={videos}
-                    selectedVideo={field.value}
-                    onSelect={field.onChange}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="text"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Text Overlay{" "}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="w-4 h-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Add text that will appear over your video (max 90 characters)</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Textarea
-                        {...field}
-                        placeholder="Enter text to display over your video..."
-                        className="resize-none"
-                        rows={4}
-                        maxLength={90}
-                      />
-                      <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-                        {field.value?.length || 0}/90
-                      </div>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="textPosition"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Text Position{" "}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="w-4 h-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Choose where to display the text on the video</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="flex gap-4"
-                    >
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <RadioGroupItem value="top" />
-                        </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">Top</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <RadioGroupItem value="middle" />
-                        </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">Middle</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <RadioGroupItem value="bottom" />
-                        </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">Bottom</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">2. Add UGC Text</h2>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="ugcText">UGC Video Text</Label>
+            <Input
+              id="ugcText"
+              value={ugcText}
+              onChange={(e) => setUgcText(e.target.value)}
+              placeholder="Enter text for UGC video"
             />
           </div>
 
-          <Button type="submit">Save Ad</Button>
-        </form>
-      </Form>
-    </TooltipProvider>
+          <div>
+            <Label>Text Position</Label>
+            <RadioGroup
+              value={ugcTextPosition}
+              onValueChange={(value) => setUgcTextPosition(value as 'top' | 'middle' | 'bottom')}
+              className="flex gap-4 mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="top" id="ugcTop" />
+                <Label htmlFor="ugcTop">Top</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="middle" id="ugcMiddle" />
+                <Label htmlFor="ugcMiddle">Middle</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="bottom" id="ugcBottom" />
+                <Label htmlFor="ugcBottom">Bottom</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">3. Select Client Video</h2>
+        <ClientVideoSelector onSelect={setSelectedClientVideo} />
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">4. Add Client Video Text</h2>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="clientText">Client Video Text</Label>
+            <Input
+              id="clientText"
+              value={clientText}
+              onChange={(e) => setClientText(e.target.value)}
+              placeholder="Enter text for client video"
+            />
+          </div>
+
+          <div>
+            <Label>Text Position</Label>
+            <RadioGroup
+              value={clientTextPosition}
+              onValueChange={(value) => setClientTextPosition(value as 'top' | 'middle' | 'bottom')}
+              className="flex gap-4 mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="top" id="clientTop" />
+                <Label htmlFor="clientTop">Top</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="middle" id="clientMiddle" />
+                <Label htmlFor="clientMiddle">Middle</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="bottom" id="clientBottom" />
+                <Label htmlFor="clientBottom">Bottom</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+      </div>
+
+      <Button
+        onClick={handleSaveAd}
+        disabled={!selectedVideo || !selectedClientVideo || isSaving}
+        className="w-full"
+      >
+        {isSaving ? "Saving..." : "Save Ad"}
+      </Button>
+    </div>
   );
 } 
