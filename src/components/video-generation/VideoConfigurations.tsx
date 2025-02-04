@@ -31,7 +31,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { createClient } from "@/lib/supabase/client";
 import { GalleryImagePicker } from "../gallery/GalleryImagePicker";
 
 const formSchema = z.object({
@@ -51,6 +50,7 @@ const VideoConfigurations = () => {
   const generateVideo = useVideoGenerateStore((state) => state.generateVideo);
   const loading = useVideoGenerateStore((state) => state.loading);
   const setLoading = useVideoGenerateStore((state) => state.setLoading);
+  const [isUploading, setIsUploading] = React.useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -64,38 +64,23 @@ const VideoConfigurations = () => {
 
   const handleFileUpload = useCallback(async (file: File) => {
     try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Unauthorized");
-
-      const fileName = `${Date.now()}_${file.name}`;
-      const filePath = `${user.id}/${fileName}`;
-
-      const { error: uploadError} = await supabase.storage
-        .from("input_images")
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data: urlData } = await supabase.storage
-        .from("input_images")
-        .createSignedUrl(filePath, 3600);
-
-      if (!urlData?.signedUrl) throw new Error("Failed to get signed URL");
-
-      form.setValue("input_image", urlData.signedUrl);
+      setIsUploading(true);
+      const url = await fal.storage.upload(file);
+      form.setValue("input_image", url);
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploading(false);
     }
   }, [form]);
 
   async function onSubmit(values: FormValues) {
     try {
       setLoading(true);
+      toast.info("Starting video generation. This process takes around 5 minutes...", {
+        duration: 10000,
+      });
       const output = await fal.subscribe("fal-ai/kling-video/v1.6/pro/image-to-video", {
         input: {
           prompt: values.prompt,
@@ -150,13 +135,13 @@ const VideoConfigurations = () => {
                         <Info className="w-4 h-4" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Upload an image, provide a URL, or select from gallery</p>
+                        <p>Upload an image or select from gallery</p>
                       </TooltipContent>
                     </Tooltip>
                   </FormLabel>
                   <div className="flex gap-2">
                     <FormControl>
-                      <Input {...field} placeholder="Image URL" />
+                      <Input {...field} type="hidden" />
                     </FormControl>
                     <Input
                       type="file"
@@ -167,16 +152,29 @@ const VideoConfigurations = () => {
                         const file = e.target.files?.[0];
                         if (file) handleFileUpload(file);
                       }}
+                      disabled={isUploading}
                     />
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() => document.getElementById("image-upload")?.click()}
+                      disabled={isUploading}
                     >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload
+                      {isUploading ? (
+                        <>
+                          <span className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-primary border-r-transparent" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Upload
+                        </>
+                      )}
                     </Button>
-                    <GalleryImagePicker onImageSelect={(imageUrl) => form.setValue("input_image", imageUrl)} />
+                    <GalleryImagePicker 
+                      onImageSelect={(imageUrl) => !isUploading && form.setValue("input_image", imageUrl)} 
+                    />
                   </div>
                   {field.value && (
                     <div className="mt-2">
@@ -281,9 +279,15 @@ const VideoConfigurations = () => {
               )}
             />
 
-            <Button type="submit" disabled={loading} className="font-medium">
-              {loading ? "Generating..." : "Generate"}
-            </Button>
+            <div className="space-y-2">
+              <Button type="submit" disabled={loading} className="w-full font-medium">
+                {loading ? "Generating..." : "Generate"}
+              </Button>
+              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Info className="w-4 h-4" />
+                <span>Video generation takes around 5 minutes</span>
+              </div>
+            </div>
           </fieldset>
         </form>
       </Form>
