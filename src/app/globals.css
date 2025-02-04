@@ -127,7 +127,3 @@ body {
   padding: 0;
   overflow-x: hidden;
 }
-input,
-textarea {
-  font-size: 36px; /* iOS won't zoom if at least 16px */
-}
