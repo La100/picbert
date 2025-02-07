@@ -15,30 +15,32 @@ interface VideoSelectorProps {
 export default function VideoSelector({ videos, selectedVideo, onSelect }: VideoSelectorProps) {
   const [activeTab, setActiveTab] = useState<"user" | "ugc">("ugc");
 
-  const renderVideoGrid = (items: string[]) => (
+  const renderVideoGrid = (items: { url: string }[]) => (
     <div className="grid grid-cols-3 gap-2">
-      {items.map((url, index) => (
+      {items.map((video, index) => (
         <Card
           key={index}
           className={cn(
             "relative aspect-[9/16] cursor-pointer overflow-hidden group hover:ring-2 hover:ring-primary transition-all",
-            selectedVideo === url && "ring-2 ring-primary"
+            selectedVideo === video.url && "ring-2 ring-primary"
           )}
-          onClick={() => onSelect(url)}
+          onClick={() => onSelect(video.url)}
         >
           {/* Video Preview */}
-          <video
-            src={url}
-            className="absolute inset-0 w-full h-full object-cover"
-            loop
-            muted
-            playsInline
-            onMouseEnter={(e) => e.currentTarget.play()}
-            onMouseLeave={(e) => {
-              e.currentTarget.pause();
-              e.currentTarget.currentTime = 0;
-            }}
-          />
+          <div className="absolute inset-0">
+            <video
+              src={video.url}
+              className="absolute inset-0 w-full h-full object-cover"
+              muted
+              playsInline
+              preload="metadata"
+              onMouseEnter={(e) => e.currentTarget.play()}
+              onMouseLeave={(e) => {
+                e.currentTarget.pause();
+                e.currentTarget.currentTime = 0;
+              }}
+            />
+          </div>
           
           {/* Hover Overlay */}
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -66,7 +68,7 @@ export default function VideoSelector({ videos, selectedVideo, onSelect }: Video
 
       <TabsContent value="user" className="p-2 rounded-lg border bg-background max-h-[560px] overflow-y-auto">
         {videos.length > 0 ? (
-          renderVideoGrid(videos.map(v => v.url))
+          renderVideoGrid(videos)
         ) : (
           <div className="text-center py-8 text-muted-foreground">
             No videos generated yet

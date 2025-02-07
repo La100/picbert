@@ -1,5 +1,15 @@
-export const ugcVideos = [
-  "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/sign/generated_videos/52438510-0f89-4693-a960-7a267d2b12a1/video_f89d8905-81e0-4bea-8143-20c264dff0ca.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJnZW5lcmF0ZWRfdmlkZW9zLzUyNDM4NTEwLTBmODktNDY5My1hOTYwLTdhMjY3ZDJiMTJhMS92aWRlb19mODlkODkwNS04MWUwLTRiZWEtODE0My0yMGMyNjRkZmYwY2EubXA0IiwiaWF0IjoxNzM4NTE0ODQzLCJleHAiOjE3Mzg1MTg0NDN9.K73l9JY3WtVajcvQa-0nkZXv1BiSzaBp3ylw3OSvKYg",
-  "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/sign/generated_videos/52438510-0f89-4693-a960-7a267d2b12a1/video_f89d8905-81e0-4bea-8143-20c264dff0ca.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJnZW5lcmF0ZWRfdmlkZW9zLzUyNDM4NTEwLTBmODktNDY5My1hOTYwLTdhMjY3ZDJiMTJhMS92aWRlb19mODlkODkwNS04MWUwLTRiZWEtODE0My0yMGMyNjRkZmYwY2EubXA0IiwiaWF0IjoxNzM4NTE0ODQzLCJleHAiOjE3Mzg1MTg0NDN9.K73l9JY3WtVajcvQa-0nkZXv1BiSzaBp3ylw3OSvKYg",
-  // Tutaj dodaj swoje linki do filmów
+interface UgcVideo {
+  url: string;
+  cloudinaryPublicId: string;
+}
+
+export const ugcVideos: UgcVideo[] = [
+  {
+    url: "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/generated_videos/52438510-0f89-4693-a960-7a267d2b12a1/video_c8644518-dc46-4b33-b2fa-d1dc1e7ed73c.mp4",
+    cloudinaryPublicId: "ugc/video_c8644518-dc46-4b33-b2fa-d1dc1e7ed73c"
+  },
+  {
+    url: "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/generated_videos/52438510-0f89-4693-a960-7a267d2b12a1/video_e2d7f340-1266-42bc-9b46-fa258fdb5029.mp4",
+    cloudinaryPublicId: "ugc/video_e2d7f340-1266-42bc-9b46-fa258fdb5029"
+  }
 ]; 

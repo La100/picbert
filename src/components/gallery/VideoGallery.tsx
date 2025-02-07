@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { VideoDialog } from "./VideoDialog";
 import { Tables } from "@database.types";
 
@@ -15,29 +15,30 @@ interface VideoGalleryProps {
 export function VideoGallery({ videos }: VideoGalleryProps) {
   const [selectedVideo, setSelectedVideo] = useState<VideoProps | null>(null);
 
-  if (videos.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-[50vh] text-muted-foreground">
-        No videos found
-      </div>
-    );
-  }
+  const handleVideoClick = useCallback((video: VideoProps) => {
+    setSelectedVideo(video);
+  }, []);
 
-  return (
-    <div className="container mx-auto py-8">
-      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+  const memoizedGalleryContent = useMemo(() => {
+    if (videos.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-[50vh] text-muted-foreground">
+          No videos found
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-max">
         {videos.map((video, index) => (
-          <div key={`${video.id}-${index}`} className="break-inside-auto">
+          <div key={`${video.id}-${index}`}>
             <div
-              className="relative group overflow-hidden cursor-pointer transition-transform"
-              onClick={() => setSelectedVideo(video)}
+              className="relative group cursor-pointer"
+              onClick={() => handleVideoClick(video)}
             >
-              {/* Overlay on hover */}
-              <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 group-hover:opacity-70 rounded">
+              <div className="absolute inset-0 bg-black/70 opacity-0 transition-opacity duration-200 group-hover:opacity-100 rounded z-10">
                 <div className="flex items-center justify-center h-full">
-                  <p className="text-white text-lg font-semibold">
-                    View Details
-                  </p>
+                  <p className="text-white text-lg font-semibold">View Details</p>
                 </div>
               </div>
               <video
@@ -49,7 +50,8 @@ export function VideoGallery({ videos }: VideoGalleryProps) {
                 }`}
                 muted
                 playsInline
-                onMouseOver={(e) => e.currentTarget.play()}
+                preload="metadata"
+                onMouseEnter={(e) => e.currentTarget.play()}
                 onMouseOut={(e) => {
                   e.currentTarget.pause();
                   e.currentTarget.currentTime = 0;
@@ -59,7 +61,12 @@ export function VideoGallery({ videos }: VideoGalleryProps) {
           </div>
         ))}
       </div>
+    );
+  }, [videos, handleVideoClick]);
 
+  return (
+    <div className="container mx-auto py-8">
+      {memoizedGalleryContent}
       {selectedVideo && (
         <VideoDialog
           video={selectedVideo}

@@ -8,7 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import ClientVideoSelector from "./ClientVideoSelector";
-import { toast } from "sonner";
+// import { toast } from "sonner";
+// import { saveAd } from "@/app/actions/ad-actions";
+import { Save } from "lucide-react";
 
 
 interface PreviewData {
@@ -22,9 +24,10 @@ interface PreviewData {
 
 interface AdCreationFormProps {
   onPreview: (data: PreviewData) => void;
+  onSave: () => void;
 }
 
-export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
+export default function AdCreationForm({ onPreview, onSave }: AdCreationFormProps) {
   const [videos, setVideos] = useState<{ url: string }[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<string>("");
   const [selectedClientVideo, setSelectedClientVideo] = useState<string>("");
@@ -32,7 +35,7 @@ export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
   const [clientText, setClientText] = useState("");
   const [ugcTextPosition, setUgcTextPosition] = useState<'top' | 'middle' | 'bottom'>('bottom');
   const [clientTextPosition, setClientTextPosition] = useState<'top' | 'middle' | 'bottom'>('bottom');
-  const [isSaving, setIsSaving] = useState(false);
+  // const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const loadVideos = async () => {
@@ -57,23 +60,32 @@ export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
     });
   }, [selectedVideo, selectedClientVideo, ugcText, clientText, ugcTextPosition, clientTextPosition, onPreview]);
 
-  const handleSaveAd = async () => {
-    if (!selectedVideo || !selectedClientVideo) {
-      toast.error("Please select both videos before saving");
-      return;
-    }
+  // const handleSaveAd = async () => {
+  //   if (!selectedVideo || !selectedClientVideo) {
+  //     toast.error("Please select both videos before saving");
+  //     return;
+  //   }
 
-    setIsSaving(true);
-    try {
-      // TODO: Implement save ad functionality
-      toast.success("Ad saved successfully!");
-    } catch (error) {
-      toast.error("Failed to save ad");
-      console.error("Failed to save ad:", error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  //   setIsSaving(true);
+  //   try {
+  //     const response = await saveAd({
+  //       ugcVideoUrl: selectedVideo,
+  //       clientVideoUrl: selectedClientVideo,
+    
+  //     });
+
+  //     if (response.error) {
+  //       toast.error(response.error);
+  //     } else {
+  //       toast.success("Ad saved successfully!");
+  //     }
+  //   } catch (error) {
+  //     toast.error("Failed to save ad");
+  //     console.error("Failed to save ad:", error);
+  //   } finally {
+  //     setIsSaving(false);
+  //   }
+  // };
 
   return (
     <div className="space-y-8">
@@ -166,11 +178,12 @@ export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
       </div>
 
       <Button
-        onClick={handleSaveAd}
-        disabled={!selectedVideo || !selectedClientVideo || isSaving}
+        onClick={onSave}
+        disabled={!selectedVideo || !selectedClientVideo}
         className="w-full"
       >
-        {isSaving ? "Saving..." : "Save Ad"}
+        <Save className="w-4 h-4 mr-2" />
+        Create Ad
       </Button>
     </div>
   );

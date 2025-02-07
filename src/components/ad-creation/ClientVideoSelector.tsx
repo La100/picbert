@@ -135,18 +135,22 @@ export default function ClientVideoSelector({ onSelect }: ClientVideoSelectorPro
             )}
             onClick={() => handleSelect(video.url)}
           >
-            <video
-              src={video.url}
-              className="absolute inset-0 w-full h-full object-cover"
-              loop
-              muted
-              playsInline
-              onMouseEnter={(e) => e.currentTarget.play()}
-              onMouseLeave={(e) => {
-                e.currentTarget.pause();
-                e.currentTarget.currentTime = 0;
-              }}
-            />
+            {/* Video Preview */}
+            <div className="absolute inset-0">
+              <video
+                src={video.url}
+                className="absolute inset-0 w-full h-full object-cover"
+                muted
+                playsInline
+                preload="metadata"
+                onMouseEnter={(e) => e.currentTarget.play()}
+                onMouseLeave={(e) => {
+                  e.currentTarget.pause();
+                  e.currentTarget.currentTime = 0;
+                }}
+              />
+            </div>
+            
             {/* Hover Overlay */}
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
               <div className="absolute bottom-2 left-2 right-2">

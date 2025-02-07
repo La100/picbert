@@ -2,9 +2,11 @@ import React from "react";
 import { Gallery } from "@/components/gallery/Gallery";
 import { VideoGallery } from "@/components/gallery/VideoGallery";
 import { ClientVideoGallery } from "@/components/gallery/ClientVideoGallery";
+import { AdGallery } from "@/components/gallery/AdGallery";
 import { getImages } from "@/app/actions/image-actions";
 import { getVideos } from "@/app/actions/video-actions";
 import { getClientVideos } from "@/app/actions/client-video-actions";
+import { getAds } from "@/app/actions/ad-actions";
 import { Metadata } from "next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -19,6 +21,7 @@ export default async function GalleryPage() {
   const { data: images } = await getImages();
   const { data: videos } = await getVideos();
   const { data: clientVideos } = await getClientVideos();
+  const { data: ads } = await getAds();
 
   return (
     <div className="container mx-auto">
@@ -31,7 +34,8 @@ export default async function GalleryPage() {
         <TabsList className="mb-4">
           <TabsTrigger value="images">Images</TabsTrigger>
           <TabsTrigger value="videos">Videos</TabsTrigger>
-          <TabsTrigger value="client-videos">Client Videos</TabsTrigger>
+          <TabsTrigger value="client-videos">Product Videos</TabsTrigger>
+          <TabsTrigger value="ads">Ads</TabsTrigger>
         </TabsList>
         
         <TabsContent value="images">
@@ -44,6 +48,10 @@ export default async function GalleryPage() {
 
         <TabsContent value="client-videos">
           <ClientVideoGallery videos={clientVideos || []} />
+        </TabsContent>
+
+        <TabsContent value="ads">
+          <AdGallery ads={ads || []} />
         </TabsContent>
       </Tabs>
     </div>
