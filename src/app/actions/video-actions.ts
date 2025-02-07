@@ -6,7 +6,6 @@ import { revalidateTag } from "next/cache";
 import { getCredits } from "./credit-actions";
 import { createClient } from "@/lib/supabase/server";
 import { createClientWithOptions } from "@/lib/supabase/server-fetch";
-import { v2 as cloudinary } from 'cloudinary';
 
 
 interface VideoResponse {
@@ -242,97 +241,4 @@ export async function checkAndUpdateVideoCredits(): Promise<{
     credits: credits.data, 
     error: null 
   };
-}
-
-const FOLDER_NAME = "concatenated-videos/";
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-export async function mergeVideos(firstVideoUrl: string, secondVideoUrl: string) {
-  try {
-    // Upload first video
-    const firstVideoUpload = await cloudinary.uploader.upload(firstVideoUrl, {
-      folder: "videos",
-      resource_type: "video",
-      allowed_formats: ["mp4"],
-    });
-
-    // Upload second video
-    const secondVideoUpload = await cloudinary.uploader.upload(secondVideoUrl, {
-      folder: "videos",
-      resource_type: "video",
-      allowed_formats: ["mp4"],
-    });
-
-    // Set uniform resolution for both videos (720p)
-    const width = 1280;
-    const height = 720;
-
-    // Create transformation array for video concatenation
-    const transformation = [
-      { height, width, crop: "pad" },
-      { flags: "splice", overlay: `video:${secondVideoUpload.public_id}` },
-      { height, width, crop: "pad" },
-      { flags: "layer_apply" }
-    ];
-
-    // Upload and merge videos
-    const mergedVideo = await cloudinary.uploader.upload(firstVideoUpload.public_id, {
-      folder: FOLDER_NAME,
-      resource_type: "video",
-      allowed_formats: ["mp4"],
-      transformation,
-    });
-
-    // Clean up individual video uploads
-    await cloudinary.api.delete_resources(
-      [firstVideoUpload.public_id, secondVideoUpload.public_id],
-      { resource_type: "video" }
-    );
-
-    return mergedVideo.secure_url;
-  } catch (error) {
-    console.error('Error merging videos:', error);
-    throw new Error('Failed to merge videos');
-  }
-}
-
-export async function uploadVideo(file: File, userId: string) {
-  const supabase = await createClient();
-  
-  try {
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const fileName = `${userId}/videos/${Date.now()}_${file.name}`;
-
-    // Upload to storage
-    const { error: uploadError } = await supabase.storage
-      .from("videos")
-      .upload(fileName, buffer, {
-        contentType: "video/mp4",
-        cacheControl: "3600",
-        upsert: false,
-      });
-
-    if (uploadError) throw uploadError;
-
-    // Get URL
-    const { data: urlData } = await supabase.storage
-      .from("videos")
-      .createSignedUrl(fileName, 3600 * 24);
-
-    if (!urlData?.signedUrl) {
-      throw new Error('Failed to get video URL');
-    }
-
-    return { url: urlData.signedUrl, path: fileName };
-  } catch (error) {
-    console.error('Upload error:', error);
-    throw error;
-  }
-}
-
+} 
