@@ -8,6 +8,7 @@ interface AdProps {
   id: string;
   ugc_video_url: string;
   client_video_url: string;
+  mergedVideoUrl: string;
   ugc_text: string;
   client_text: string;
   ugc_text_position: 'top' | 'middle' | 'bottom';
@@ -49,7 +50,7 @@ export function AdGallery({ ads }: AdGalleryProps) {
                 </div>
               </div>
               <video
-                src={ad.ugc_video_url}
+                src={ad.mergedVideoUrl}
                 className="w-full aspect-[9/16] object-cover rounded"
                 muted
                 playsInline

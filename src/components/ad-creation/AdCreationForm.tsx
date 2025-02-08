@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import VideoSelector from "./VideoSelector";
 import { getVideos } from "@/app/actions/video-actions";
 import { Input } from "@/components/ui/input";
@@ -10,8 +9,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import ClientVideoSelector from "./ClientVideoSelector";
 // import { toast } from "sonner";
 // import { saveAd } from "@/app/actions/ad-actions";
-import { Save } from "lucide-react";
-
 
 interface PreviewData {
   videoId: string;
@@ -24,10 +21,9 @@ interface PreviewData {
 
 interface AdCreationFormProps {
   onPreview: (data: PreviewData) => void;
-  onSave: () => void;
 }
 
-export default function AdCreationForm({ onPreview, onSave }: AdCreationFormProps) {
+export default function AdCreationForm({ onPreview }: AdCreationFormProps) {
   const [videos, setVideos] = useState<{ url: string }[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<string>("");
   const [selectedClientVideo, setSelectedClientVideo] = useState<string>("");
@@ -176,15 +172,6 @@ export default function AdCreationForm({ onPreview, onSave }: AdCreationFormProp
           </div>
         </div>
       </div>
-
-      <Button
-        onClick={onSave}
-        disabled={!selectedVideo || !selectedClientVideo}
-        className="w-full"
-      >
-        <Save className="w-4 h-4 mr-2" />
-        Create Ad
-      </Button>
     </div>
   );
 } 

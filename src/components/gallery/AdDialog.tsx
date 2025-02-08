@@ -22,6 +22,7 @@ interface AdProps {
   ugc_text_position: 'top' | 'middle' | 'bottom';
   client_text_position: 'top' | 'middle' | 'bottom';
   created_at: string;
+  mergedVideoUrl: string;
 }
 
 interface AdDialogProps {
@@ -62,7 +63,7 @@ export function AdDialog({ ad, onClose }: AdDialogProps) {
         <div className="grid gap-4">
           <div className="relative aspect-video overflow-hidden rounded-lg">
             <video
-              src={ad.ugc_video_url}
+              src={ad.mergedVideoUrl}
               controls
               autoPlay
               loop

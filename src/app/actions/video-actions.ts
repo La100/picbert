@@ -6,6 +6,7 @@ import { revalidateTag } from "next/cache";
 import { getCredits } from "./credit-actions";
 import { createClient } from "@/lib/supabase/server";
 import { createClientWithOptions } from "@/lib/supabase/server-fetch";
+import { v2 as cloudinary } from 'cloudinary';
 
 
 interface VideoResponse {
@@ -21,6 +22,13 @@ type StoreVideoInput = {
   aspect_ratio: string;
   duration: string;
 };
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 export async function storeVideo(
   data: StoreVideoInput,
@@ -241,4 +249,115 @@ export async function checkAndUpdateVideoCredits(): Promise<{
     credits: credits.data, 
     error: null 
   };
+}
+
+export async function mergeVideosWithCloudinary(
+  firstVideoUrl: string,
+  secondVideoUrl: string,
+  firstText: string,
+  secondText: string,
+  firstTextPosition: string,
+  secondTextPosition: string
+) {
+  try {
+    // Configure Cloudinary
+    cloudinary.config({
+      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+      secure: true
+    });
+
+    console.log('Starting uploads to Cloudinary...');
+
+    // Upload first video
+    const firstVideoUpload = await cloudinary.uploader.upload(firstVideoUrl, {
+      resource_type: "video",
+      folder: "videos"
+    });
+    console.log('First video uploaded:', firstVideoUpload.public_id);
+
+    // Upload second video
+    const secondVideoUpload = await cloudinary.uploader.upload(secondVideoUrl, {
+      resource_type: "video",
+      folder: "videos"
+    });
+    console.log('Second video uploaded:', secondVideoUpload.public_id);
+
+    // Calculate text positions
+    const getTextPosition = (position: string): { gravity: string } => {
+      switch (position) {
+        case 'top': return { gravity: "north" };
+        case 'middle': return { gravity: "center" };
+        case 'bottom': return { gravity: "south" };
+        default: return { gravity: "south" };
+      }
+    };
+
+    // Create the concatenated video with text overlays
+    const result = await cloudinary.uploader.upload(firstVideoUrl, {
+      resource_type: "video",
+      folder: "concatenated-videos",
+      transformation: [
+        // First video with text
+        {
+          width: 720,
+          height: 1280,
+          crop: "fill"
+        },
+        {
+          overlay: {
+            font_family: "Arial",
+            font_size: 50,
+            font_weight: "bold",
+            text: firstText
+          },
+          color: "#FFFFFF",
+          gravity: getTextPosition(firstTextPosition).gravity,
+          y: 50
+        },
+        // Second video with text
+        {
+          overlay: {
+            resource_type: "video",
+            public_id: secondVideoUpload.public_id
+          },
+          flags: "splice",
+          width: 720,
+          height: 1280,
+          crop: "fill"
+        },
+        {
+          overlay: {
+            font_family: "Arial",
+            font_size: 50,
+            font_weight: "bold",
+            text: secondText
+          },
+          color: "#FFFFFF",
+          gravity: getTextPosition(secondTextPosition).gravity,
+          y: 50,
+          start_offset: firstVideoUpload.duration
+        }
+      ]
+    });
+
+    console.log('Final video result:', result);
+
+    // Clean up uploaded videos
+    try {
+      await cloudinary.api.delete_resources(
+        [firstVideoUpload.public_id, secondVideoUpload.public_id],
+        { resource_type: "video" }
+      );
+      console.log('Cleanup completed');
+    } catch (cleanupError) {
+      console.error('Error cleaning up videos:', cleanupError);
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error in mergeVideosWithCloudinary:', error);
+    throw error;
+  }
 } 

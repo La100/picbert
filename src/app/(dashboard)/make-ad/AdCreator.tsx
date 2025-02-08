@@ -4,8 +4,9 @@ import AdCreationForm from "@/components/ad-creation/AdCreationForm"
 import { useEffect, useRef, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { toBlobURL } from '@ffmpeg/util';
 import { saveAd } from "@/app/actions/ad-actions";
+import { mergeVideosWithCloudinary } from "@/app/actions/video-actions";
 
 interface PreviewData {
   videoId: string;
@@ -33,13 +34,11 @@ export default function AdCreator() {
 
   const firstVideoRef = useRef<HTMLVideoElement>(null);
   const secondVideoRef = useRef<HTMLVideoElement>(null);
+  const outputVideoRef = useRef<HTMLVideoElement>(null);
   const ffmpegRef = useRef<FFmpeg | null>(null);
   const [isShowingFirstVideo, setIsShowingFirstVideo] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [ffmpegMessage, setFFmpegMessage] = useState("");
-  const [mergedVideoUrl, setMergedVideoUrl] = useState<string>("");
-  const [isDownloadReady, setIsDownloadReady] = useState(false);
-  const [isFFmpegLoaded, setIsFFmpegLoaded] = useState(false);
   const [processingMetrics, setProcessingMetrics] = useState<ProcessingMetrics>({
     progress: 0,
     time: '00:00:00'
@@ -49,7 +48,6 @@ export default function AdCreator() {
   const initFFmpeg = useCallback(async () => {
     try {
       if (ffmpegRef.current) {
-        setIsFFmpegLoaded(true);
         return;
       }
 
@@ -75,11 +73,9 @@ export default function AdCreator() {
       });
 
       ffmpegRef.current = ffmpeg;
-      setIsFFmpegLoaded(true);
     } catch (error) {
       console.error('Error initializing FFmpeg:', error);
       toast.error('Failed to initialize video processing tools');
-      setIsFFmpegLoaded(false);
     }
   }, []);
 
@@ -119,115 +115,98 @@ export default function AdCreator() {
     }
   }, [preview.videoId, preview.clientVideoId]);
 
-  const handleDownload = () => {
-    if (!mergedVideoUrl) return;
-    
-    const a = document.createElement('a');
-    a.href = mergedVideoUrl;
-    a.download = `merged-ad-${Date.now()}.mp4`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const handleCloudinaryMerge = async () => {
+    if (!preview.videoId || !preview.clientVideoId) {
+      toast.error("Please select both videos before merging");
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const result = await mergeVideosWithCloudinary(
+        preview.videoId,
+        preview.clientVideoId,
+        preview.ugcText,
+        preview.clientText,
+        preview.ugcTextPosition,
+        preview.clientTextPosition
+      );
+
+      // Automatically download the merged video
+      const response = await fetch(result.secure_url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `merged-ad-${Date.now()}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      // Reset video players
+      if (firstVideoRef.current) {
+        firstVideoRef.current.currentTime = 0;
+        firstVideoRef.current.style.display = 'block';
+      }
+      if (secondVideoRef.current) {
+        secondVideoRef.current.currentTime = 0;
+        secondVideoRef.current.style.display = 'none';
+      }
+      setIsShowingFirstVideo(true);
+
+      toast.success("Ad created and downloaded successfully!");
+    } catch (error) {
+      console.error('Error merging videos with Cloudinary:', error);
+      toast.error('Failed to create ad with Cloudinary');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const handleSaveAd = async () => {
+  const handleSaveToGallery = async () => {
     if (!preview.videoId || !preview.clientVideoId) {
       toast.error("Please select both videos before saving");
       return;
     }
 
-    if (!isFFmpegLoaded || !ffmpegRef.current) {
-      toast.error("Video processing tools are not ready yet");
-      return;
-    }
-
     setIsProcessing(true);
-    setIsDownloadReady(false);
-    
     try {
-      const ffmpeg = ffmpegRef.current;
-      
-      // Download videos and font
-      const video1Data = await fetchFile(preview.videoId);
-      const video2Data = await fetchFile(preview.clientVideoId);
-      const fontData = await fetchFile('https://raw.githubusercontent.com/ffmpegwasm/testdata/master/arial.ttf');
-      
-      // Write files to FFmpeg's virtual filesystem
-      await ffmpeg.writeFile('video1.mp4', video1Data);
-      await ffmpeg.writeFile('video2.mp4', video2Data);
-      await ffmpeg.writeFile('arial.ttf', fontData);
-      
-      // Process first video with text
-      const text1Y = preview.ugcTextPosition === 'top' ? 10 : 
-                     preview.ugcTextPosition === 'middle' ? '(h-text_h)/2' : 
-                     'h-th-10';
-      
-      await ffmpeg.exec([
-        '-i', 'video1.mp4',
-        '-vf', `drawtext=fontfile=/arial.ttf:text='${preview.ugcText}':x=(w-text_w)/2:y=${text1Y}:fontsize=24:fontcolor=white:box=1:boxcolor=black@0.5:boxborderw=5`,
-        '-threads', '0',
-        '-preset', 'ultrafast',
-        'video1_text.mp4'
-      ]);
-      
-      // Process second video with text
-      const text2Y = preview.clientTextPosition === 'top' ? 10 : 
-                     preview.clientTextPosition === 'middle' ? '(h-text_h)/2' : 
-                     'h-th-10';
-      
-      await ffmpeg.exec([
-        '-i', 'video2.mp4',
-        '-vf', `drawtext=fontfile=/arial.ttf:text='${preview.clientText}':x=(w-text_w)/2:y=${text2Y}:fontsize=24:fontcolor=white:box=1:boxcolor=black@0.5:boxborderw=5`,
-        '-threads', '0',
-        '-preset', 'ultrafast',
-        'video2_text.mp4'
-      ]);
-      
-      // Create a file list for concatenation
-      await ffmpeg.writeFile('list.txt', 'file video1_text.mp4\nfile video2_text.mp4');
-      
-      // Concatenate the videos
-      await ffmpeg.exec([
-        '-f', 'concat',
-        '-safe', '0',
-        '-i', 'list.txt',
-        '-c', 'copy',
-        '-threads', '0',
-        '-preset', 'ultrafast',
-        'output.mp4'
-      ]);
-      
-      // Read and clean up the merged video file
-      const mergedData = await ffmpeg.readFile('output.mp4');
-      const mergedBlob = new Blob([mergedData], { type: 'video/mp4' });
-      const url = URL.createObjectURL(mergedBlob);
-      
-      // Clean up files
-      await ffmpeg.deleteFile('video1.mp4');
-      await ffmpeg.deleteFile('video2.mp4');
-      await ffmpeg.deleteFile('video1_text.mp4');
-      await ffmpeg.deleteFile('video2_text.mp4');
-      await ffmpeg.deleteFile('list.txt');
-      await ffmpeg.deleteFile('output.mp4');
-      
-      // Save the merged video URL
-      setMergedVideoUrl(url);
-      
-      // Save ad to database
-      const result = await saveAd({
+      const result = await mergeVideosWithCloudinary(
+        preview.videoId,
+        preview.clientVideoId,
+        preview.ugcText,
+        preview.clientText,
+        preview.ugcTextPosition,
+        preview.clientTextPosition
+      );
+
+      // Save to ads gallery
+      const saveResult = await saveAd({
         ugcVideoUrl: preview.videoId,
-        clientVideoUrl: preview.clientVideoId
+        clientVideoUrl: preview.clientVideoId,
+        mergedVideoUrl: result.secure_url
       });
 
-      if (result.error) {
-        throw new Error(result.error);
+      if (saveResult.error) {
+        throw new Error(saveResult.error);
       }
 
-      setIsDownloadReady(true);
-      toast.success("Ad created successfully! Click download to save.");
+      // Reset video players
+      if (firstVideoRef.current) {
+        firstVideoRef.current.currentTime = 0;
+        firstVideoRef.current.style.display = 'block';
+      }
+      if (secondVideoRef.current) {
+        secondVideoRef.current.currentTime = 0;
+        secondVideoRef.current.style.display = 'none';
+      }
+      setIsShowingFirstVideo(true);
+
+      toast.success("Ad saved to gallery successfully!");
     } catch (error) {
-      console.error('Error merging videos:', error);
-      toast.error('Failed to create ad');
+      console.error('Error saving ad to gallery:', error);
+      toast.error('Failed to save ad to gallery');
     } finally {
       setIsProcessing(false);
     }
@@ -243,15 +222,23 @@ export default function AdCreator() {
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Ad Creation Form */}
         <div>
-          <AdCreationForm onPreview={setPreview} onSave={handleSaveAd} />
-          {isDownloadReady && (
+          <AdCreationForm onPreview={setPreview} />
+          <div className="space-y-4 mt-4">
             <button
-              onClick={handleDownload}
-              className="mt-4 w-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md"
+              onClick={handleCloudinaryMerge}
+              disabled={!preview.videoId || !preview.clientVideoId || isProcessing}
+              className="w-full bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 rounded-md disabled:opacity-50"
             >
-              Download Merged Video
+              {isProcessing ? "Processing..." : "Create and Download"}
             </button>
-          )}
+            <button
+              onClick={handleSaveToGallery}
+              disabled={!preview.videoId || !preview.clientVideoId || isProcessing}
+              className="w-full bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded-md disabled:opacity-50"
+            >
+              {isProcessing ? "Processing..." : "Save to Ads Gallery"}
+            </button>
+          </div>
         </div>
 
         {/* Preview Section */}
@@ -304,6 +291,14 @@ export default function AdCreator() {
                         playsInline
                       />
                     )}
+
+                    {/* Output Video */}
+                    <video
+                      ref={outputVideoRef}
+                      className="absolute inset-0 w-full h-full object-cover hidden"
+                      controls
+                      playsInline
+                    />
 
                     {/* Text Overlay */}
                     {isShowingFirstVideo ? (

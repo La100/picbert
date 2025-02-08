@@ -13,6 +13,7 @@ interface AdResponse {
 interface SaveAdInput {
   ugcVideoUrl: string;
   clientVideoUrl: string;
+  mergedVideoUrl: string;
 }
 
 export async function saveAd(data: SaveAdInput): Promise<AdResponse> {
@@ -35,6 +36,7 @@ export async function saveAd(data: SaveAdInput): Promise<AdResponse> {
         user_id: user.id,
         ugc_video_url: data.ugcVideoUrl,
         client_video_url: data.clientVideoUrl,
+        mergedVideoUrl: data.mergedVideoUrl,
       }])
       .select();
 
