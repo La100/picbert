@@ -34,6 +34,13 @@ export default function VideoSelector({ videos, selectedVideo, onSelect }: Video
               muted
               playsInline
               preload="metadata"
+              poster={`${video.url}#t=0.001`}
+              onLoadedMetadata={(e) => {
+                e.currentTarget.currentTime = 0;
+              }}
+              onError={(e) => {
+                e.currentTarget.style.backgroundColor = '#f0f0f0';
+              }}
               onMouseEnter={(e) => e.currentTarget.play()}
               onMouseLeave={(e) => {
                 e.currentTarget.pause();

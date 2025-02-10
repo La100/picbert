@@ -1,8 +1,6 @@
 import React from "react";
 import { Gallery } from "@/components/gallery/Gallery";
-import { VideoGallery } from "@/components/gallery/VideoGallery";
-import { ClientVideoGallery } from "@/components/gallery/ClientVideoGallery";
-import { AdGallery } from "@/components/gallery/AdGallery";
+import { MediaGallery } from "@/components/gallery/MediaGallery";
 import { getImages } from "@/app/actions/image-actions";
 import { getVideos } from "@/app/actions/video-actions";
 import { getClientVideos } from "@/app/actions/client-video-actions";
@@ -17,11 +15,22 @@ export const metadata: Metadata = {
   description: "Gallery for Pictoria AI",
 };
 
-export default async function GalleryPage() {
+export default async function GalleryPage({
+  searchParams,
+}: {
+  searchParams: { tab?: string };
+}) {
   const { data: images } = await getImages();
   const { data: videos } = await getVideos();
   const { data: clientVideos } = await getClientVideos();
   const { data: ads } = await getAds();
+
+  const videosWithType = videos?.map(video => ({ ...video, type: 'video' as const })) || [];
+  const clientVideosWithType = clientVideos?.map(video => ({ ...video, type: 'client-video' as const })) || [];
+  const adsWithType = ads?.map(ad => ({ ...ad, type: 'ad' as const })) || [];
+
+  const { tab } = searchParams;
+  const activeTab = tab || "images";
 
   return (
     <div className="container mx-auto">
@@ -30,12 +39,20 @@ export default async function GalleryPage() {
         Here you can see all your generated content. Click on an item to view details.
       </p>
 
-      <Tabs defaultValue="images" className="w-full">
+      <Tabs defaultValue={activeTab} className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="images">Images</TabsTrigger>
-          <TabsTrigger value="videos">Videos</TabsTrigger>
-          <TabsTrigger value="client-videos">Product Videos</TabsTrigger>
-          <TabsTrigger value="ads">Ads</TabsTrigger>
+          <TabsTrigger asChild value="images">
+            <a href="/gallery?tab=images">Images</a>
+          </TabsTrigger>
+          <TabsTrigger asChild value="videos">
+            <a href="/gallery?tab=videos">Videos</a>
+          </TabsTrigger>
+          <TabsTrigger asChild value="client-videos">
+            <a href="/gallery?tab=client-videos">Product Videos</a>
+          </TabsTrigger>
+          <TabsTrigger asChild value="ads">
+            <a href="/gallery?tab=ads">Ads</a>
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="images">
@@ -43,15 +60,15 @@ export default async function GalleryPage() {
         </TabsContent>
         
         <TabsContent value="videos">
-          <VideoGallery videos={videos || []} />
+          <MediaGallery items={videosWithType} type="video" />
         </TabsContent>
 
         <TabsContent value="client-videos">
-          <ClientVideoGallery videos={clientVideos || []} />
+          <MediaGallery items={clientVideosWithType} type="client-video" showUpload />
         </TabsContent>
 
         <TabsContent value="ads">
-          <AdGallery ads={ads || []} />
+          <MediaGallery items={adsWithType} type="ad" />
         </TabsContent>
       </Tabs>
     </div>

@@ -63,10 +63,8 @@ const Configurations = () => {
       const output = await fal.subscribe("fal-ai/flux-pro/v1.1-ultra", {
         input: {
           prompt: values.prompt + ", selfie, full body visible, 4k high resolution",
-   
           aspect_ratio: values.aspect_ratio,
           raw: true,
-        
         },
         logs: true,
       });
@@ -75,15 +73,21 @@ const Configurations = () => {
         throw new Error("No image URL in response");
       }
 
+      // Check for NSFW content
+      if (output.data.has_nsfw_concepts?.[0] === true) {
+        toast.error("The generated image was flagged as NSFW content. Please try a different prompt.");
+        setLoading(false);
+        return;
+      }
+
       const image = output.data.images[0];
       const imageData = [{
         url: image.url,
         width: image.width ?? 0,
         height: image.height ?? 0,
-        safety_checker:true,
+        safety_checker: true,
         prompt: values.prompt,
         aspect_ratio: values.aspect_ratio,
-   
       }];
 
       await generateImage({
