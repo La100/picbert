@@ -15,11 +15,7 @@ export const metadata: Metadata = {
   description: "Gallery for Pictoria AI",
 };
 
-export default async function GalleryPage({
-  searchParams,
-}: {
-  searchParams: { tab?: string };
-}) {
+export default async function GalleryPage() {
   const { data: images } = await getImages();
   const { data: videos } = await getVideos();
   const { data: clientVideos } = await getClientVideos();
@@ -29,9 +25,6 @@ export default async function GalleryPage({
   const clientVideosWithType = clientVideos?.map(video => ({ ...video, type: 'client-video' as const })) || [];
   const adsWithType = ads?.map(ad => ({ ...ad, type: 'ad' as const })) || [];
 
-  const { tab } = searchParams;
-  const activeTab = tab || "images";
-
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl font-semibold mb-2">My Gallery</h1>
@@ -39,7 +32,7 @@ export default async function GalleryPage({
         Here you can see all your generated content. Click on an item to view details.
       </p>
 
-      <Tabs defaultValue={activeTab} className="w-full">
+      <Tabs defaultValue="images" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger asChild value="images">
             <a href="/gallery?tab=images">Images</a>
