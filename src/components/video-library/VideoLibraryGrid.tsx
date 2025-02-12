@@ -17,18 +17,31 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
 
   const handleDownload = async (video: ClientVideo) => {
     try {
-      const response = await fetch(video.video_url);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `video.mp4`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      // Check if Web Share API is available (typically on mobile devices)
+      if (navigator.share && /mobile|android|ios/i.test(navigator.userAgent)) {
+        const response = await fetch(video.video_url);
+        const blob = await response.blob();
+        const file = new File([blob], 'video.mp4', { type: 'video/mp4' });
+        
+        await navigator.share({
+          files: [file],
+          title: 'Download Video',
+        });
+      } else {
+        // Fallback for desktop browsers
+        const response = await fetch(video.video_url);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `video.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
     } catch (error) {
-      console.error("Failed to download video:", error);
+      console.error("Failed to download/share video:", error);
     }
   };
 
@@ -44,7 +57,7 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
             className="aspect-auto"
           >
             <div 
-              className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+              className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
               onMouseEnter={(e) => {
                 const videoEl = e.currentTarget.querySelector('video');
                 if (videoEl && videoEl.paused) {
@@ -91,23 +104,23 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
 
       {selectedVideo && (
         <Dialog open onOpenChange={() => setSelectedVideo(null)}>
-          <DialogContent className="max-w-[90vw] w-full lg:max-w-[1200px]">
-            <DialogHeader>
+          <DialogContent className="max-h-[80vh] md:max-h-[90vh] w-auto min-w-[350px] md:min-w-[400px] lg:min-w-[500px] max-w-[800px] p-4 md:p-6">
+            <DialogHeader className="space-y-1 md:space-y-2 mb-2 md:mb-4">
               <DialogTitle>Video Preview</DialogTitle>
               <DialogDescription>
                 Preview and download the selected video
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid gap-4">
-              <div className="relative aspect-video overflow-hidden rounded-lg">
+            <div className="space-y-2 md:space-y-4">
+              <div className="relative overflow-hidden rounded-lg aspect-[9/16] bg-black max-h-[60vh] md:max-h-[80vh] mx-auto">
                 <video
                   src={selectedVideo.video_url}
                   controls
                   autoPlay
                   loop
                   muted
-                  className="w-full h-full object-contain"
+                  className="absolute inset-0 w-full h-full object-contain"
                 />
               </div>
               
@@ -115,8 +128,10 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
                 <Button
                   onClick={() => handleDownload(selectedVideo)}
                   className="flex items-center gap-2"
+                  size="default"
+                  variant="default"
                 >
-                  <Download className="h-4 w-4" />
+                  <Download className="h-4 w-4 md:h-5 md:w-5" />
                   Download Video
                 </Button>
               </div>
