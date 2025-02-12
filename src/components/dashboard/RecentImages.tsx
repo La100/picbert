@@ -41,7 +41,7 @@ export function RecentImages({ images }: RecentImagesProps) {
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <CardTitle className="text-base">Recent Image Generations</CardTitle>
         <Button asChild variant="ghost" size="sm" className="-mr-2">
-          <Link href="/gallery">
+          <Link href="/gallery/images">
             View All <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>

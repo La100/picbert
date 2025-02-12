@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { Tables } from "@database.types";
+import { useEffect, useRef } from "react";
 
 interface RecentVideosProps {
   videos: Array<
@@ -28,6 +29,40 @@ interface RecentVideosProps {
 }
 
 export function RecentVideos({ videos }: RecentVideosProps) {
+  const videoRefs = useRef<{ [key: string]: HTMLVideoElement }>({});
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) {
+            video.play().catch(() => {
+              // Autoplay failed
+            });
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    Object.values(videoRefs.current).forEach((video) => {
+      if (video) {
+        observer.observe(video);
+      }
+    });
+
+    return () => {
+      Object.values(videoRefs.current).forEach((video) => {
+        if (video) {
+          observer.unobserve(video);
+        }
+      });
+    };
+  }, [videos]);
+
   if (videos.length === 0) {
     return (
       <Card>
@@ -46,7 +81,7 @@ export function RecentVideos({ videos }: RecentVideosProps) {
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <CardTitle className="text-base">Recent Video Generations</CardTitle>
         <Button asChild variant="ghost" size="sm" className="-mr-2">
-          <Link href="/gallery?type=video">
+          <Link href="/gallery/videos">
             View All <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
@@ -67,18 +102,28 @@ export function RecentVideos({ videos }: RecentVideosProps) {
                 <div className="space-y-1">
                   <div
                     className={cn(
-                      "relative overflow-hidden rounded-lg",
+                      "relative overflow-hidden rounded-lg bg-muted",
                       video.aspect_ratio === "1:1"
                         ? "aspect-square"
                         : `aspect-[${video.aspect_ratio.replace(":", "/")}]`
                     )}
                   >
                     <video
+                      ref={(el) => {
+                        if (el) {
+                          videoRefs.current[video.id.toString()] = el;
+                        }
+                      }}
                       src={video.url}
                       className="h-full w-full object-cover"
                       muted
                       playsInline
                       loop
+                      autoPlay
+                      onError={(e) => {
+                        const target = e.target as HTMLVideoElement;
+                        target.style.display = 'none';
+                      }}
                     />
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-2">
