@@ -110,7 +110,7 @@ export async function getPresignedStorageUrl(filePath: string) {
   return { signedUrl: urlData?.signedUrl || "", error: error?.message || null };
 }
 
-export async function getImages(limit?: number) {
+export async function getImages(page = 1, limit = 12) {
   const cacheOptions = {
     cache: "force-cache",
     next: {
@@ -126,26 +126,26 @@ export async function getImages(limit?: number) {
       error: "Unauthorized",
       success: false,
       data: null,
+      count: 0,
     };
   }
 
-  let query = supabase
+  const start = (page - 1) * limit;
+  const end = start + limit - 1;
+
+  const { data, error, count } = await supabase
     .from("generated_images")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("user_id", user?.id || "")
-    .order("created_at", { ascending: false });
-
-  if (limit) {
-    query = query.limit(limit);
-  }
-
-  const { data, error } = await query;
+    .order("created_at", { ascending: false })
+    .range(start, end);
 
   if (error) {
     return {
       error: error.message || "Failed to fetch images",
       success: false,
       data: null,
+      count: 0,
     };
   }
 
@@ -171,6 +171,7 @@ export async function getImages(limit?: number) {
     error: null,
     success: true,
     data: imagesWithUrls || null,
+    count: count || 0,
   };
 }
 

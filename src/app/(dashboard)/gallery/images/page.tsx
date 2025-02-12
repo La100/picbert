@@ -16,8 +16,16 @@ const GalleryLoading = () => (
   </div>
 );
 
-export default async function ImagesGalleryPage() {
-  const images = await getImages();
+interface PageProps {
+  searchParams: Promise<{ page?: string }>;
+}
+
+export default async function ImagesGalleryPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const currentPage = Number(params.page) || 1;
+  const pageSize = 12;
+
+  const images = await getImages(currentPage, pageSize);
 
   return (
     <div className="container mx-auto">
@@ -29,7 +37,12 @@ export default async function ImagesGalleryPage() {
       </header>
 
       <Suspense fallback={<GalleryLoading />}>
-        <Gallery images={images.data || []} />
+        <Gallery 
+          images={images.data || []} 
+          currentPage={currentPage}
+          totalCount={images.count || 0}
+          pageSize={pageSize}
+        />
       </Suspense>
     </div>
   );

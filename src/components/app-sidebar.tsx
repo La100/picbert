@@ -39,6 +39,11 @@ const navMain =  [
       icon: Video,
     },
     {
+      title: "Video Library",
+      url: "/video-library",
+      icon: Video,
+    },
+    {
       title: "Gallery",
       icon: Images,
       items: [

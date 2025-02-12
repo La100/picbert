@@ -6,24 +6,21 @@ import { Tables } from "@database.types";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
-
 type ImageProps = {
   url: string | undefined;
 } & Tables<"generated_images">;
 
 interface GalleryProps {
   images: ImageProps[];
+  currentPage: number;
+  totalCount: number;
   pageSize?: number;
-  currentPage?: number;
 }
 
-export function Gallery({ images, pageSize = 16, currentPage = 1 }: GalleryProps) {
+export function Gallery({ images, currentPage, totalCount, pageSize = 12 }: GalleryProps) {
   const [selectedImage, setSelectedImage] = useState<ImageProps | null>(null);
   const router = useRouter();
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const currentImages = images.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(images.length / pageSize);
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   const handlePageChange = (page: number) => {
     router.push(`?page=${page}`);
@@ -38,7 +35,7 @@ export function Gallery({ images, pageSize = 16, currentPage = 1 }: GalleryProps
         className="space-y-8"
       >
         <div className="columns-1 sm:columns-2 md:columns-3 xl:columns-4 gap-4 space-y-4">
-          {currentImages.map((image, index) => (
+          {images.map((image, index) => (
             <motion.div
               key={image.id}
               initial={{ opacity: 0, scale: 0.9 }}
