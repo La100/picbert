@@ -1,52 +1,49 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { VideoLibraryGrid } from "@/components/video-library/VideoLibraryGrid";
 import { TagFilter } from "@/components/video-library/TagFilter";
-import { getClientVideos } from "@/app/actions/client-video-actions";
 import { Button } from "@/components/ui/button";
-import { ClientVideo } from "@/app/actions/client-video-actions";
+import { VideoData } from "@/data/video-library";
+
+// Number of items per page
+const ITEMS_PER_PAGE = 15;
 
 interface VideoLibraryContentProps {
-  initialVideos: ClientVideo[];
-  totalVideos: number;
-  availableTags: string[];
+  videos: VideoData[];
 }
 
-export function VideoLibraryContent({ 
-  initialVideos, 
- 
-  availableTags 
-}: VideoLibraryContentProps) {
-  const [videos, setVideos] = useState(initialVideos);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+export function VideoLibraryContent({ videos }: VideoLibraryContentProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [displayedVideos, setDisplayedVideos] = useState<ClientVideo[]>([]);
-  const ITEMS_PER_PAGE = 15;
-  const totalPages = Math.ceil(videos.length / ITEMS_PER_PAGE);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  useEffect(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    setDisplayedVideos(videos.slice(start, end));
-  }, [currentPage, videos]);
+  // Filter videos based on selected tags
+  const filteredVideos = selectedTags.length === 0
+    ? videos
+    : videos.filter(video =>
+        selectedTags.some(selectedTag =>
+          video.tags.some(videoTag => 
+            videoTag.toLowerCase() === selectedTag.toLowerCase()
+          )
+        )
+      );
 
-  const handleTagSelect = async (tag: string) => {
+  // Calculate pagination
+  const totalVideos = filteredVideos.length;
+  const totalPages = Math.ceil(totalVideos / ITEMS_PER_PAGE);
+
+  // Get current page videos
+  const displayedVideos = filteredVideos.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handleTagSelect = (tag: string) => {
     const newSelectedTags = selectedTags.includes(tag)
       ? selectedTags.filter(t => t !== tag)
       : [...selectedTags, tag];
-    
     setSelectedTags(newSelectedTags);
-    setCurrentPage(1);
-    
-    const { data } = await getClientVideos(undefined, newSelectedTags);
-    if (data) {
-      setVideos(data);
-    }
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    setCurrentPage(1); // Reset to first page when changing filters
   };
 
   return (
@@ -59,7 +56,6 @@ export function VideoLibraryContent({
       </header>
 
       <TagFilter
-        availableTags={availableTags}
         selectedTags={selectedTags}
         onTagSelect={handleTagSelect}
       />
@@ -72,7 +68,7 @@ export function VideoLibraryContent({
             <Button
               key={page}
               variant={currentPage === page ? "default" : "secondary"}
-              onClick={() => handlePageChange(page)}
+              onClick={() => setCurrentPage(page)}
             >
               {page}
             </Button>

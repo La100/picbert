@@ -1,10 +1,12 @@
 import * as React from "react"
 import {
   Image,
-  Images,
+  ImagePlus,
   Sparkles,
   SquareTerminal,
   Video,
+  FileVideo,
+  Users,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -29,35 +31,30 @@ const navMain =  [
       icon: SquareTerminal,
     },
     {
+      title: "AI People Library",
+      url: "/video-library",
+      icon: Users,
+    },                          
+    {
       title: "Generate Images",
       url: "/image-generation",
-      icon: Image,
+      icon: ImagePlus,
     },
     {
       title: "Generate Videos",
       url: "/video-generation",
-      icon: Video,
+      icon: FileVideo,
+    },
+  
+    {
+      title: "Your Images",
+      url: "/gallery/images",
+      icon: Image,
     },
     {
-      title: "Video Library",
-      url: "/video-library",
+      title: "Your Videos",
+      url: "/gallery/videos",
       icon: Video,
-    },
-    {
-      title: "Gallery",
-      icon: Images,
-      items: [
-        {
-          title: "Images",
-          url: "/gallery/images",
-          icon: Image,
-        },
-        {
-          title: "Videos",
-          url: "/gallery/videos",
-          icon: Video,
-        },
-      ],
     },
   ]
 

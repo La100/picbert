@@ -30,6 +30,7 @@ import { Button } from "../ui/button";
 import useGenerateStore from "@/store/useGenerateStore";
 import { fal } from "@/lib/fal";
 import { toast } from "sonner";
+import { PromptStarterSelector } from "./PromptStarter";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -56,6 +57,10 @@ const Configurations = () => {
       raw: true,
     },
   });
+
+  const handlePromptSelect = (prompt: string) => {
+    form.setValue("prompt", prompt);
+  };
 
   async function onSubmit(values: FormValues) {
     try {
@@ -111,6 +116,21 @@ const Configurations = () => {
         >
           <fieldset className="grid gap-6 rounded-lg border p-4 bg-background">
             <legend className="-ml-1 px-1 text-sm font-medium">Settings</legend>
+
+            <div className="space-y-2">
+              <FormLabel className="flex items-center gap-2">
+                Prompt Starters{" "}
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info className="w-4 h-4" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Choose a starter prompt to begin with</p>
+                  </TooltipContent>
+                </Tooltip>
+              </FormLabel>
+              <PromptStarterSelector onSelect={handlePromptSelect} />
+            </div>
 
             <FormField
               control={form.control}
