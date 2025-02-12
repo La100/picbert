@@ -2,7 +2,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tables } from "@database.types";
-import Image from "next/image";
 import {
   Carousel,
   CarouselContent,
@@ -71,13 +70,12 @@ export function RecentImages({ images }: RecentImagesProps) {
                         : "aspect-square"
                     )}
                   >
-                    <Image
+                    <img
                       src={image.url || ""}
                       alt={image.prompt || "Generated image"}
                       width={image.width || 100}
                       height={image.height || 100}
                       className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-2">

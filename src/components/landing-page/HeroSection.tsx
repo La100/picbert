@@ -2,7 +2,6 @@ import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { ChevronRight } from "lucide-react";
-import Image from "next/image";
 import Marquee from "../ui/marquee";
 import img1 from "@/public/hero-images/Charismatic Young Man with a Warm Smile and Stylish Tousled Hair.jpeg";
 import img2 from "@/public/hero-images/Confident Businesswoman on Turquoise Backdrop.jpeg";
@@ -114,13 +113,11 @@ const MarqueeColumn = ({
       style={{ "--duration": duration }}
     >
       {Images.sort(() => Math.random() - 0.5).map((image, index) => (
-        <Image
+        <img
           key={index}
-          src={image.src}
+          src={image.src.src}
           alt={image.alt}
-          priority
           className="w-full h-full object-cover rounded opacity-[.25] hover:opacity-100 transition-opacity duration-300 ease-in-out"
-          sizes="(max-width: 768px) 40vw, (max-width: 1200px) 50vw, 33vw bg-background"
         />
       ))}
     </Marquee>

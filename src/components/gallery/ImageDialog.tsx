@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   Sheet,
   SheetContent,
@@ -52,7 +51,7 @@ export function ImageDialog({ image, onClose }: ImageDialogProps) {
           <ScrollArea className="flex flex-col h-[100vh]">
             <div className="relative w-fit h-fit ">
               <a href={image.url || ""} target="_blank" rel="noopener noreferrer">
-                <Image
+                <img
                   src={image.url || ""}
                   alt={image.prompt || "Generated image"}
                   width={image.width || 0}

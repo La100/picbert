@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Tables } from "@database.types";
-import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -64,7 +63,7 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
                   <p className="text-white text-sm font-semibold">Select Image</p>
                 </div>
               </div>
-              <Image
+              <img
                 src={image.url || ""}
                 alt={image.prompt || "Generated image"}
                 width={image.width || 0}
