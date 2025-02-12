@@ -12,7 +12,6 @@ const PROTECTED_ROUTES = [
   '/billing',
   '/account-settings',
   '/models',
-  '/make-ad',
   '/reset-password',
   // Add more protected routes here
 ]

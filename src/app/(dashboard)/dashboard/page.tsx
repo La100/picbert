@@ -2,10 +2,11 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { RecentImages } from "@/components/dashboard/RecentImages";
-
+import { RecentVideos } from "@/components/dashboard/RecentVideos";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { getImages } from "@/app/actions/image-actions";
 import { getCredits } from "@/app/actions/credit-actions";
+import { getVideos } from "@/app/actions/video-actions";
 
 import { Metadata } from "next";
 
@@ -25,10 +26,12 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
-
   const { data: credits } = await getCredits();
   const { data: images } = await getImages();
+  const { data: videos } = await getVideos();
   const imageCount = images?.length || 0;
+  const videoCount = videos?.length || 0;
+
   return (
     <div className="container mx-auto flex-1 space-y-6">
       <div className="flex items-center justify-between">
@@ -38,14 +41,14 @@ export default async function Dashboard() {
       </div>
       <StatsCards
         imageCount={imageCount}
-     
+        videoCount={videoCount}
         credits={Array.isArray(credits) ? credits[0] : credits}
       />
-      <div className="grid gap-6 grid-cols-1 md:grid-cols-4">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         <RecentImages images={images?.slice(0, 6) ?? []} />
-        <div className="col-span-full xl:col-span-1 gap-6 xl:gap-0 xl:space-y-6 flex flex-col sm:flex-row xl:flex-col h-full">
+        <RecentVideos videos={videos?.slice(0, 6) ?? []} />
+        <div className="lg:col-span-2">
           <QuickActions />
-    
         </div>
       </div>
     </div>

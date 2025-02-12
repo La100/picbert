@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { deleteVideo } from "@/app/actions/video-actions";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { Trash2, Download } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -42,6 +42,26 @@ export function VideoDialog({ video, onClose }: VideoDialogProps) {
       toast.error("Failed to delete video");
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    try {
+      if (!video.url) return;
+      const response = await fetch(video.url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = video.video_name || 'video.mp4';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success("Download started");
+    } catch (error) {
+      console.error("Failed to download video:", error);
+      toast.error("Failed to download video");
     }
   };
 
@@ -90,7 +110,16 @@ export function VideoDialog({ video, onClose }: VideoDialogProps) {
                 {new Date(video.created_at).toLocaleString()}
               </p>
             </div>
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="secondary"
+                size="default"
+                onClick={handleDownload}
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download
+              </Button>
               <Button
                 variant="destructive"
                 size="default"

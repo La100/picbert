@@ -65,6 +65,7 @@ const Configurations = () => {
           prompt: values.prompt + ", selfie, full body visible, 4k high resolution",
           aspect_ratio: values.aspect_ratio,
           raw: true,
+      
         },
         logs: true,
       });

@@ -4,9 +4,9 @@ import { Database } from "@database.types";
 import { randomUUID } from "crypto";
 import { revalidateTag } from "next/cache";
 import { getCredits } from "./credit-actions";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { createClientWithOptions } from "@/lib/supabase/server-fetch";
-import { v2 as cloudinary } from 'cloudinary';
+import { fal } from "@/lib/fal";
 
 
 interface VideoResponse {
@@ -21,27 +21,36 @@ type StoreVideoInput = {
   input_image: string;
   aspect_ratio: string;
   duration: string;
+  user_id?: string; // Optional for backward compatibility
 };
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+interface QueueVideoInput {
+  prompt: string;
+  input_image: string;
+  aspect_ratio: "16:9" | "9:16" | "1:1";
+  duration: "5" | "10";
+}
 
 export async function storeVideo(
   data: StoreVideoInput,
 ): Promise<VideoResponse> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return {
-      error: "Unauthorized",
-      success: false,
-      data: null,
-    };
+  // If user_id is provided, use service client (for webhook case)
+  // Otherwise use normal client (for user case)
+  const supabase = data.user_id ? createServiceClient() : await createClient();
+  
+  // If user_id is provided, use it directly (for webhook case)
+  // Otherwise get it from auth (for normal case)
+  let userId = data.user_id;
+  if (!userId) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return {
+        error: "Unauthorized",
+        success: false,
+        data: null,
+      };
+    }
+    userId = user.id;
   }
 
   try {
@@ -52,7 +61,7 @@ export async function storeVideo(
 
     // Generate unique filename
     const fileName = `video_${randomUUID()}.mp4`;
-    const filePath = `${user.id}/${fileName}`;
+    const filePath = `${userId}/${fileName}`;
 
     // Upload to storage
     const { error: storageError } = await supabase.storage
@@ -75,7 +84,7 @@ export async function storeVideo(
     const { data: dbData, error: dbError } = await supabase
       .from("generated_videos")
       .insert([{
-        user_id: user.id,
+        user_id: userId,
         prompt: data.prompt,
         input_image: data.input_image,
         aspect_ratio: data.aspect_ratio,
@@ -114,6 +123,7 @@ export async function getVideos(limit?: number) {
     cache: "force-cache",
     next: {
       tags: ["dashboard-videos", "gallery-videos"],
+      revalidate: 3600,
     },
   };
 
@@ -140,26 +150,35 @@ export async function getVideos(limit?: number) {
 
   const { data, error } = await query;
 
-  if (error) {
+  if (error || !data?.length) {
     return {
-      error: error.message || "Failed to fetch videos",
+      error: error?.message || "Failed to fetch videos",
       success: false,
       data: null,
     };
   }
 
+  // Create signed URLs one by one but with better error handling
   const videosWithUrls = await Promise.all(
     data.map(async (video) => {
-      const { data: urlData } = await supabase
-        .storage
-        .from("generated_videos")
-        .createSignedUrl(`${user?.id || ""}/${video.video_name}`, 3600);
+      try {
+        const { data: urlData } = await supabase
+          .storage
+          .from("generated_videos")
+          .createSignedUrl(`${user.id}/${video.video_name}`, 3600);
 
-      return {
-        ...video,
-        url: urlData?.signedUrl,
-      };
-    }),
+        return {
+          ...video,
+          url: urlData?.signedUrl,
+        };
+      } catch (e) {
+        console.error(`Failed to sign URL for video ${video.video_name}:`, e);
+        return {
+          ...video,
+          url: null,
+        };
+      }
+    })
   );
 
   return {
@@ -251,113 +270,173 @@ export async function checkAndUpdateVideoCredits(): Promise<{
   };
 }
 
-export async function mergeVideosWithCloudinary(
-  firstVideoUrl: string,
-  secondVideoUrl: string,
-  firstText: string,
-  secondText: string,
-  firstTextPosition: string,
-  secondTextPosition: string
-) {
-  try {
-    // Configure Cloudinary
-    cloudinary.config({
-      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
-      secure: true
-    });
+export async function queueVideoGeneration(
+  data: QueueVideoInput
+): Promise<VideoResponse> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-    console.log('Starting uploads to Cloudinary...');
-
-    // Upload first video
-    const firstVideoUpload = await cloudinary.uploader.upload(firstVideoUrl, {
-      resource_type: "video",
-      folder: "videos"
-    });
-    console.log('First video uploaded:', firstVideoUpload.public_id);
-
-    // Upload second video
-    const secondVideoUpload = await cloudinary.uploader.upload(secondVideoUrl, {
-      resource_type: "video",
-      folder: "videos"
-    });
-    console.log('Second video uploaded:', secondVideoUpload.public_id);
-
-    // Calculate text positions
-    const getTextPosition = (position: string): { gravity: string } => {
-      switch (position) {
-        case 'top': return { gravity: "north" };
-        case 'middle': return { gravity: "center" };
-        case 'bottom': return { gravity: "south" };
-        default: return { gravity: "south" };
-      }
+  if (!user) {
+    return {
+      error: "Unauthorized",
+      success: false,
+      data: null,
     };
+  }
 
-    // Create the concatenated video with text overlays
-    const result = await cloudinary.uploader.upload(firstVideoUrl, {
-      resource_type: "video",
-      folder: "concatenated-videos",
-      transformation: [
-        // First video with text
-        {
-          width: 720,
-          height: 1280,
-          crop: "fill"
-        },
-        {
-          overlay: {
-            font_family: "Arial",
-            font_size: 50,
-            font_weight: "bold",
-            text: firstText
-          },
-          color: "#FFFFFF",
-          gravity: getTextPosition(firstTextPosition).gravity,
-          y: 50
-        },
-        // Second video with text
-        {
-          overlay: {
-            resource_type: "video",
-            public_id: secondVideoUpload.public_id
-          },
-          flags: "splice",
-          width: 720,
-          height: 1280,
-          crop: "fill"
-        },
-        {
-          overlay: {
-            font_family: "Arial",
-            font_size: 50,
-            font_weight: "bold",
-            text: secondText
-          },
-          color: "#FFFFFF",
-          gravity: getTextPosition(secondTextPosition).gravity,
-          y: 50,
-          start_offset: firstVideoUpload.duration
-        }
-      ]
-    });
-
-    console.log('Final video result:', result);
-
-    // Clean up uploaded videos
-    try {
-      await cloudinary.api.delete_resources(
-        [firstVideoUpload.public_id, secondVideoUpload.public_id],
-        { resource_type: "video" }
-      );
-      console.log('Cleanup completed');
-    } catch (cleanupError) {
-      console.error('Error cleaning up videos:', cleanupError);
+  try {
+    // Check credits first
+    const creditCheck = await checkAndUpdateVideoCredits();
+    if (!creditCheck.hasCredits) {
+      return {
+        error: creditCheck.error || "Insufficient credits",
+        success: false,
+        data: null,
+      };
     }
 
-    return result;
+    // Get webhook URL from environment
+    const webhookUrl = process.env.NEXT_PUBLIC_VIDEO_WEBHOOK_URL;
+    if (!webhookUrl) {
+      throw new Error("Webhook URL not configured");
+    }
+
+    // Submit to fal.ai queue
+    const { request_id } = await fal.queue.submit("fal-ai/kling-video/v1.6/pro/image-to-video", {
+      input: {
+        prompt: data.prompt,
+        image_url: data.input_image,
+        aspect_ratio: data.aspect_ratio as "16:9" | "9:16" | "1:1",
+        duration: data.duration as "5" | "10",
+      },
+      webhookUrl,
+    });
+
+    // Store request in database
+    const { data: requestData, error: dbError } = await supabase
+      .from("video_requests")
+      .insert([{
+        user_id: user.id,
+        request_id,
+        prompt: data.prompt,
+        input_image: data.input_image,
+        aspect_ratio: data.aspect_ratio,
+        duration: data.duration,
+        status: "pending"
+      }])
+      .select()
+      .single();
+
+    if (dbError) {
+      return {
+        error: dbError.message,
+        success: false,
+        data: null,
+      };
+    }
+
+    return {
+      error: null,
+      success: true,
+      data: requestData,
+    };
   } catch (error) {
-    console.error('Error in mergeVideosWithCloudinary:', error);
-    throw error;
+    return {
+      error: error instanceof Error ? error.message : "Failed to queue video generation",
+      success: false,
+      data: null,
+    };
+  }
+}
+
+export async function getVideoRequestStatus(requestId: string): Promise<VideoResponse> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      error: "Unauthorized",
+      success: false,
+      data: null,
+    };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("video_requests")
+      .select("*")
+      .eq("request_id", requestId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (error) {
+      return {
+        error: error.message,
+        success: false,
+        data: null,
+      };
+    }
+
+    // If request is still pending, check fal.ai status
+    if (data.status === "pending") {
+      const status = await fal.queue.status("fal-ai/kling-video/v1.6/pro/image-to-video", {
+        requestId,
+        logs: true,
+      });
+
+      // Map fal.ai status to our database status
+      let newStatus;
+      let errorMessage = null;
+      
+      switch (status.status) {
+        case "IN_QUEUE":
+          newStatus = "pending";
+          break;
+        case "IN_PROGRESS":
+          newStatus = "processing";
+          break;
+        case "COMPLETED":
+          newStatus = "completed";
+          break;
+        default:
+          newStatus = "failed";
+          errorMessage = "Generation failed";
+      }
+
+      // Update status in database
+      await supabase
+        .from("video_requests")
+        .update({ 
+          status: newStatus,
+          ...(errorMessage && { error: errorMessage }),
+       
+        })
+        .eq("request_id", requestId);
+
+      // Return appropriate response
+      if (newStatus === "failed") {
+        return {
+          error: errorMessage,
+          success: false,
+          data: null,
+        };
+      }
+
+      // Update data with new status
+      data.status = newStatus;
+    
+    }
+
+    return {
+      error: null,
+      success: true,
+      data,
+    };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Failed to get video status",
+      success: false,
+      data: null,
+    };
   }
 } 

@@ -1,8 +1,14 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tables } from "@database.types";
-import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -11,27 +17,25 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { Tables } from "@database.types";
 
-interface RecentImagesProps {
-  images: Array<
-    Tables<"generated_images"> & {
+interface RecentVideosProps {
+  videos: Array<
+    Tables<"generated_videos"> & {
       url: string | undefined;
     }
   >;
 }
 
-export function RecentImages({ images }: RecentImagesProps) {
-  if (images.length === 0) {
+export function RecentVideos({ videos }: RecentVideosProps) {
+  if (videos.length === 0) {
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Recent Image Generations</CardTitle>
+          <CardTitle className="text-base">Recent Video Generations</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No images generated yet</p>
+          <p className="text-sm text-muted-foreground">No videos generated yet</p>
         </CardContent>
       </Card>
     );
@@ -40,9 +44,9 @@ export function RecentImages({ images }: RecentImagesProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <CardTitle className="text-base">Recent Image Generations</CardTitle>
+        <CardTitle className="text-base">Recent Video Generations</CardTitle>
         <Button asChild variant="ghost" size="sm" className="-mr-2">
-          <Link href="/gallery">
+          <Link href="/gallery?type=video">
             View All <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
@@ -55,33 +59,30 @@ export function RecentImages({ images }: RecentImagesProps) {
           className="w-full"
         >
           <CarouselContent className="-ml-2 md:-ml-4">
-            {images.map((image) => (
+            {videos.map((video) => (
               <CarouselItem
-                key={image.id}
+                key={video.id}
                 className="pl-2 md:pl-4 basis-1/2 md:basis-1/3"
               >
                 <div className="space-y-1">
                   <div
                     className={cn(
                       "relative overflow-hidden rounded-lg",
-                      image.height && image.width
-                        ? Number(image.width / image.height) === 1
-                          ? "aspect-square"
-                          : `aspect-[${image.width}/${image.height}]`
-                        : "aspect-square"
+                      video.aspect_ratio === "1:1"
+                        ? "aspect-square"
+                        : `aspect-[${video.aspect_ratio.replace(":", "/")}]`
                     )}
                   >
-                    <Image
-                      src={image.url || ""}
-                      alt={image.prompt || "Generated image"}
-                      width={image.width || 100}
-                      height={image.height || 100}
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    <video
+                      src={video.url}
+                      className="h-full w-full object-cover"
+                      muted
+                      playsInline
+                      loop
                     />
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-2">
-                    {image.prompt}
+                    {video.prompt}
                   </p>
                 </div>
               </CarouselItem>
@@ -93,4 +94,4 @@ export function RecentImages({ images }: RecentImagesProps) {
       </CardContent>
     </Card>
   );
-}
+} 

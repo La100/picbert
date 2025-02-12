@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import {
   Sheet,
@@ -105,6 +107,8 @@ export function ImageDialog({ image, onClose }: ImageDialogProps) {
               </Badge>
 
             
+
+             
 
              
 

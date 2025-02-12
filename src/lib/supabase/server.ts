@@ -1,5 +1,6 @@
 import { createServerClient} from '@supabase/ssr'
 import { cookies } from 'next/headers';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export async function createClient() {
   const cookieStore = await cookies()
@@ -26,4 +27,25 @@ export async function createClient() {
       },
     }
   )
+}
+
+export function createServiceClient() {
+  return createSupabaseClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      db: {
+        schema: 'public'
+      },
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      },
+      global: {
+        headers: {
+          'x-supabase-auth-bypass': process.env.SUPABASE_SERVICE_ROLE_KEY!
+        }
+      }
+    }
+  );
 }

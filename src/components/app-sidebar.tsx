@@ -4,7 +4,6 @@ import {
   Images,
   Sparkles,
   SquareTerminal,
-  Megaphone,
   Video,
 } from "lucide-react"
 
@@ -41,15 +40,20 @@ const navMain =  [
     },
     {
       title: "Gallery",
-      url: "/gallery",
       icon: Images,
+      items: [
+        {
+          title: "Images",
+          url: "/gallery/images",
+          icon: Image,
+        },
+        {
+          title: "Videos",
+          url: "/gallery/videos",
+          icon: Video,
+        },
+      ],
     },
-    {
-      title: "Make Ad",
-      url: "/make-ad",
-      icon: Megaphone,
-    },
-
   ]
 
 export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

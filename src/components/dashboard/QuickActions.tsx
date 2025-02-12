@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CreditCardIcon,Wand2Icon } from "lucide-react";
+import { CreditCardIcon, Wand2Icon, VideoIcon } from "lucide-react";
 import Link from "next/link";
 
 export function QuickActions() {
@@ -25,7 +25,13 @@ export function QuickActions() {
             Generate Image
           </Button>
         </Link>
-        
+
+        <Link href="/video-generation" className="w-full">
+          <Button className="w-full">
+            <VideoIcon className="mr-2 h-4 w-4" />
+            Generate Video
+          </Button>
+        </Link>
 
         <Link href="/billing" className="w-full">
           <Button variant="secondary" className="w-full">

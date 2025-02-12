@@ -32,6 +32,8 @@ import {
   SelectValue,
 } from "../ui/select";
 import { GalleryImagePicker } from "../gallery/GalleryImagePicker";
+import { revalidateTag } from "next/cache";
+import { queueVideoGeneration, getVideoRequestStatus } from "@/app/actions/video-actions";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -47,7 +49,6 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const VideoConfigurations = () => {
-  const generateVideo = useVideoGenerateStore((state) => state.generateVideo);
   const loading = useVideoGenerateStore((state) => state.loading);
   const setLoading = useVideoGenerateStore((state) => state.setLoading);
   const [isUploading, setIsUploading] = React.useState(false);
@@ -81,31 +82,70 @@ const VideoConfigurations = () => {
       toast.info("Starting video generation. This process takes around 5 minutes...", {
         duration: 10000,
       });
-      const output = await fal.subscribe("fal-ai/kling-video/v1.6/pro/image-to-video", {
-        input: {
-          prompt: values.prompt,
-          image_url: values.input_image,
-          aspect_ratio: values.aspect_ratio,
-          duration: values.duration,
-        },
-        logs: true,
-      });
 
-      if (!output.data?.video?.url) {
-        throw new Error("No video URL in response");
-      }
-
-      const videoData = {
-        url: output.data.video.url,
+      // Queue the video generation
+      const result = await queueVideoGeneration({
         prompt: values.prompt,
         input_image: values.input_image,
         aspect_ratio: values.aspect_ratio,
         duration: values.duration,
-      };
-
-      await generateVideo({
-        data: { video: videoData },
       });
+
+      if (!result.success || result.error) {
+        throw new Error(result.error || "Failed to queue video generation");
+      }
+
+      if (!result.data?.request_id) {
+        throw new Error("No request ID returned");
+      }
+
+      // Start polling for status
+      const requestId = result.data.request_id as string;
+      const pollInterval = setInterval(async () => {
+        const status = await getVideoRequestStatus(requestId);
+        
+        if (status.error) {
+          clearInterval(pollInterval);
+          setLoading(false);
+          toast.error(status.error);
+          return;
+        }
+
+        // Handle different statuses
+        switch (status.data?.status) {
+          case "processing":
+            toast.info("Processing your video...", { id: "video-status" });
+            break;
+          case "completed":
+            clearInterval(pollInterval);
+            setLoading(false);
+            toast.success("Video generated successfully!");
+            // Trigger a refresh of the video list
+            revalidateTag("gallery-videos");
+            revalidateTag("dashboard-videos");
+            break;
+          case "failed":
+            clearInterval(pollInterval);
+            setLoading(false);
+            toast.error(String(status.error || "Failed to generate video"));
+            break;
+          case "pending":
+            toast.info("Your video is queued...", { id: "video-status" });
+            break;
+          default:
+            toast.info("Checking video status...", { id: "video-status" });
+        }
+      }, 5000); // Poll every 5 seconds
+
+      // Clean up interval after 10 minutes (failsafe)
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        if (loading) {
+          setLoading(false);
+          toast.error("Video generation timed out. Please try again.");
+        }
+      }, 10 * 60 * 1000);
+
     } catch (error) {
       console.error("Failed to generate video:", error);
       toast.error("Failed to generate video. Please try again.");
