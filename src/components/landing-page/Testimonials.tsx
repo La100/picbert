@@ -8,7 +8,6 @@ import avatar3 from "@/public/avatars/Golden Hour Contemplation.jpeg";
 import avatar4 from "@/public/avatars/Portrait of a Woman in Rust-Colored Top.jpeg";
 import avatar5 from "@/public/avatars/Radiant Comfort.jpeg";
 import avatar6 from "@/public/avatars/Relaxed Bearded Man with Tattoo at Cozy Cafe.jpeg";
-import type { StaticImageData } from "next/image";
 
 const reviews = [
   {
@@ -55,7 +54,7 @@ const ReviewCard = ({
   username,
   body,
 }: {
-  img: StaticImageData;
+  img: { src: string };
   name: string;
   username: string;
   body: string;
