@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Info } from "lucide-react";
+import { Info, Camera } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,6 +31,7 @@ import useGenerateStore from "@/store/useGenerateStore";
 import { fal } from "@/lib/fal";
 import { toast } from "sonner";
 import { PromptStarterSelector } from "./PromptStarter";
+import { Checkbox } from "../ui/checkbox";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -39,6 +40,7 @@ const formSchema = z.object({
   }),
   output_format: z.string().default("jpeg"),
   raw: z.boolean().default(true),
+  selfie: z.boolean().default(false),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -55,6 +57,7 @@ const Configurations = () => {
       aspect_ratio: "9:16",
       output_format: "jpeg",
       raw: true,
+      selfie: false,
     },
   });
 
@@ -65,12 +68,15 @@ const Configurations = () => {
   async function onSubmit(values: FormValues) {
     try {
       setLoading(true);
+      const finalPrompt = values.selfie 
+        ? values.prompt + ", selfie, full body visible, 4k high resolution"
+        : values.prompt;
+        
       const output = await fal.subscribe("fal-ai/flux-pro/v1.1-ultra", {
         input: {
-          prompt: values.prompt + ", selfie, full body visible, 4k high resolution",
+          prompt: finalPrompt,
           aspect_ratio: values.aspect_ratio,
           raw: true,
-      
         },
         logs: true,
       });
@@ -187,6 +193,24 @@ const Configurations = () => {
                     <Textarea {...field} rows={6} />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="selfie"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel className="font-normal flex items-center gap-2">
+                    Selfie <Camera className="w-4 h-4" />
+                  </FormLabel>
                 </FormItem>
               )}
             />

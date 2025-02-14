@@ -21,7 +21,7 @@ export function VideoLibraryContent({ videos }: VideoLibraryContentProps) {
   const filteredVideos = selectedTags.length === 0
     ? videos
     : videos.filter(video =>
-        selectedTags.some(selectedTag =>
+        selectedTags.every(selectedTag =>
           video.tags.some(videoTag => 
             videoTag.toLowerCase() === selectedTag.toLowerCase()
           )
