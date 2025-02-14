@@ -1,9 +1,10 @@
 export interface VideoData {
+  id: string;
   tags: string[];
   video_url: string;
 }
 
-export const videoLibraryData: VideoData[] = Array(33).fill([
+const baseVideos = [
   {
     tags: ["happy", "woman"],
     video_url: "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/client_videos//video_fabda98d-baca-47b4-afdf-06abc46943b3.mp4"
@@ -16,4 +17,12 @@ export const videoLibraryData: VideoData[] = Array(33).fill([
     tags: ["cmd", "gang","bob"],
     video_url: "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/client_videos//ugc-video-1738751352043.mp4"
   }
-]).flat(); 
+];
+
+export const videoLibraryData: VideoData[] = Array(33)
+  .fill(baseVideos)
+  .flat()
+  .map((video, index) => ({
+    ...video,
+    id: `video-${index + 1}`
+  })); 
