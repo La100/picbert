@@ -2,17 +2,12 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createClientWithOptions } from "@/lib/supabase/server-fetch";
-import { randomUUID } from "crypto";
 
 export interface ClientVideo {
   id: string;
   tags: string[];
   video_url: string;
-}
-
-export interface BulkVideoUpload {
-  video_url: string;
-  tags: string[];
+  poster_url?: string;  // Optional for backward compatibility
 }
 
 export async function getClientVideos(page?: number, selectedTags: string[] = []) {
@@ -86,76 +81,6 @@ export async function getClientVideos(page?: number, selectedTags: string[] = []
     success: true,
     data: videosWithSignedUrls as ClientVideo[],
     count: count || 0,
-  };
-}
-
-export async function bulkAddVideos(videos: BulkVideoUpload[]) {
-  const supabase = await createClient();
-
-  const uploadResults = await Promise.all(
-    videos.map(async (video) => {
-      try {
-        // Download video from URL
-        const response = await fetch(video.video_url);
-        const videoBlob = await response.blob();
-        const arrayBuffer = await videoBlob.arrayBuffer();
-
-        // Generate unique filename
-        const fileName = `video_${randomUUID()}.mp4`;
-
-        // Upload to storage
-        const { error: storageError } = await supabase.storage
-          .from("client_videos")
-          .upload(fileName, arrayBuffer, {
-            contentType: "video/mp4",
-            cacheControl: "3600",
-            upsert: false,
-          });
-
-        if (storageError) {
-          throw storageError;
-        }
-
-        return {
-          video_url: fileName,  // Store just the filename
-          tags: video.tags,
-        };
-      } catch (error) {
-        console.error('Failed to process video:', error);
-        return null;
-      }
-    })
-  );
-
-  // Filter out failed uploads
-  const successfulUploads = uploadResults.filter((result): result is NonNullable<typeof result> => result !== null);
-
-  if (successfulUploads.length === 0) {
-    return {
-      error: "All video uploads failed",
-      success: false,
-      data: null,
-    };
-  }
-
-  // Insert records into database
-  const { data, error } = await supabase
-    .from("client_videos")
-    .insert(successfulUploads)
-    .select();
-
-  if (error) {
-    return {
-      error: error.message,
-      success: false,
-      data: null,
-    };
-  }
-
-  return {
-    error: null,
-    success: true,
-    data: data as ClientVideo[],
   };
 }
 

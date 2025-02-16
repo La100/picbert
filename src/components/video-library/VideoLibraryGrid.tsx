@@ -58,34 +58,12 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
           >
             <div 
               className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
-              onMouseEnter={(e) => {
-                const videoEl = e.currentTarget.querySelector('video');
-                if (videoEl && videoEl.paused) {
-                  videoEl.play().catch(() => {
-                    // Ignore playback errors
-                  });
-                }
-              }}
-              onMouseLeave={(e) => {
-                const videoEl = e.currentTarget.querySelector('video');
-                if (videoEl) {
-                  videoEl.pause();
-                  videoEl.currentTime = 0;
-                }
-              }}
               onClick={() => setSelectedVideo(video)}
             >
-              <video 
-                src={video.video_url}
-                className="w-full h-auto object-cover"
-                loop
-                muted
-                playsInline
-                preload="metadata"
-                poster={`${video.video_url}#t=0.001`}
-                onLoadedMetadata={(e) => {
-                  e.currentTarget.currentTime = 0;
-                }}
+              <img 
+                src={video.poster_url || `${video.video_url}#t=0.001`}
+                alt="Video thumbnail"
+                className="w-full h-full object-cover"
               />
               
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
@@ -114,14 +92,17 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
 
             <div className="space-y-2 md:space-y-4">
               <div className="relative overflow-hidden rounded-lg aspect-[9/16] bg-black max-h-[60vh] md:max-h-[80vh] mx-auto">
-                <video
-                  src={selectedVideo.video_url}
-                  controls
-                  autoPlay
-                  loop
-                  muted
-                  className="absolute inset-0 w-full h-full object-contain"
-                />
+                {selectedVideo && (
+                  <video
+                    key={selectedVideo.id}
+                    src={selectedVideo.video_url}
+                    controls
+                    autoPlay
+                    loop
+                    muted
+                    className="absolute inset-0 w-full h-full object-contain"
+                  />
+                )}
               </div>
               
               <div className="flex justify-end">
