@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { GalleryImagePicker } from "../gallery/GalleryImagePicker";
+
 import { revalidateTag } from "next/cache";
 import { queueVideoGeneration, getVideoRequestStatus } from "@/app/actions/video-actions";
 
@@ -151,7 +151,7 @@ const VideoConfigurations = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid w-full items-start gap-6 pt-20"
+        className="grid w-full items-start gap-6 xl:pt-20"
       >
         <fieldset className="grid gap-6 rounded-lg border p-4 bg-background">
           <legend className="-ml-1 px-1 text-sm font-medium">Settings</legend>
@@ -182,22 +182,29 @@ const VideoConfigurations = () => {
                     variant="outline"
                     onClick={() => document.getElementById("image-upload")?.click()}
                     disabled={isUploading}
+                    className="flex items-center gap-2"
                   >
                     {isUploading ? (
                       <>
-                        <span className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-primary border-r-transparent" />
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent" />
                         Uploading...
                       </>
                     ) : (
                       <>
-                        <Upload className="w-4 h-4 mr-2" />
+                        <Upload className="w-4 h-4" />
                         Upload
                       </>
                     )}
                   </Button>
-                  <GalleryImagePicker 
-                    onImageSelect={(imageUrl) => !isUploading && form.setValue("input_image", imageUrl)} 
-                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById("gallery-picker")?.click()}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="i-lucide-image w-4 h-4" />
+                    Choose from Gallery
+                  </Button>
                 </div>
                 {field.value && (
                   <div className="mt-2">
@@ -213,50 +220,52 @@ const VideoConfigurations = () => {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="aspect_ratio"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Aspect Ratio</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select an aspect ratio" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="16:9">Landscape</SelectItem>
-                    <SelectItem value="9:16">Mobile</SelectItem>
-                    <SelectItem value="1:1">Square</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex gap-4">
+            <FormField
+              control={form.control}
+              name="aspect_ratio"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Aspect Ratio</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select aspect ratio" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="16:9">Landscape</SelectItem>
+                      <SelectItem value="9:16">Mobile</SelectItem>
+                      <SelectItem value="1:1">Square</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="duration"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Duration</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select duration" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="5">5 seconds</SelectItem>
-                    <SelectItem value="10">10 seconds</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="duration"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Duration</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select duration" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="5">5 seconds</SelectItem>
+                      <SelectItem value="10">10 seconds</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             control={form.control}
@@ -265,7 +274,11 @@ const VideoConfigurations = () => {
               <FormItem>
                 <FormLabel>Prompt</FormLabel>
                 <FormControl>
-                  <Textarea {...field} rows={6} />
+                  <Textarea 
+                    {...field} 
+                    rows={6} 
+                    placeholder="Describe your imagination..."
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -273,8 +286,13 @@ const VideoConfigurations = () => {
           />
 
           <div className="space-y-2">
-            <Button type="submit" disabled={loading} className="w-full font-medium">
-              {loading ? "Generating..." : "Generate"}
+            <Button type="submit" disabled={loading} className="w-full font-medium gap-2">
+              {loading ? "Generating..." : (
+                <>
+                  <span className="i-lucide-wand-2 w-4 h-4" />
+                  Generate
+                </>
+              )}
             </Button>
             <div className="flex items-center justify-center text-sm text-muted-foreground">
               <span>Video generation takes around 5 minutes</span>

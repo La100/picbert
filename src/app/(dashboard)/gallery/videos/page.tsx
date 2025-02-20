@@ -16,8 +16,16 @@ const GalleryLoading = () => (
   </div>
 );
 
-export default async function VideosGalleryPage() {
-  const videos = await getVideos();
+interface PageProps {
+  searchParams: Promise<{ page?: string }>;
+}
+
+export default async function VideosGalleryPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const currentPage = Number(params.page) || 1;
+  const pageSize = 12;
+
+  const videos = await getVideos(currentPage, pageSize);
   const videosWithType = videos.data?.map(video => ({ ...video, type: 'video' as const })) || [];
 
   return (
@@ -30,7 +38,12 @@ export default async function VideosGalleryPage() {
       </header>
 
       <Suspense fallback={<GalleryLoading />}>
-        <MediaGallery items={videosWithType} />
+        <MediaGallery 
+          items={videosWithType}
+          currentPage={currentPage}
+          totalCount={videos.count || 0}
+          pageSize={pageSize}
+        />
       </Suspense>
     </div>
   );

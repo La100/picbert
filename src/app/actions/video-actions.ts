@@ -118,7 +118,7 @@ export async function storeVideo(
   }
 }
 
-export async function getVideos(limit?: number) {
+export async function getVideos(page?: number, pageSize: number = 12) {
   const cacheOptions = {
     cache: "force-cache",
     next: {
@@ -135,32 +135,36 @@ export async function getVideos(limit?: number) {
       error: "Unauthorized",
       success: false,
       data: null,
+      count: 0,
     };
   }
 
   let query = supabase
     .from("generated_videos")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("user_id", user?.id || "")
     .order("created_at", { ascending: false });
 
-  if (limit) {
-    query = query.limit(limit);
+  if (page && pageSize) {
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
+    query = query.range(start, end);
   }
 
-  const { data, error } = await query;
+  const { data, error, count } = await query;
 
-  if (error || !data?.length) {
+  if (error) {
     return {
-      error: error?.message || "Failed to fetch videos",
+      error: error.message,
       success: false,
       data: null,
+      count: 0,
     };
   }
 
   // Create signed URLs one by one but with better error handling
   const videosWithUrls = await Promise.all(
-    data.map(async (video) => {
+    (data || []).map(async (video) => {
       try {
         const { data: urlData } = await supabase
           .storage
@@ -185,6 +189,7 @@ export async function getVideos(limit?: number) {
     error: null,
     success: true,
     data: videosWithUrls || null,
+    count: count || 0,
   };
 }
 

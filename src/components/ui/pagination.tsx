@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { ButtonProps, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
@@ -105,6 +106,30 @@ const PaginationEllipsis = ({
   </span>
 )
 PaginationEllipsis.displayName = "PaginationEllipsis"
+
+interface PaginationComponentProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+export function PaginationComponent({ currentPage, totalPages, onPageChange }: PaginationComponentProps) {
+  if (totalPages <= 1) return null;
+
+  return (
+    <div className="flex justify-center gap-2 mt-8">
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        <Button
+          key={page}
+          variant={currentPage === page ? "default" : "secondary"}
+          onClick={() => onPageChange(page)}
+        >
+          {page}
+        </Button>
+      ))}
+    </div>
+  );
+}
 
 export {
   Pagination,

@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "./button";
-import { Badge } from "./badge";
+
 import { Download, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -132,15 +132,16 @@ export function MediaPopup({
 
           {promptMetadata && (
             <>
-              <hr className="border-primary/30 mb-4" />
-              <div className="flex flex-col gap-2">
-                <Badge
-                  variant="secondary"
-                  className="rounded-full border border-primary/30 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-normal"
-                >
-                  <span className="font-semibold uppercase mr-2">Prompt:</span>
-                  {promptMetadata.value}
-                </Badge>
+              <hr className="border-primary/30 mb-6" />
+              <div className="flex flex-col gap-4 animate-in fade-in-50 duration-500">
+                <div className="bg-secondary/30 backdrop-blur-sm rounded-xl p-6 shadow-inner">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">Prompt</span>
+                  </div>
+                  <p className="text-foreground/90 text-sm sm:text-base font-medium leading-relaxed">
+                    {promptMetadata.value}
+                  </p>
+                </div>
               </div>
             </>
           )}

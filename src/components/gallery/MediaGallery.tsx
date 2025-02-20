@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { MediaPopup } from "../ui/media-popup";
 import { deleteVideo } from "@/app/actions/video-actions";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { PaginationComponent } from "../ui/pagination";
 
 type VideoItem = {
   url: string | undefined;
@@ -13,19 +15,20 @@ type VideoItem = {
 
 interface MediaGalleryProps {
   items: VideoItem[];
-  showUpload?: boolean;
+  currentPage: number;
+  totalCount: number;
+  pageSize: number;
 }
 
-export function MediaGallery({ items, showUpload = false }: MediaGalleryProps) {
+export function MediaGallery({ items, currentPage, totalCount, pageSize }: MediaGalleryProps) {
   const [selectedItem, setSelectedItem] = useState<VideoItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 16;
+  const router = useRouter();
+  const totalPages = Math.ceil(totalCount / pageSize);
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = items.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const handlePageChange = (page: number) => {
+    router.push(`?page=${page}`);
+  };
 
   const handleDelete = async () => {
     if (!selectedItem || isDeleting) return;
@@ -38,6 +41,7 @@ export function MediaGallery({ items, showUpload = false }: MediaGalleryProps) {
       }
       toast.success("Video deleted successfully");
       setSelectedItem(null);
+      router.refresh();
     } catch (error) {
       console.error("Failed to delete video:", error);
       toast.error("Failed to delete video");
@@ -53,14 +57,8 @@ export function MediaGallery({ items, showUpload = false }: MediaGalleryProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {showUpload && (
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-xl font-semibold">Videos</h2>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-          {currentItems.map((item, index) => (
+          {items.map((item, index) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -114,25 +112,11 @@ export function MediaGallery({ items, showUpload = false }: MediaGalleryProps) {
           ))}
         </div>
 
-        {totalPages > 1 && (
-          <div className="flex justify-center gap-2 mt-8">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <motion.button
-                key={page}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setCurrentPage(page)}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  currentPage === page
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary hover:bg-secondary/80'
-                }`}
-              >
-                {page}
-              </motion.button>
-            ))}
-          </div>
-        )}
+        <PaginationComponent
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </motion.div>
 
       {selectedItem && (
