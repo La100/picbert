@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Info, Camera } from "lucide-react";
+import { Camera } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,12 +20,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
 import useGenerateStore from "@/store/useGenerateStore";
 import { fal } from "@/lib/fal";
@@ -57,7 +51,7 @@ const Configurations = () => {
       aspect_ratio: "9:16",
       output_format: "jpeg",
       raw: true,
-      selfie: false,
+      selfie: true,
     },
   });
 
@@ -114,114 +108,82 @@ const Configurations = () => {
   }
 
   return (
-    <TooltipProvider>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid w-full items-start gap-6"
-        >
-          <fieldset className="grid gap-6 rounded-lg border p-4 bg-background">
-            <legend className="-ml-1 px-1 text-sm font-medium">Settings</legend>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid w-full items-start gap-6"
+      >
+        <fieldset className="grid gap-6 rounded-lg border p-4 bg-background">
+          <legend className="-ml-1 px-1 text-sm font-medium">Settings</legend>
 
-            <div className="space-y-2">
-              <FormLabel className="flex items-center gap-2">
-                Prompt Starters{" "}
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Info className="w-4 h-4" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Choose a starter prompt to begin with</p>
-                  </TooltipContent>
-                </Tooltip>
-              </FormLabel>
-              <PromptStarterSelector onSelect={handlePromptSelect} />
-            </div>
+          <div className="space-y-2">
+            <FormLabel>Prompt Starters</FormLabel>
+            <PromptStarterSelector onSelect={handlePromptSelect} />
+          </div>
 
-            <FormField
-              control={form.control}
-              name="aspect_ratio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Aspect Ratio{" "}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="w-4 h-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Aspect ratio for the generated image</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an aspect ratio" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="1:1">1:1</SelectItem>
-                      <SelectItem value="9:16">9:16</SelectItem>
-                      <SelectItem value="16:9">16:9</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="prompt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Prompt{" "}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="w-4 h-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Describe the image you want to generate</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
+          <FormField
+            control={form.control}
+            name="aspect_ratio"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Aspect Ratio</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
-                    <Textarea {...field} rows={6} />
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an aspect ratio" />
+                    </SelectTrigger>
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                  <SelectContent>
+                    <SelectItem value="1:1">1:1</SelectItem>
+                    <SelectItem value="9:16">9:16</SelectItem>
+                    <SelectItem value="16:9">16:9</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="selfie"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormLabel className="font-normal flex items-center gap-2">
-                    Selfie <Camera className="w-4 h-4" />
-                  </FormLabel>
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="prompt"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Prompt</FormLabel>
+                <FormControl>
+                  <Textarea {...field} rows={6} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <Button type="submit" disabled={loading} className="font-medium">
-              {loading ? "Generowanie..." : "Generuj"}
-            </Button>
-          </fieldset>
-        </form>
-      </Form>
-    </TooltipProvider>
+          <FormField
+            control={form.control}
+            name="selfie"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <FormLabel className="font-normal flex items-center gap-2">
+                  Selfie <Camera className="w-4 h-4" />
+                </FormLabel>
+              </FormItem>
+            )}
+          />
+
+          <Button type="submit" disabled={loading} className="font-medium">
+            {loading ? "Generowanie..." : "Generuj"}
+          </Button>
+        </fieldset>
+      </form>
+    </Form>
   );
 };
 

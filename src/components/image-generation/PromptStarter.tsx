@@ -6,7 +6,7 @@ interface PromptStarterProps {
 
 export function PromptStarterSelector({ onSelect }: PromptStarterProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+    <div className="flex flex-wrap gap-2 mb-4">
       {promptStarters.map((starter) => (
         <button
           type="button"
@@ -16,16 +16,16 @@ export function PromptStarterSelector({ onSelect }: PromptStarterProps) {
             e.stopPropagation();
             onSelect(starter.prompt);
           }}
-          className="relative group overflow-hidden rounded-lg hover:ring-2 hover:ring-primary transition-all"
+          className="relative group overflow-hidden rounded-lg hover:ring-1 hover:ring-primary transition-all w-[100px] h-[100px]"
         >
-          <div className="relative aspect-square">
+          <div className=" w-full h-full">
             <img
               src={starter.previewImageUrl}
               alt={starter.name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute' }}
+              className="  w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <span className="text-white text-sm font-medium px-2 text-center">
+              <span className="text-white text-sm font-medium px-1 text-center">
                 {starter.name}
               </span>
             </div>

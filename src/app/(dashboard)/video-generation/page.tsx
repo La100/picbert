@@ -11,11 +11,10 @@ export const metadata: Metadata = {
 
 export default function VideoGenerationPage() {
   return (
-    <section className="container mx-auto grid flex-1 gap-4 overflow-auto grid-cols-1 lg:grid-cols-3">
+    <section className="container mx-auto flex flex-col gap-8 p-4">
       <VideoConfigurations />
-      <div className="relative flex h-fit flex-col items-center justify-center rounded-xl p-0 lg:p-4 lg:col-span-2">
+      <div className="w-full flex justify-center">
         <GeneratedVideos />
-        <div className="flex-1" />
       </div>
     </section>
   );

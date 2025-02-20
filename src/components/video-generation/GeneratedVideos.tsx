@@ -6,17 +6,9 @@ import { cn } from "@/lib/utils";
 
 const GeneratedVideos = () => {
   const videos = useVideoGenerateStore((state) => state.videos);
-  const loading = useVideoGenerateStore((state) => state.loading);
+ 
 
-  if (videos.length === 0) return (
-    <Card className="w-full max-w-2xl bg-muted">
-      <CardContent className="flex aspect-square items-center justify-center p-6">
-        <span className="text-2xl">
-          {loading ? "Loading..." : "There are no videos generated"}
-        </span>
-      </CardContent>
-    </Card>
-  );
+  if (videos.length === 0) return null;
 
   const video = videos[0];
 

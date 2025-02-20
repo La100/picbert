@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback } from "react";
-import { Info, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -12,12 +12,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
 import useVideoGenerateStore from "@/store/useVideoGenerateStore";
 import { fal } from "@/lib/fal";
@@ -154,184 +148,141 @@ const VideoConfigurations = () => {
   }
 
   return (
-    <TooltipProvider>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid w-full items-start gap-6 pt-20"
-        >
-          <fieldset className="grid gap-6 rounded-lg border p-4 bg-background">
-            <legend className="-ml-1 px-1 text-sm font-medium">Settings</legend>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid w-full items-start gap-6 pt-20"
+      >
+        <fieldset className="grid gap-6 rounded-lg border p-4 bg-background">
+          <legend className="-ml-1 px-1 text-sm font-medium">Settings</legend>
 
-            <FormField
-              control={form.control}
-              name="input_image"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Input Image{" "}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="w-4 h-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Upload an image or select from gallery</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <div className="flex gap-2">
-                    <FormControl>
-                      <Input {...field} type="hidden" />
-                    </FormControl>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      id="image-upload"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleFileUpload(file);
-                      }}
-                      disabled={isUploading}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => document.getElementById("image-upload")?.click()}
-                      disabled={isUploading}
-                    >
-                      {isUploading ? (
-                        <>
-                          <span className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-primary border-r-transparent" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          Upload
-                        </>
-                      )}
-                    </Button>
-                    <GalleryImagePicker 
-                      onImageSelect={(imageUrl) => !isUploading && form.setValue("input_image", imageUrl)} 
+          <FormField
+            control={form.control}
+            name="input_image"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Input Image</FormLabel>
+                <div className="flex gap-2">
+                  <FormControl>
+                    <Input {...field} type="hidden" />
+                  </FormControl>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    id="image-upload"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file);
+                    }}
+                    disabled={isUploading}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById("image-upload")?.click()}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <>
+                        <span className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-primary border-r-transparent" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload
+                      </>
+                    )}
+                  </Button>
+                  <GalleryImagePicker 
+                    onImageSelect={(imageUrl) => !isUploading && form.setValue("input_image", imageUrl)} 
+                  />
+                </div>
+                {field.value && (
+                  <div className="mt-2">
+                    <img
+                      src={field.value} 
+                      alt="Selected input" 
+                      className="max-h-[200px] rounded-md object-contain"
                     />
                   </div>
-                  {field.value && (
-                    <div className="mt-2">
-                      <img
-                        src={field.value} 
-                        alt="Selected input" 
-                        className="max-h-[200px] rounded-md object-contain"
-                      />
-                    </div>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="aspect_ratio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Aspect Ratio{" "}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="w-4 h-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Aspect ratio for the generated video</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an aspect ratio" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="16:9">Landscape</SelectItem>
-                      <SelectItem value="9:16">Mobile</SelectItem>
-                      <SelectItem value="1:1">Square</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="duration"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Duration{" "}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="w-4 h-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Duration of the generated video in seconds</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select duration" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="5">5 seconds</SelectItem>
-                      <SelectItem value="10">10 seconds</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="prompt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Prompt{" "}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="w-4 h-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Describe how you want the image to be animated</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
+          <FormField
+            control={form.control}
+            name="aspect_ratio"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Aspect Ratio</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <Textarea {...field} rows={6} />
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an aspect ratio" />
+                    </SelectTrigger>
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                  <SelectContent>
+                    <SelectItem value="16:9">Landscape</SelectItem>
+                    <SelectItem value="9:16">Mobile</SelectItem>
+                    <SelectItem value="1:1">Square</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className="space-y-2">
-              <Button type="submit" disabled={loading} className="w-full font-medium">
-                {loading ? "Generating..." : "Generate"}
-              </Button>
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <Info className="w-4 h-4" />
-                <span>Video generation takes around 5 minutes</span>
-              </div>
+          <FormField
+            control={form.control}
+            name="duration"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Duration</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select duration" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="5">5 seconds</SelectItem>
+                    <SelectItem value="10">10 seconds</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="prompt"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Prompt</FormLabel>
+                <FormControl>
+                  <Textarea {...field} rows={6} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="space-y-2">
+            <Button type="submit" disabled={loading} className="w-full font-medium">
+              {loading ? "Generating..." : "Generate"}
+            </Button>
+            <div className="flex items-center justify-center text-sm text-muted-foreground">
+              <span>Video generation takes around 5 minutes</span>
             </div>
-          </fieldset>
-        </form>
-      </Form>
-    </TooltipProvider>
+          </div>
+        </fieldset>
+      </form>
+    </Form>
   );
 }
 

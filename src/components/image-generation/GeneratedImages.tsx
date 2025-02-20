@@ -14,7 +14,7 @@ interface GeneratedImage {
 
 const GeneratedImages = () => {
   const images = useGenerateStore((state) => state.images);
-  const loading = useGenerateStore((state) => state.loading);
+  
 
   const handleDownload = (image: GeneratedImage) => {
     const fileExtension = image?.output_format?.toLowerCase() || 'png';
@@ -37,15 +37,7 @@ const GeneratedImages = () => {
       .catch((error) => console.error("Error downloading the image:", error));
   };
 
-  if (images.length === 0) return (
-    <Card className="w-full max-w-2xl bg-muted">
-      <CardContent className="flex aspect-square items-center justify-center p-6">
-        <span className="text-2xl">
-          {loading ? "Loading..." : "There are no images generated"}
-        </span>
-      </CardContent>
-    </Card>
-  );
+  if (images.length === 0) return null;
 
   const image = images[0];
 
