@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Camera } from "lucide-react";
+import { Smartphone } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -172,14 +172,14 @@ const Configurations = () => {
                   />
                 </FormControl>
                 <FormLabel className="font-normal flex items-center gap-2">
-                  Selfie <Camera className="w-4 h-4" />
+                  Selfie mode<Smartphone className="w-4 h-4" />
                 </FormLabel>
               </FormItem>
             )}
           />
 
           <Button type="submit" disabled={loading} className="font-medium">
-            {loading ? "Generowanie..." : "Generuj"}
+            {loading ? "Generating..." : "Generate"}
           </Button>
         </fieldset>
       </form>

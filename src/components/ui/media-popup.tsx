@@ -100,7 +100,7 @@ export function MediaPopup({
             </div>
             <Button
               size="icon"
-              variant="ghost"
+              
               onClick={onClose}
               className="h-9 w-12 sm:w-14"
             >
@@ -125,7 +125,7 @@ export function MediaPopup({
               <img
                 src={url}
                 alt="Preview"
-                className="max-w-full h-auto max-h-[50vh] sm:max-h-[50vh] rounded-lg shadow-lg mb-4 object-contain"
+                className="max-w-full h-auto max-h-[65vh] sm:max-h-[70vh] rounded-lg shadow-lg mb-4 object-contain"
               />
             )}
           </div>
