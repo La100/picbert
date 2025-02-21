@@ -35,7 +35,7 @@ export default async function Dashboard() {
   return (
     <div className="container mx-auto flex-1 space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">
+        <h2 className="text-4xl font-bold tracking-tight">
           Welcome back, {user.user_metadata.full_name}
         </h2>
       </div>
@@ -44,7 +44,7 @@ export default async function Dashboard() {
         videoCount={videoCount}
         credits={Array.isArray(credits) ? credits[0] : credits}
       />
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 text-lg">
         <RecentImages images={images?.slice(0, 6) ?? []} />
         <RecentVideos videos={videos?.slice(0, 6) ?? []} />
         <div className="lg:col-span-2">

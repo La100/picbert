@@ -19,12 +19,12 @@ export function StatsCards({
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Images</CardTitle>
+          <CardTitle className="text-base font-medium">Total Images</CardTitle>
           <ImageIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{imageCount}</div>
-          <p className="text-xs text-muted-foreground">
+          <div className="text-3xl font-bold">{imageCount}</div>
+          <p className="text-sm text-muted-foreground">
             Images generated so far
           </p>
         </CardContent>
@@ -32,12 +32,12 @@ export function StatsCards({
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Videos</CardTitle>
+          <CardTitle className="text-base font-medium">Total Videos</CardTitle>
           <VideoIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{videoCount}</div>
-          <p className="text-xs text-muted-foreground">
+          <div className="text-3xl font-bold">{videoCount}</div>
+          <p className="text-sm text-muted-foreground">
             Videos generated so far
           </p>
         </CardContent>
@@ -45,15 +45,15 @@ export function StatsCards({
     
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Image Credits</CardTitle>
+          <CardTitle className="text-base font-medium">Image Credits</CardTitle>
           <ZapIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className="text-3xl font-bold">
             {credits?.image_generation_count || 0}/
             {credits?.max_image_generation_count || 0}
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Available generation credits
           </p>
         </CardContent>
@@ -61,15 +61,15 @@ export function StatsCards({
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Video Credits</CardTitle>
+          <CardTitle className="text-base font-medium">Video Credits</CardTitle>
           <ZapIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className="text-3xl font-bold">
             {credits?.video_generation_count || 0}/
             {credits?.max_video_generation_count || 0}
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Available video credits
           </p>
         </CardContent>

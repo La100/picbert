@@ -27,10 +27,10 @@ export function RecentImages({ images }: RecentImagesProps) {
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Recent Image Generations</CardTitle>
+          <CardTitle className="text-lg">Recent Image Generations</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No images generated yet</p>
+          <p className="text-base text-muted-foreground">No images generated yet</p>
         </CardContent>
       </Card>
     );
@@ -39,7 +39,7 @@ export function RecentImages({ images }: RecentImagesProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <CardTitle className="text-base">Recent Image Generations</CardTitle>
+        <CardTitle className="text-lg">Recent Image Generations</CardTitle>
         <Button asChild variant="ghost" size="sm" className="-mr-2">
           <Link href="/gallery/images">
             View All <ArrowRight className="ml-2 h-4 w-4" />
@@ -78,7 +78,7 @@ export function RecentImages({ images }: RecentImagesProps) {
                       className="object-cover"
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
+                  <p className="text-sm text-muted-foreground line-clamp-2">
                     {image.prompt}
                   </p>
                 </div>

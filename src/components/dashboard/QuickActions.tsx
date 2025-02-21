@@ -15,26 +15,26 @@ export function QuickActions() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Quick Actions</CardTitle>
-        <CardDescription>Get started with common actions</CardDescription>
+        <CardTitle className="text-lg">Quick Actions</CardTitle>
+        <CardDescription className="text-base">Get started with common actions</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
         <Link href="/image-generation" className="w-full">
-          <Button className="w-full">
+          <Button className="w-full text-base">
             <Wand2Icon className="mr-2 h-4 w-4" />
             Generate Image
           </Button>
         </Link>
 
         <Link href="/video-generation" className="w-full">
-          <Button className="w-full">
+          <Button className="w-full text-base">
             <VideoIcon className="mr-2 h-4 w-4" />
             Generate Video
           </Button>
         </Link>
 
         <Link href="/billing" className="w-full">
-          <Button variant="secondary" className="w-full">
+          <Button variant="secondary" className="w-full text-base">
             <CreditCardIcon className="mr-2 h-4 w-4" />
             Billing
           </Button>

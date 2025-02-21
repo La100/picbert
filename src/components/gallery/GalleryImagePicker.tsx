@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Image as ImageIcon } from "lucide-react";
 import { getImages } from "@/app/actions/image-actions";
 import { useEffect } from "react";
+import { PaginationComponent } from "@/components/ui/pagination";
 
 type ImageProps = {
   url: string | undefined;
@@ -25,16 +26,29 @@ interface GalleryImagePickerProps {
 export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
   const [images, setImages] = useState<ImageProps[]>([]);
   const [open, setOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const pageSize = 12;
+
+  const loadImages = async (page: number) => {
+    const response = await getImages(page, pageSize);
+    if (response.success && response.data) {
+      setImages(response.data);
+      setTotalCount(response.count || 0);
+    }
+  };
 
   useEffect(() => {
-    const loadImages = async () => {
-      const response = await getImages();
-      if (response.success && response.data) {
-        setImages(response.data);
-      }
-    };
-    loadImages();
-  }, []);
+    if (open) {
+      loadImages(currentPage);
+    }
+  }, [open, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -48,30 +62,40 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
         <DialogHeader>
           <DialogTitle>Select Image from Gallery</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-          {images.map((image, index) => (
-            <div
-              key={`${image.id}-${index}`}
-              className="relative group cursor-pointer"
-              onClick={() => {
-                onImageSelect(image.url || "");
-                setOpen(false);
-              }}
-            >
-              <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 group-hover:opacity-50 rounded">
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-white text-sm font-semibold">Select Image</p>
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {images.map((image, index) => (
+              <div
+                key={`${image.id}-${index}`}
+                className="relative group cursor-pointer"
+                onClick={() => {
+                  onImageSelect(image.url || "");
+                  setOpen(false);
+                }}
+              >
+                <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 group-hover:opacity-50 rounded">
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-white text-sm font-semibold">Select Image</p>
+                  </div>
                 </div>
+                <img
+                  src={image.url || ""}
+                  alt={image.prompt || "Generated image"}
+                  width={image.width || 0}
+                  height={image.height || 0}
+                  className="object-cover rounded w-full aspect-[3/4] h-auto"
+                />
               </div>
-              <img
-                src={image.url || ""}
-                alt={image.prompt || "Generated image"}
-                width={image.width || 0}
-                height={image.height || 0}
-                className="object-cover rounded w-full h-48"
-              />
-            </div>
-          ))}
+            ))}
+          </div>
+          
+          {totalPages > 1 && (
+            <PaginationComponent
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
       </DialogContent>
     </Dialog>
