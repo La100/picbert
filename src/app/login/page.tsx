@@ -2,6 +2,7 @@ import { AuthForm } from "@/components/authentication/AuthForm";
 import { Metadata } from "next";
 import AuthBg from "@/public/Abstract Curves and Colors.jpeg";
 import Logo from "@/components/Logo";
+import Image from "next/image";
 
 type AuthMode = "login" | "signup" | "reset";
 
@@ -27,11 +28,16 @@ export default async function AuthenticationPage({
           <div className="w-full h-[30%] bg-gradient-to-t from-transparent to-black/50 absolute top-0 left-0 z-10" />
           <div className="w-full h-[40%] bg-gradient-to-b from-transparent to-black/50 absolute bottom-0 left-0 z-10" />
 
-          <img
-            src={AuthBg.src}
-            alt="auth-bg"
-            className="w-full h-full object-cover absolute top-0 left-0"
-          />
+          <div className="absolute inset-0">
+            <Image
+              src={AuthBg.src}
+              alt="auth-bg"
+              fill
+              className="object-cover"
+              priority
+              sizes="50vw"
+            />
+          </div>
           <div className="relative z-20 flex items-center text-lg font-medium">
             <Logo />
           </div>

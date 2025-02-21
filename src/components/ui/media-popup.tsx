@@ -6,6 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "./button";
+import Image from "next/image";
 
 import { Download, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -122,11 +123,15 @@ export function MediaPopup({
                 />
               </div>
             ) : (
-              <img
-                src={url}
-                alt="Preview"
-                className="max-w-full h-auto max-h-[65vh] sm:max-h-[70vh] rounded-lg shadow-lg mb-4 object-contain"
-              />
+              <div className="relative w-full h-[65vh] sm:h-[70vh]">
+                <Image
+                  src={url}
+                  alt="Preview"
+                  fill
+                  className="rounded-lg shadow-lg mb-4 object-contain"
+                  sizes="100vw"
+                />
+              </div>
             )}
           </div>
 

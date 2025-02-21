@@ -8,6 +8,7 @@ import { MediaPopup } from "../ui/media-popup";
 import { deleteImage } from "@/app/actions/image-actions";
 import { toast } from "sonner";
 import { PaginationComponent } from "../ui/pagination";
+import Image from "next/image";
 
 type ImageProps = {
   url: string | undefined;
@@ -67,17 +68,18 @@ export function Gallery({ images, currentPage, totalCount, pageSize = 12 }: Gall
               transition={{ delay: index * 0.1 }}
             >
               <div
-                className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
                 onClick={() => setSelectedImage(image)}
               >
-                <img
+                <Image
                   src={image.url || "/placeholder-image.png"}
                   alt={image.prompt || "Generated image"}
-                  className="w-full h-auto object-cover"
-                  loading="lazy"
-                  decoding="async"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/placeholder-image.png';
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  onError={() => {
+                    const imgElement = document.querySelector(`[src="${image.url}"]`) as HTMLImageElement;
+                    if (imgElement) imgElement.src = '/placeholder-image.png';
                   }}
                 />
               </div>

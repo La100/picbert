@@ -14,6 +14,7 @@ import { Image as ImageIcon } from "lucide-react";
 import { getImages } from "@/app/actions/image-actions";
 import { useEffect } from "react";
 import { PaginationComponent } from "@/components/ui/pagination";
+import Image from "next/image";
 
 type ImageProps = {
   url: string | undefined;
@@ -78,13 +79,15 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
                     <p className="text-white text-sm font-semibold">Select Image</p>
                   </div>
                 </div>
-                <img
-                  src={image.url || ""}
-                  alt={image.prompt || "Generated image"}
-                  width={image.width || 0}
-                  height={image.height || 0}
-                  className="object-cover rounded w-full aspect-[3/4] h-auto"
-                />
+                <div className="relative w-full aspect-[3/4]">
+                  <Image
+                    src={image.url || ""}
+                    alt={image.prompt || "Generated image"}
+                    fill
+                    className="object-cover rounded"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  />
+                </div>
               </div>
             ))}
           </div>

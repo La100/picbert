@@ -3,6 +3,7 @@ import { ImageIcon, Package2, Palette } from "lucide-react";
 import dashboardImg from "@/public/dashboard-img.png";
 import { cn } from "@/lib/utils";
 import AnimatedGradientText from "../ui/animated-gradient-text";
+import Image from "next/image";
 
 const featureList = [
   {
@@ -77,11 +78,15 @@ const Features = () => {
             "h-fit lg:sticky top-32 pl-16 pt-16 rounded-lg animate-gradient bg-gradient-to-r from-[#627FAB] via-[#B95480] to-[#627FAB] bg-[length:var(--bg-size)_100%] [--bg-size:400%] border border-r-gray-300 border-b-gray-300 order-1 lg:order-2"
           )}
         >
-          <img
-            src={dashboardImg.src}
-            alt="Features"
-            className="w-full h-auto border- border-foreground/50 rounded-tl-lg "
-          />
+          <div className="relative w-full aspect-[16/9]">
+            <Image
+              src={dashboardImg.src}
+              alt="Features"
+              fill
+              className="border-foreground/50 rounded-tl-lg object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </div>
         </div>
       </div>
     </section>

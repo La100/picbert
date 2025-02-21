@@ -8,6 +8,7 @@ import avatar3 from "@/public/avatars/Golden Hour Contemplation.jpeg";
 import avatar4 from "@/public/avatars/Portrait of a Woman in Rust-Colored Top.jpeg";
 import avatar5 from "@/public/avatars/Radiant Comfort.jpeg";
 import avatar6 from "@/public/avatars/Relaxed Bearded Man with Tattoo at Cozy Cafe.jpeg";
+import Image from "next/image";
 
 const reviews = [
   {
@@ -69,13 +70,14 @@ const ReviewCard = ({
     >
       <blockquote className="text-sm">{body}</blockquote>
       <div className="flex flex-row items-center gap-2 mt-2">
-        <img
-          className="rounded-full"
-          width="32"
-          height="32"
-          alt=""
-          src={img.src}
-        />
+        <div className="relative w-8 h-8">
+          <Image
+            className="rounded-full"
+            fill
+            alt={`${name}'s profile picture`}
+            src={img.src}
+          />
+        </div>
         <div className="flex flex-col">
           <figcaption className="text-sm font-medium dark:text-white">
             {name}

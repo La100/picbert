@@ -8,6 +8,7 @@ import { deleteVideo } from "@/app/actions/video-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { PaginationComponent } from "../ui/pagination";
+import Image from "next/image";
 
 type VideoItem = {
   url: string | undefined;
@@ -71,10 +72,12 @@ export function MediaGallery({ items, currentPage, totalCount, pageSize }: Media
               <div 
                 className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
               >
-                <img
+                <Image
                   src={item.input_image}
                   alt={item.prompt || "Video thumbnail"}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 />
               </div>
             </motion.div>

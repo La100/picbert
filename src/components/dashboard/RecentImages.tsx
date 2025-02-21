@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 interface RecentImagesProps {
   images: Array<
@@ -70,12 +71,12 @@ export function RecentImages({ images }: RecentImagesProps) {
                         : "aspect-square"
                     )}
                   >
-                    <img
+                    <Image
                       src={image.url || ""}
                       alt={image.prompt || "Generated image"}
-                      width={image.width || 100}
-                      height={image.height || 100}
+                      fill
                       className="object-cover"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     />
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">

@@ -17,6 +17,7 @@ import img11 from "@/public/hero-images/Sophisticated Businessman Portrait.jpeg"
 import { cn } from "@/lib/utils";
 import AnimatedGradientText from "../ui/animated-gradient-text";
 import Link from "next/link";
+import Image from "next/image";
 
 const avatars = [
   {
@@ -113,12 +114,15 @@ const MarqueeColumn = ({
       style={{ "--duration": duration }}
     >
       {Images.sort(() => Math.random() - 0.5).map((image, index) => (
-        <img
-          key={index}
-          src={image.src.src}
-          alt={image.alt}
-          className="w-full h-full object-cover rounded opacity-[.25] hover:opacity-100 transition-opacity duration-300 ease-in-out"
-        />
+        <div key={index} className="relative w-full h-full">
+          <Image
+            src={image.src.src}
+            alt={image.alt}
+            fill
+            className="object-cover rounded opacity-[.25] hover:opacity-100 transition-opacity duration-300 ease-in-out"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+        </div>
       ))}
     </Marquee>
   );

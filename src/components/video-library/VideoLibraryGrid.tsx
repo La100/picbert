@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { ClientVideo } from "@/app/actions/client-video-actions";
 import { Badge } from "@/components/ui/badge";
 import { MediaPopup } from "../ui/media-popup";
@@ -28,10 +29,12 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
             <div 
               className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
             >
-              <img 
+              <Image 
                 src={video.poster_url || `${video.video_url}#t=0.001`}
                 alt="Video thumbnail"
+                fill
                 className="w-full h-full object-cover"
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
               />
               
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">

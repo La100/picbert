@@ -29,6 +29,7 @@ import {
 import { revalidateTag } from "next/cache";
 import { queueVideoGeneration, getVideoRequestStatus } from "@/app/actions/video-actions";
 import { GalleryImagePicker } from "@/components/gallery/GalleryImagePicker";
+import Image from "next/image";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -204,11 +205,13 @@ const VideoConfigurations = () => {
                   />
                 </div>
                 {field.value && (
-                  <div className="mt-2">
-                    <img
+                  <div className="mt-2 relative h-[200px] w-full">
+                    <Image
                       src={field.value} 
                       alt="Selected input" 
-                      className="max-h-[200px] rounded-md object-contain"
+                      fill
+                      className="rounded-md object-contain"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   </div>
                 )}
