@@ -11,6 +11,7 @@ import { PaginationComponent } from "../ui/pagination";
 
 type VideoItem = {
   url: string | undefined;
+  input_image: string;
 } & Tables<"generated_videos">;
 
 interface MediaGalleryProps {
@@ -69,43 +70,11 @@ export function MediaGallery({ items, currentPage, totalCount, pageSize }: Media
             >
               <div 
                 className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
-                onMouseEnter={(e) => {
-                  const video = e.currentTarget.querySelector('video');
-                  if (video && video.paused) {
-                    video.play().catch(() => {});
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  const video = e.currentTarget.querySelector('video');
-                  if (video) {
-                    video.pause();
-                    video.currentTime = 0;
-                  }
-                }}
               >
-                <video
-                  src={item.url}
-                  className="w-full h-auto object-cover"
-                  loop
-                  muted
-                  playsInline
-                  preload="metadata"
-                  poster={`${item.url}#t=0.001`}
-                  onLoadedMetadata={(e) => {
-                    e.currentTarget.currentTime = 0;
-                  }}
-                  onError={(e) => {
-                    e.currentTarget.style.backgroundColor = '#f0f0f0';
-                  }}
-                  onTouchStart={(e) => {
-                    e.stopPropagation();
-                    const video = e.currentTarget;
-                    if (video.paused) {
-                      video.play();
-                    } else {
-                      video.pause();
-                    }
-                  }}
+                <img
+                  src={item.input_image}
+                  alt={item.prompt || "Video thumbnail"}
+                  className="w-full h-full object-cover"
                 />
               </div>
             </motion.div>

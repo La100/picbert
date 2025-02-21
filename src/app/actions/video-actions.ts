@@ -162,24 +162,37 @@ export async function getVideos(page?: number, pageSize: number = 12) {
     };
   }
 
-  // Create signed URLs one by one but with better error handling
+  // Create signed URLs for both videos and input images
   const videosWithUrls = await Promise.all(
     (data || []).map(async (video) => {
       try {
-        const { data: urlData } = await supabase
+        // Get signed URL for video
+        const { data: videoUrlData } = await supabase
           .storage
           .from("generated_videos")
           .createSignedUrl(`${user.id}/${video.video_name}`, 3600);
 
+        // Extract image name from the input_image URL
+        const imageMatch = video.input_image.match(/\/([^\/]+?)(?:\?|$)/);
+        const imageName = imageMatch ? imageMatch[1] : video.input_image;
+
+        // Get signed URL for input image
+        const { data: imageUrlData } = await supabase
+          .storage
+          .from("generated_images")
+          .createSignedUrl(`${user.id}/${imageName}`, 3600);
+
         return {
           ...video,
-          url: urlData?.signedUrl,
+          url: videoUrlData?.signedUrl,
+          input_image: imageUrlData?.signedUrl || video.input_image,
         };
       } catch (e) {
-        console.error(`Failed to sign URL for video ${video.video_name}:`, e);
+        console.error(`Failed to sign URLs for video ${video.video_name}:`, e);
         return {
           ...video,
           url: null,
+          input_image: video.input_image,
         };
       }
     })
