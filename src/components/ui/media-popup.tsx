@@ -7,9 +7,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "./button";
 import Image from "next/image";
-
 import { Download, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface MediaPopupProps {
   url: string;
@@ -70,88 +70,116 @@ export function MediaPopup({
   );
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-full w-[90%] sm:w-[85%] sm:max-w-2xl mx-auto my-4 p-4 sm:p-6 [&>button]:hidden max-h-[95vh] overflow-y-auto">
-        <DialogTitle className="sr-only">
-          {type === 'video' ? 'Video Preview' : 'Image Preview'}
-        </DialogTitle>
-        <div className="pb-4">
-          <div className="flex justify-between items-center gap-2 sm:gap-4 mb-4">
-            <div className="flex gap-2 sm:gap-4">
-              <Button
-                size="icon"
-                variant="default"
-                onClick={handleDownload}
-                className="h-9 w-12 sm:w-14"
+    <AnimatePresence>
+      <Dialog open={true} onOpenChange={onClose}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 z-50"
+          onClick={onClose}
+        />
+        <DialogContent className="max-w-full w-[90%] sm:w-[85%] sm:max-w-2xl mx-auto my-4 p-4 sm:p-6 [&>button]:hidden max-h-[95vh] overflow-y-auto z-50 bg-background/95 shadow-[0_2px_32px_rgba(0,0,0,0.08)]">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
+          >
+            <DialogTitle className="sr-only">
+              {type === 'video' ? 'Video Preview' : 'Image Preview'}
+            </DialogTitle>
+            <div className="pb-4">
+              <motion.div 
+                className="flex justify-between items-center gap-2 sm:gap-4 mb-4"
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
               >
-                <Download className="h-4 w-4" />
-                <span className="sr-only">Download</span>
-              </Button>
-              {showDelete && onDelete && (
+                <div className="flex gap-2 sm:gap-4">
+                  <Button
+                    size="icon"
+                    variant="default"
+                    onClick={handleDownload}
+                    className="h-9 w-12 sm:w-14"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span className="sr-only">Download</span>
+                  </Button>
+                  {showDelete && onDelete && (
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      onClick={onDelete}
+                      className="h-9 w-12 sm:w-14"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  )}
+                </div>
                 <Button
                   size="icon"
-                  variant="destructive"
-                  onClick={onDelete}
+                  onClick={onClose}
                   className="h-9 w-12 sm:w-14"
                 >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Delete</span>
+                  <X className="h-8 w-8" />
+                  <span className="sr-only">Close</span>
                 </Button>
+              </motion.div>
+
+              <motion.div 
+                className="relative w-full flex justify-center items-center"
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                {type === 'video' ? (
+                  <div className="w-full max-h-[65vh] sm:max-h-[70vh] rounded-xl border border-border/20 shadow-[0_2px_16px_rgba(0,0,0,0.06)] mb-4 overflow-hidden">
+                    <video
+                      src={url}
+                      controls
+                      autoPlay
+                      loop
+                      muted
+                      className="max-w-full h-auto max-h-[65vh] sm:max-h-[70vh] object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="relative w-full h-[65vh] sm:h-[70vh] rounded-xl border border-border/20 shadow-[0_2px_16px_rgba(0,0,0,0.06)] mb-4 overflow-hidden">
+                    <Image
+                      src={url}
+                      alt="Preview"
+                      fill
+                      className="object-contain"
+                      sizes="100vw"
+                    />
+                  </div>
+                )}
+              </motion.div>
+
+              {promptMetadata && (
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <div className="flex flex-col gap-4 animate-in fade-in-50 duration-500">
+                    <div className="bg-secondary/5 rounded-lg p-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">Prompt</span>
+                      </div>
+                      <p className="text-foreground/90 text-sm sm:text-base font-medium leading-relaxed">
+                        {promptMetadata.value}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
               )}
             </div>
-            <Button
-              size="icon"
-              
-              onClick={onClose}
-              className="h-9 w-12 sm:w-14"
-            >
-              <X className="h-8 w-8" />
-              <span className="sr-only">Close</span>
-            </Button>
-          </div>
-
-          <div className="relative w-full flex justify-center items-center">
-            {type === 'video' ? (
-              <div className="w-full max-h-[65vh] sm:max-h-[70vh] flex justify-center items-center">
-                <video
-                  src={url}
-                  controls
-                  autoPlay
-                  loop
-                  muted
-                  className="max-w-full h-auto max-h-[65vh] sm:max-h-[70vh] rounded-lg shadow-lg mb-4 object-contain"
-                />
-              </div>
-            ) : (
-              <div className="relative w-full h-[65vh] sm:h-[70vh]">
-                <Image
-                  src={url}
-                  alt="Preview"
-                  fill
-                  className="rounded-lg shadow-lg mb-4 object-contain"
-                  sizes="100vw"
-                />
-              </div>
-            )}
-          </div>
-
-          {promptMetadata && (
-            <>
-              <hr className="border-primary/30 mb-6" />
-              <div className="flex flex-col gap-4 animate-in fade-in-50 duration-500">
-                <div className="bg-secondary/30 backdrop-blur-sm rounded-xl p-6 shadow-inner">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">Prompt</span>
-                  </div>
-                  <p className="text-foreground/90 text-sm sm:text-base font-medium leading-relaxed">
-                    {promptMetadata.value}
-                  </p>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+          </motion.div>
+        </DialogContent>
+      </Dialog>
+    </AnimatePresence>
   );
 } 
