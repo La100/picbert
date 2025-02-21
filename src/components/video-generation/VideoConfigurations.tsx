@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback } from "react";
-import { Upload } from "lucide-react";
+import { Upload, Sparkles } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -287,7 +287,7 @@ const VideoConfigurations = () => {
             <Button type="submit" disabled={loading} className="w-full font-medium gap-2">
               {loading ? "Generating..." : (
                 <>
-                  <span className="i-lucide-wand-2 w-4 h-4" />
+                  <Sparkles className="w-4 h-4" />
                   Generate
                 </>
               )}

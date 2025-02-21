@@ -2,7 +2,7 @@
 
 import {
   BadgeCheck,
-  ChevronsUpDown,
+  Settings,
   CreditCard,
   LogOut,
 } from "lucide-react"
@@ -55,7 +55,7 @@ export function NavUser({
                 <span className="truncate font-semibold">{user.name}</span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <Settings className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -78,13 +78,13 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 <Link href="/account-settings" className="w-full cursor-pointer">
-                <DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
                   <BadgeCheck />
                   Settings
                 </DropdownMenuItem>
               </Link>
               <Link href="/billing" className="w-full cursor-pointer">
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <CreditCard />
                   Billing
                 </DropdownMenuItem>

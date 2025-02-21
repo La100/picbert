@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Smartphone } from "lucide-react";
+import { Smartphone, Sparkles } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -179,8 +179,13 @@ const Configurations = () => {
             )}
           />
 
-          <Button type="submit" disabled={loading} className="font-medium">
-            {loading ? "Generating..." : "Generate"}
+          <Button type="submit" disabled={loading} className="font-medium gap-2">
+            {loading ? "Generating..." : (
+              <>
+                <Sparkles className="w-4 h-4" />
+                Generate
+              </>
+            )}
           </Button>
         </fieldset>
       </form>

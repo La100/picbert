@@ -126,7 +126,7 @@ export function RecentVideos({ videos }: RecentVideosProps) {
                       }}
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
+                  <p className="text-sm text-muted-foreground line-clamp-2">
                     {video.prompt}
                   </p>
                 </div>
