@@ -59,7 +59,7 @@ export function MediaGallery({ items, currentPage, totalCount, pageSize }: Media
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
           {items.map((item, index) => (
             <motion.div
               key={item.id}

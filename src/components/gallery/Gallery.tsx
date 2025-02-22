@@ -31,6 +31,12 @@ export function Gallery({ images, currentPage, totalCount, pageSize = 12 }: Gall
     router.push(`?page=${page}`);
   };
 
+  const handleUseInVideo = () => {
+    if (selectedImage?.url) {
+      router.push(`/video-generation?input_image=${encodeURIComponent(selectedImage.url)}`);
+    }
+  };
+
   const handleDelete = async () => {
     if (!selectedImage || isDeleting) return;
     
@@ -59,7 +65,7 @@ export function Gallery({ images, currentPage, totalCount, pageSize = 12 }: Gall
         transition={{ duration: 0.5 }}
         className="space-y-8"
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
           {images.map((image, index) => (
             <motion.div
               key={image.id}
@@ -101,6 +107,7 @@ export function Gallery({ images, currentPage, totalCount, pageSize = 12 }: Gall
           showDelete={true}
           onDelete={handleDelete}
           type="image"
+          onUseInVideo={handleUseInVideo}
           metadata={[
             {
               label: "Prompt",

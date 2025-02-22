@@ -114,19 +114,123 @@ interface PaginationComponentProps {
 }
 
 export function PaginationComponent({ currentPage, totalPages, onPageChange }: PaginationComponentProps) {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   if (totalPages <= 1) return null;
 
-  return (
-    <div className="flex justify-center gap-2 mt-8">
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+  const renderPageNumbers = () => {
+    const pages = [];
+
+    // Always show first page
+    pages.push(
+      <Button
+        key={1}
+        variant={currentPage === 1 ? "default" : "secondary"}
+        onClick={() => onPageChange(1)}
+        className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2"
+      >
+        1
+      </Button>
+    );
+
+    let start = Math.max(2, currentPage - 1);
+    let end = Math.min(totalPages - 1, currentPage + 1);
+
+    // Adjust for mobile
+    if (isMobile) {
+      start = Math.max(2, currentPage);
+      end = Math.min(totalPages - 1, currentPage);
+    }
+
+    // Add ellipsis if needed at start
+    if (start > 2) {
+      pages.push(
         <Button
-          key={page}
-          variant={currentPage === page ? "default" : "secondary"}
-          onClick={() => onPageChange(page)}
+          key="start-ellipsis"
+          variant="ghost"
+          disabled
+          className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2"
         >
-          {page}
+          ...
         </Button>
-      ))}
+      );
+    }
+
+    // Add middle pages
+    for (let i = start; i <= end; i++) {
+      pages.push(
+        <Button
+          key={i}
+          variant={currentPage === i ? "default" : "secondary"}
+          onClick={() => onPageChange(i)}
+          className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2"
+        >
+          {i}
+        </Button>
+      );
+    }
+
+    // Add ellipsis if needed at end
+    if (end < totalPages - 1) {
+      pages.push(
+        <Button
+          key="end-ellipsis"
+          variant="ghost"
+          disabled
+          className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2"
+        >
+          ...
+        </Button>
+      );
+    }
+
+    // Always show last page if there is more than one page
+    if (totalPages > 1) {
+      pages.push(
+        <Button
+          key={totalPages}
+          variant={currentPage === totalPages ? "default" : "secondary"}
+          onClick={() => onPageChange(totalPages)}
+          className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2"
+        >
+          {totalPages}
+        </Button>
+      );
+    }
+
+    return pages;
+  };
+
+  return (
+    <div className="flex justify-center items-center gap-1 sm:gap-2 mt-8">
+      <Button
+        variant="outline"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </Button>
+      {renderPageNumbers()}
+      <Button
+        variant="outline"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </Button>
     </div>
   );
 }

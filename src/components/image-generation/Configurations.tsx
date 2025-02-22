@@ -111,7 +111,7 @@ const Configurations = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid w-full items-start gap-6"
+        className="grid w-full max-w-2xl mx-auto items-start gap-6 xl:pt-20"
       >
         <fieldset className="grid gap-6 rounded-lg border p-4 bg-white">
           <legend className="-ml-1 px-1 text-base font-medium">Image Generation</legend>
@@ -179,14 +179,19 @@ const Configurations = () => {
             )}
           />
 
-          <Button type="submit" disabled={loading} className="font-medium gap-2">
-            {loading ? "Generating..." : (
-              <>
-                <Sparkles className="w-4 h-4" />
-                Generate
-              </>
-            )}
-          </Button>
+          <div className="space-y-2">
+            <Button type="submit" disabled={loading} className="w-full font-medium gap-2">
+              {loading ? "Generating..." : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Generate
+                </>
+              )}
+            </Button>
+            <div className="flex items-center justify-center text-base text-muted-foreground font-medium">
+              <span>Image generation takes around 30 seconds</span>
+            </div>
+          </div>
         </fieldset>
       </form>
     </Form>

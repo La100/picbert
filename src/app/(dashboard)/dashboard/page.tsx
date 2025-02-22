@@ -46,7 +46,7 @@ export default async function Dashboard() {
       />
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 text-lg">
         <RecentImages images={images?.slice(0, 6) ?? []} />
-        <RecentVideos videos={videos?.slice(0, 6) ?? []} />
+        <RecentVideos videos={videos?.slice(0, 4) ?? []} />
         <div className="lg:col-span-2">
           <QuickActions />
         </div>

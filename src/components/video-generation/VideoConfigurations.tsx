@@ -4,6 +4,7 @@ import { Upload, Sparkles } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -48,16 +49,25 @@ const VideoConfigurations = () => {
   const loading = useVideoGenerateStore((state) => state.loading);
   const setLoading = useVideoGenerateStore((state) => state.setLoading);
   const [isUploading, setIsUploading] = React.useState(false);
+  const searchParams = useSearchParams();
+  const inputImageFromUrl = searchParams.get('input_image');
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       prompt: "",
-      input_image: "",
+      input_image: inputImageFromUrl || "",
       aspect_ratio: "9:16",
       duration: "5",
     },
   });
+
+  // Effect to handle URL parameters
+  React.useEffect(() => {
+    if (inputImageFromUrl) {
+      form.setValue("input_image", inputImageFromUrl);
+    }
+  }, [inputImageFromUrl, form]);
 
   const handleFileUpload = useCallback(async (file: File) => {
     try {
@@ -153,7 +163,7 @@ const VideoConfigurations = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid w-full items-start gap-6 xl:pt-20"
+        className="grid w-full max-w-2xl mx-auto items-start gap-6 xl:pt-20"
       >
         <fieldset className="grid gap-6 rounded-lg border p-4 bg-white">
           <legend className="-ml-1 px-1 text-base font-medium">Video Generation</legend>
@@ -198,20 +208,22 @@ const VideoConfigurations = () => {
                       </>
                     )}
                   </Button>
-                  <GalleryImagePicker 
-                    onImageSelect={(imageUrl) => {
-                      form.setValue("input_image", imageUrl);
-                    }}
-                  />
+                  <div className="px-2 sm:px-4 md:px-6">
+                    <GalleryImagePicker 
+                      onImageSelect={(imageUrl) => {
+                        form.setValue("input_image", imageUrl);
+                      }}
+                    />
+                  </div>
                 </div>
                 {field.value && (
-                  <div className="mt-2 relative h-[200px] w-full">
+                  <div className="mt-2 relative w-[120px] sm:w-[140px] aspect-square">
                     <Image
                       src={field.value} 
                       alt="Selected input" 
                       fill
-                      className="rounded-md object-contain"
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="rounded-md object-cover"
+                      sizes="140px"
                     />
                   </div>
                 )}

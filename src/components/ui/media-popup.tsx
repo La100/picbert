@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "./button";
 import Image from "next/image";
-import { Download, Trash2, X } from "lucide-react";
+import { Download, Trash2, X, Video } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -21,6 +21,7 @@ interface MediaPopupProps {
     value: string;
   }[];
   type: 'image' | 'video';
+  onUseInVideo?: () => void;
 }
 
 export function MediaPopup({
@@ -29,7 +30,8 @@ export function MediaPopup({
   showDelete = false,
   onDelete,
   metadata,
-  type
+  type,
+  onUseInVideo
 }: MediaPopupProps) {
   const handleDownload = async () => {
     try {
@@ -91,7 +93,7 @@ export function MediaPopup({
             </DialogTitle>
             <div className="pb-4">
               <motion.div 
-                className="flex justify-between items-center gap-2 sm:gap-4 mb-4"
+                className="flex justify-between items-center gap-2 sm:gap-4 mb-4 pt-4 "
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -117,6 +119,16 @@ export function MediaPopup({
                       <span className="sr-only">Delete</span>
                     </Button>
                   )}
+                  {type === 'image' && onUseInVideo && (
+                    <Button
+                      size="icon"
+                      onClick={onUseInVideo}
+                      className="h-9 w-12 sm:w-14"
+                    >
+                      <Video className="h-4 w-4" />
+                      <span className="sr-only">Use in Video Generation</span>
+                    </Button>
+                  )}
                 </div>
                 <Button
                   size="icon"
@@ -135,18 +147,18 @@ export function MediaPopup({
                 transition={{ delay: 0.3 }}
               >
                 {type === 'video' ? (
-                  <div className="w-full max-h-[65vh] sm:max-h-[70vh] rounded-xl border border-border/20 shadow-[0_2px_16px_rgba(0,0,0,0.06)] mb-4 overflow-hidden">
+                  <div className="w-full max-h-[65vh] sm:max-h-[70vh] rounded-xl border border-border/20  mb-4 overflow-hidden bg-transparent flex items-center justify-center">
                     <video
                       src={url}
                       controls
                       autoPlay
                       loop
                       muted
-                      className="max-w-full h-auto max-h-[65vh] sm:max-h-[70vh] object-contain"
+                      className="max-w-full h-auto max-h-[65vh] sm:max-h-[70vh] object-contain bg-transparent"
                     />
                   </div>
                 ) : (
-                  <div className="relative w-full h-[65vh] sm:h-[70vh] rounded-xl border border-border/20 shadow-[0_2px_16px_rgba(0,0,0,0.06)] mb-4 overflow-hidden">
+                  <div className="relative w-full h-[65vh] sm:h-[70vh] rounded-xl border border-border/20  mb-4 overflow-hidden">
                     <Image
                       src={url}
                       alt="Preview"

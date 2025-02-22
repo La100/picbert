@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { VideoLibraryGrid } from "@/components/video-library/VideoLibraryGrid";
 import { TagFilter } from "@/components/video-library/TagFilter";
-import { Button } from "@/components/ui/button";
 import { VideoData } from "@/data/video-library";
+import { PaginationComponent } from "@/components/ui/pagination";
 
 // Number of items per page
 const ITEMS_PER_PAGE = 15;
@@ -62,19 +62,11 @@ export function VideoLibraryContent({ videos }: VideoLibraryContentProps) {
 
       <VideoLibraryGrid videos={displayedVideos} />
 
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-8">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <Button
-              key={page}
-              variant={currentPage === page ? "default" : "secondary"}
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </Button>
-          ))}
-        </div>
-      )}
+      <PaginationComponent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </>
   );
 } 

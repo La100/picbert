@@ -67,8 +67,8 @@ export function RecentImages({ images }: RecentImagesProps) {
                       image.height && image.width
                         ? Number(image.width / image.height) === 1
                           ? "aspect-square"
-                          : `aspect-[${image.width}/${image.height}]`
-                        : "aspect-square"
+                          : "aspect-[9/16]"
+                        : "aspect-[9/16]"
                     )}
                   >
                     <Image
@@ -77,6 +77,10 @@ export function RecentImages({ images }: RecentImagesProps) {
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
                     />
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">
