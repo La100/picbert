@@ -208,13 +208,11 @@ const VideoConfigurations = () => {
                       </>
                     )}
                   </Button>
-                  <div className="px-2 sm:px-4 md:px-6">
-                    <GalleryImagePicker 
-                      onImageSelect={(imageUrl) => {
-                        form.setValue("input_image", imageUrl);
-                      }}
-                    />
-                  </div>
+                  <GalleryImagePicker 
+                    onImageSelect={(imageUrl) => {
+                      form.setValue("input_image", imageUrl);
+                    }}
+                  />
                 </div>
                 {field.value && (
                   <div className="mt-2 relative w-[120px] sm:w-[140px] aspect-square">
