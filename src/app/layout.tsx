@@ -21,9 +21,9 @@ const satoshi = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Pictoria AI",
+  title: "Faces Factory",
   description:
-    "Pictoria AI is a platform for creating and training AI models for image generation.",
+    "Faces Factory is a platform for creating and training AI models for image generation.",
 };
 
 export default function RootLayout({

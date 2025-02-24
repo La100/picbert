@@ -3,11 +3,11 @@ import React from 'react'
 import AnimatedGradientText from '../ui/animated-gradient-text'
 import { cn } from '@/lib/utils'
 
-const faqsList = [
-  {question: "How does Pictoria AI work?", answer: "Pictoria AI uses advanced machine learning algorithms to analyze and understand your photos. It then generates new images based on your features and the scenarios you choose, creating realistic and personalized results."},
-  {question: "Is my data safe with Pictoria AI?", answer: "Yes, we take data privacy very seriously. All uploaded photos and generated images are encrypted and stored securely. We never share your personal data or images with third parties without your explicit consent."},
+const faqs = [
+  {question: "How does Faces Factory work?", answer: "Faces Factory uses advanced machine learning algorithms to analyze and understand your photos. It then generates new images based on your features and the scenarios you choose, creating realistic and personalized results."},
+  {question: "Is my data safe with Faces Factory?", answer: "Yes, we take data privacy very seriously. All uploaded photos and generated images are encrypted and stored securely. We never share your personal data or images with third parties without your explicit consent."},
   {question: "How many photos do I need for best results?", answer: "For optimal results, we recommend providing a clear reference photo that shows your features well. The better the quality and clarity of your reference photo, the more accurate and realistic the generated images will be."},
-  {question: "Can I use Pictoria AI for commercial purposes?", answer: "Yes, our Pro and Enterprise plans include commercial usage rights for the images you generate. However, please note that you should always respect copyright and privacy laws when using AI-generated images."},
+  {question: "Can I use Faces Factory for commercial purposes?", answer: "Yes, our Pro and Enterprise plans include commercial usage rights for the images you generate. However, please note that you should always respect copyright and usage rights when using generated images."},
   {question: "How often do you update the AI system?", answer: "We continuously work on improving our AI technology. Updates are released regularly to enhance image quality, add new features, and optimize performance. All users automatically benefit from these improvements."},
   {question: "What are the differences between the free and paid plans?", answer: "The free plan allows you to generate up to 5 images per day. The Pro plan includes unlimited image generation, higher resolution output, and access to additional features. The Enterprise plan is tailored for businesses and offers custom integrations and dedicated support."},
 ]
@@ -38,7 +38,7 @@ const Faqs = () => {
         Here are some of the most frequently asked questions about our product.
       </p>
       <Accordion type="single" collapsible className="w-full max-w-4xl mx-auto mt-16">
-        {faqsList.map((faq) => (
+        {faqs.map((faq) => (
           <Question key={faq.question} {...faq} />
         ))}
       </Accordion>

@@ -29,7 +29,7 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
   const [open, setOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const pageSize = 12;
+  const pageSize = 20;
 
   const loadImages = async (page: number) => {
     const response = await getImages(page, pageSize);
@@ -59,12 +59,12 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
           Choose from Gallery
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Select Image from Gallery</DialogTitle>
         </DialogHeader>
         <div className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
             {images.map((image, index) => (
               <div
                 key={`${image.id}-${index}`}
@@ -76,16 +76,16 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
               >
                 <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 group-hover:opacity-50 rounded">
                   <div className="flex items-center justify-center h-full">
-                    <p className="text-white text-sm font-semibold">Select Image</p>
+                    <p className="text-white text-xs font-semibold">Select</p>
                   </div>
                 </div>
-                <div className="relative w-full aspect-[3/4]">
+                <div className="relative w-full aspect-square">
                   <Image
                     src={image.url || ""}
                     alt={image.prompt || "Generated image"}
                     fill
                     className="object-cover rounded"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                    sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 16vw"
                   />
                 </div>
               </div>

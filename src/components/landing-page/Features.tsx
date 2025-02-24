@@ -44,7 +44,7 @@ const Features = () => {
             </span>
           </AnimatedGradientText>
           <h2 className="subHeading">
-            Unlock Unlimited Possibilities with Pictoria AI
+            Unlock Unlimited Possibilities with Faces Factory
           </h2>
           <p className="text-sm xs:text-base text-muted-foreground lg:max-w-[75%]">
             Our platform offers a wide range of features designed to enhance

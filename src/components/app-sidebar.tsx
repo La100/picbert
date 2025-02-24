@@ -85,7 +85,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
               </div>
               <div className="grid flex-1 text-left text-base leading-tight">
                 <span className="truncate font-medium">
-                  Pictoria AI
+                  Faces Factory
                 </span>
                 <span className="truncate text-sm">{currentPlanName}</span>
               </div>

@@ -13,9 +13,9 @@ import Faqs from "@/components/landing-page/Faqs";
 import Footer from "@/components/landing-page/Footer";
 
 export const metadata: Metadata = {
-  title: "Pictoria AI",
+  title: "Faces Factory",
   description:
-    "Pictoria AI is a platform for creating and sharing images with AI",
+    "Faces Factory is a platform for creating and sharing images with AI",
 };
 
 export default async function Home() {

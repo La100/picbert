@@ -1,9 +1,14 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { ButtonProps, buttonVariants } from "@/components/ui/button"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
@@ -115,6 +120,8 @@ interface PaginationComponentProps {
 
 export function PaginationComponent({ currentPage, totalPages, onPageChange }: PaginationComponentProps) {
   const [isMobile, setIsMobile] = React.useState(false);
+  const [showPicker, setShowPicker] = React.useState(false);
+  const [pickerRange, setPickerRange] = React.useState<{ start: number; end: number }>({ start: 1, end: 1 });
 
   React.useEffect(() => {
     const checkMobile = () => {
@@ -128,6 +135,11 @@ export function PaginationComponent({ currentPage, totalPages, onPageChange }: P
   }, []);
 
   if (totalPages <= 1) return null;
+
+  const handleEllipsisClick = (start: number, end: number) => {
+    setPickerRange({ start, end });
+    setShowPicker(true);
+  };
 
   const renderPageNumbers = () => {
     const pages = [];
@@ -159,7 +171,7 @@ export function PaginationComponent({ currentPage, totalPages, onPageChange }: P
         <Button
           key="start-ellipsis"
           variant="ghost"
-          disabled
+          onClick={() => handleEllipsisClick(2, start)}
           className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2"
         >
           ...
@@ -187,7 +199,7 @@ export function PaginationComponent({ currentPage, totalPages, onPageChange }: P
         <Button
           key="end-ellipsis"
           variant="ghost"
-          disabled
+          onClick={() => handleEllipsisClick(end + 1, totalPages - 1)}
           className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2"
         >
           ...
@@ -213,25 +225,58 @@ export function PaginationComponent({ currentPage, totalPages, onPageChange }: P
   };
 
   return (
-    <div className="flex justify-center items-center gap-1 sm:gap-2 mt-8">
-      <Button
-        variant="outline"
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
-      {renderPageNumbers()}
-      <Button
-        variant="outline"
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2"
-      >
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-    </div>
+    <>
+      <div className="flex justify-center items-center gap-1 sm:gap-2 mt-8">
+        <Button
+          variant="outline"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2 border-gray-300 hover:bg-gray-100"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        {renderPageNumbers()}
+        <Button
+          variant="outline"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="w-8 h-8 p-0 sm:w-10 sm:h-10 sm:p-2 border-gray-300 hover:bg-gray-100"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <Dialog open={showPicker} onOpenChange={setShowPicker}>
+        <DialogContent className="sm:max-w-[425px] bg-white border-2">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold">Select Page</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 p-4">
+            {Array.from({ length: pickerRange.end - pickerRange.start + 1 }, (_, i) => {
+              const pageNum = pickerRange.start + i;
+              return (
+                <Button
+                  key={pageNum}
+                  variant={currentPage === pageNum ? "default" : "secondary"}
+                  onClick={() => {
+                    onPageChange(pageNum);
+                    setShowPicker(false);
+                  }}
+                  className={cn(
+                    "w-full h-10 text-base font-medium",
+                    currentPage === pageNum 
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                  )}
+                >
+                  {pageNum}
+                </Button>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

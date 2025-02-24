@@ -11,8 +11,8 @@ import { getVideos } from "@/app/actions/video-actions";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dashboard | Pictoria AI",
-  description: "Dashboard for Pictoria AI",
+  title: "Dashboard | Faces Factory",
+  description: "Dashboard for Faces Factory",
 };
 
 export default async function Dashboard() {
