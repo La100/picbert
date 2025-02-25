@@ -16,6 +16,7 @@ const relevantEvents = new Set([
   'price.created',
   'price.updated',
   'price.deleted',
+  'plan.updated',
   'checkout.session.completed',
   'customer.subscription.created',
   'customer.subscription.updated',
@@ -49,6 +50,20 @@ export async function POST(req: Request) {
         case 'price.created':
         case 'price.updated':
           await upsertPriceRecord(event.data.object as Stripe.Price);
+          break;
+        case 'plan.updated':
+          // Handle plan.updated event
+          // In newer Stripe API versions, plans are represented as Prices
+          // We need to cast to unknown first due to type differences
+          const planObject = event.data.object as unknown;
+          // Log the plan object for debugging
+          console.log('Plan updated event received:', planObject);
+          // Process as a price object if possible
+          try {
+            await upsertPriceRecord(planObject as Stripe.Price);
+          } catch (error) {
+            console.error('Error processing plan.updated event:', error);
+          }
           break;
         case 'price.deleted':
           await deletePriceRecord(event.data.object as Stripe.Price);

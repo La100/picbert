@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { Tables } from "@database.types";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { MediaPopup } from "@/components/ui/media-popup";
 
