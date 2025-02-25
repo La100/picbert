@@ -10,6 +10,8 @@ import Image from "next/image";
 import { Download, Trash2, X, Video } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { Skeleton } from "./skeleton";
+import { useState } from "react";
 
 interface MediaPopupProps {
   url: string;
@@ -33,6 +35,8 @@ export function MediaPopup({
   type,
   onUseInVideo
 }: MediaPopupProps) {
+  const [isLoading, setIsLoading] = useState(true);
+
   const handleDownload = async () => {
     try {
       if (!url) return;
@@ -147,24 +151,36 @@ export function MediaPopup({
                 transition={{ delay: 0.3 }}
               >
                 {type === 'video' ? (
-                  <div className="w-full max-h-[65vh] sm:max-h-[70vh] rounded-xl border border-border/20  mb-4 overflow-hidden bg-transparent flex items-center justify-center">
+                  <div className="relative w-full h-[65vh] sm:h-[70vh] rounded-xl border border-border/20 mb-4 overflow-hidden bg-transparent">
+                    {isLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                        <Skeleton className="w-full h-full rounded-xl" />
+                      </div>
+                    )}
                     <video
                       src={url}
                       controls
                       autoPlay
                       loop
                       muted
-                      className="max-w-full h-auto max-h-[65vh] sm:max-h-[70vh] object-contain bg-transparent"
+                      className="absolute inset-0 w-full h-full object-contain bg-transparent"
+                      onLoadedData={() => setIsLoading(false)}
                     />
                   </div>
                 ) : (
-                  <div className="relative w-full h-[65vh] sm:h-[70vh] rounded-xl border border-border/20  mb-4 overflow-hidden">
+                  <div className="relative w-full h-[65vh] sm:h-[70vh] rounded-xl border border-border/20 mb-4 overflow-hidden">
+                    {isLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                        <Skeleton className="w-full h-full rounded-xl" />
+                      </div>
+                    )}
                     <Image
                       src={url}
                       alt="Preview"
                       fill
                       className="object-contain"
                       sizes="100vw"
+                      onLoadingComplete={() => setIsLoading(false)}
                     />
                   </div>
                 )}

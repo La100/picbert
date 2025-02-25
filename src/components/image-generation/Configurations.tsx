@@ -188,9 +188,6 @@ const Configurations = () => {
                 </>
               )}
             </Button>
-            <div className="flex items-center justify-center text-base text-muted-foreground font-medium">
-              <span>Image generation takes around 30 seconds</span>
-            </div>
           </div>
         </fieldset>
       </form>

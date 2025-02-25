@@ -15,6 +15,7 @@ import { getImages } from "@/app/actions/image-actions";
 import { useEffect } from "react";
 import { PaginationComponent } from "@/components/ui/pagination";
 import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ImageProps = {
   url: string | undefined;
@@ -29,13 +30,19 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
   const [open, setOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const pageSize = 20;
 
   const loadImages = async (page: number) => {
-    const response = await getImages(page, pageSize);
-    if (response.success && response.data) {
-      setImages(response.data);
-      setTotalCount(response.count || 0);
+    try {
+      setIsLoading(true);
+      const response = await getImages(page, pageSize);
+      if (response.success && response.data) {
+        setImages(response.data);
+        setTotalCount(response.count || 0);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,31 +72,41 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
         </DialogHeader>
         <div className="space-y-6">
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
-            {images.map((image, index) => (
-              <div
-                key={`${image.id}-${index}`}
-                className="relative group cursor-pointer"
-                onClick={() => {
-                  onImageSelect(image.url || "");
-                  setOpen(false);
-                }}
-              >
-                <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 group-hover:opacity-50 rounded">
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-white text-xs font-semibold">Select</p>
+            {isLoading ? (
+              // Skeleton grid
+              Array.from({ length: pageSize }).map((_, index) => (
+                <div key={index} className="relative aspect-square">
+                  <Skeleton className="w-full h-full rounded" />
+                </div>
+              ))
+            ) : (
+              // Actual images
+              images.map((image, index) => (
+                <div
+                  key={`${image.id}-${index}`}
+                  className="relative group cursor-pointer"
+                  onClick={() => {
+                    onImageSelect(image.url || "");
+                    setOpen(false);
+                  }}
+                >
+                  <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 group-hover:opacity-50 rounded">
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-white text-xs font-semibold">Select</p>
+                    </div>
+                  </div>
+                  <div className="relative w-full aspect-square">
+                    <Image
+                      src={image.url || ""}
+                      alt={image.prompt || "Generated image"}
+                      fill
+                      className="object-cover rounded"
+                      sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 16vw"
+                    />
                   </div>
                 </div>
-                <div className="relative w-full aspect-square">
-                  <Image
-                    src={image.url || ""}
-                    alt={image.prompt || "Generated image"}
-                    fill
-                    className="object-cover rounded"
-                    sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 16vw"
-                  />
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
           
           {totalPages > 1 && (

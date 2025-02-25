@@ -18,50 +18,24 @@ import {
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { Tables } from "@database.types";
-import { useEffect, useRef } from "react";
+import { useRef, useState } from "react";
+import Image from "next/image";
+import { MediaPopup } from "@/components/ui/media-popup";
 
 interface RecentVideosProps {
   videos: Array<
     Tables<"generated_videos"> & {
       url: string | undefined;
+      input_image: string;
     }
   >;
 }
 
 export function RecentVideos({ videos }: RecentVideosProps) {
-  const videoRefs = useRef<{ [key: string]: HTMLVideoElement }>({});
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const video = entry.target as HTMLVideoElement;
-          if (entry.isIntersecting) {
-            video.play().catch(() => {
-              // Autoplay failed
-            });
-          } else {
-            video.pause();
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    Object.values(videoRefs.current).forEach((video) => {
-      if (video) {
-        observer.observe(video);
-      }
-    });
-
-    return () => {
-      Object.values(videoRefs.current).forEach((video) => {
-        if (video) {
-          observer.unobserve(video);
-        }
-      });
-    };
-  }, [videos]);
+  const [selectedVideo, setSelectedVideo] = useState<(Tables<"generated_videos"> & {
+    url: string | undefined;
+    input_image: string;
+  }) | null>(null);
 
   if (videos.length === 0) {
     return (
@@ -102,28 +76,19 @@ export function RecentVideos({ videos }: RecentVideosProps) {
                 <div className="space-y-1">
                   <div
                     className={cn(
-                      "relative overflow-hidden rounded-lg bg-muted",
+                      "relative overflow-hidden rounded-lg bg-muted cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]",
                       video.aspect_ratio === "1:1"
                         ? "aspect-square"
                         : `aspect-[${video.aspect_ratio.replace(":", "/")}]`
                     )}
+                    onClick={() => setSelectedVideo(video)}
                   >
-                    <video
-                      ref={(el) => {
-                        if (el) {
-                          videoRefs.current[video.id.toString()] = el;
-                        }
-                      }}
-                      src={video.url}
-                      className="h-full w-full object-cover"
-                      muted
-                      playsInline
-                      loop
-                      autoPlay
-                      onError={(e) => {
-                        const target = e.target as HTMLVideoElement;
-                        target.style.display = 'none';
-                      }}
+                    <Image
+                      src={video.input_image}
+                      alt={video.prompt || "Video thumbnail"}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     />
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">
@@ -137,6 +102,20 @@ export function RecentVideos({ videos }: RecentVideosProps) {
           <CarouselNext className="-right-3 h-8 w-8" />
         </Carousel>
       </CardContent>
+
+      {selectedVideo && (
+        <MediaPopup
+          url={selectedVideo.url || ""}
+          onClose={() => setSelectedVideo(null)}
+          type="video"
+          metadata={[
+            {
+              label: "Prompt",
+              value: selectedVideo.prompt || "",
+            }
+          ]}
+        />
+      )}
     </Card>
   );
 } 

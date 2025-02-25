@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function ImageGenerationPage() {
   return (
-    <section className="container mx-auto flex flex-col gap-8 p-4">
+    <section className="container mx-auto flex flex-col gap-8">
       <Configurations />
       <div className="w-full flex justify-center">
         <GeneratedImages />
