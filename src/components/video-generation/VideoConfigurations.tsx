@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Upload, Sparkles } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,6 +31,8 @@ import { revalidateTag } from "next/cache";
 import { queueVideoGeneration, getVideoRequestStatus } from "@/app/actions/video-actions";
 import { GalleryImagePicker } from "@/components/gallery/GalleryImagePicker";
 import Image from "next/image";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { checkSubscriptionStatus } from "@/app/actions/subscription-actions";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -48,6 +50,7 @@ type FormValues = z.infer<typeof formSchema>;
 const VideoConfigurations = () => {
   const loading = useVideoGenerateStore((state) => state.loading);
   const setLoading = useVideoGenerateStore((state) => state.setLoading);
+  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
   const [isUploading, setIsUploading] = React.useState(false);
   const searchParams = useSearchParams();
   const inputImageFromUrl = searchParams.get('input_image');
@@ -69,6 +72,15 @@ const VideoConfigurations = () => {
     }
   }, [inputImageFromUrl, form]);
 
+  useEffect(() => {
+    const checkStatus = async () => {
+      const { isSubscribed } = await checkSubscriptionStatus();
+      setIsSubscribed(isSubscribed);
+    };
+    
+    checkStatus();
+  }, []);
+
   const handleFileUpload = useCallback(async (file: File) => {
     try {
       setIsUploading(true);
@@ -83,6 +95,12 @@ const VideoConfigurations = () => {
   }, [form]);
 
   async function onSubmit(values: FormValues) {
+    // If not subscribed, show subscription message
+    if (!isSubscribed) {
+      toast.error("Video generation requires a subscription. Please subscribe to continue.");
+      return;
+    }
+    
     try {
       setLoading(true);
       toast.info("Starting video generation. This process takes around 5 minutes...", {
@@ -165,6 +183,17 @@ const VideoConfigurations = () => {
         onSubmit={form.handleSubmit(onSubmit)}
         className="grid w-full max-w-2xl mx-auto items-start gap-6 xl:pt-20"
       >
+        {isSubscribed === false && (
+          <Alert className="bg-gradient-to-r from-amber-50 to-red-50 border-amber-200">
+            <AlertTitle className="text-amber-800">Try Video Generation</AlertTitle>
+            <AlertDescription className="text-amber-700">
+              You can explore the video generation interface, but generating videos requires a subscription.
+              <br />
+              <a href="/billing" className="underline font-medium">Subscribe now</a> to unlock this powerful feature.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <fieldset className="grid gap-6 rounded-lg border p-4 bg-white">
           <legend className="-ml-1 px-1 text-base font-medium">Video Generation</legend>
 
@@ -297,17 +326,23 @@ const VideoConfigurations = () => {
           />
 
           <div className="space-y-2">
-            <Button type="submit" disabled={loading} className="w-full font-medium gap-2">
-              {loading ? "Generating..." : (
+            <Button 
+              type="submit" 
+              disabled={loading || isUploading || isSubscribed === false} 
+              className="w-full font-medium gap-2"
+            >
+              {loading ? "Processing..." : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  Generate
+                  Generate Video
                 </>
               )}
             </Button>
-            <div className="flex items-center justify-center text-base text-muted-foreground font-medium">
-              <span>Video generation takes around 5 minutes</span>
-            </div>
+            {isSubscribed === false && (
+              <p className="text-xs text-center text-muted-foreground">
+                Please subscribe to generate videos
+              </p>
+            )}
           </div>
         </fieldset>
       </form>

@@ -60,11 +60,14 @@ const renderPricingButton = ({
   handleStripePortalRequest: () => Promise<void>;
   handleStripeCheckout: (price: Price) => Promise<void>;
 }) => {
+  const isPopular = product.name?.toLowerCase() === mostPopularProduct.toLowerCase();
+  const isCurrentPlan = user && subscription && subscription.prices?.products?.name?.toLowerCase() === product.name?.toLowerCase();
+  
   // Case 1: User has active subscription for this product
-  if (user && subscription && subscription.prices?.products?.name?.toLowerCase() === product.name?.toLowerCase()) {
+  if (isCurrentPlan) {
     return (
       <Button
-        className="mt-8 w-full font-semibold"
+        className="mt-8 w-full font-semibold h-12"
         onClick={handleStripePortalRequest}
       >
         Manage Subscription
@@ -75,28 +78,28 @@ const renderPricingButton = ({
   if (user && subscription) {
     return (
       <Button 
-        className="mt-8 w-full font-semibold"
+        className="mt-8 w-full font-semibold h-12"
         onClick={handleStripePortalRequest}
-        variant={"secondary"}
+        variant={isPopular ? "default" : "secondary"}
       >
-        Switch Plan
+        Switch to This Plan
       </Button>
     );
   }
 
-  // Case 3: Logged in user with no subscription or different subscription
+  // Case 3: Logged in user with no subscription
   if (user && !subscription) {
     return (
       <Button
-        className="mt-8 w-full font-semibold"
+        className="mt-8 w-full font-semibold h-12"
         onClick={() => handleStripeCheckout(price)}
-        variant={product.name?.toLowerCase() === mostPopularProduct.toLowerCase() ? "default" : "secondary"}
+        variant={isPopular ? "default" : "secondary"}
         disabled={priceIdLoading === price.id}
       >
         {priceIdLoading === price.id && (
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         )}
-        Subscribe
+        Subscribe Now
       </Button>
     );
   }
@@ -104,8 +107,8 @@ const renderPricingButton = ({
   // Case 4: No user logged in
   return (
     <Button
-      className="mt-8 w-full font-semibold"
-      variant={product.name?.toLowerCase() === mostPopularProduct.toLowerCase() ? "default" : "secondary"}
+      className="mt-8 w-full font-semibold h-12"
+      variant={isPopular ? "default" : "secondary"}
       disabled={priceIdLoading === price.id}
       onClick={() => handleStripeCheckout(price)}
     >
@@ -178,16 +181,17 @@ const Pricing = ({
 
   return (
     <div
+      id="pricing-plans"
       className={cn(
-        "max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 flex flex-col",
+        "max-w-7xl mx-auto py-8 sm:py-16 px-2 sm:px-4 md:px-6 lg:px-8 flex flex-col",
         className
       )}
     >
       {showInterval && (
-        <div className="flex justify-center items-center space-x-4">
+        <div className="flex justify-center items-center space-x-4 mb-6 sm:mb-10">
           <Label
             htmlFor="yearly-pricing"
-            className="font-semibold text-base text-muted-foreground"
+            className={`font-semibold text-sm sm:text-base ${billingInterval === "month" ? "text-foreground" : "text-muted-foreground"}`}
           >
             Monthly
           </Label>
@@ -200,14 +204,14 @@ const Pricing = ({
           />
           <Label
             htmlFor="yearly-pricing"
-            className="font-semibold text-base text-muted-foreground"
+            className={`font-semibold text-sm sm:text-base ${billingInterval === "year" ? "text-foreground" : "text-muted-foreground"}`}
           >
             Yearly
           </Label>
         </div>
       )}
 
-      <div className="space-y-4 sm:space-y-0 grid-cols-1 sm:grid sm:grid-cols-2 lg:grid-cols-2 sm:gap-8 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3 place-items-center">
+      <div className="space-y-6 sm:space-y-0 grid-cols-1 sm:grid sm:grid-cols-2 lg:grid-cols-2 sm:gap-4 md:gap-6 lg:gap-8 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3 place-items-center">
         {products.map((product) => {
           const price = product?.prices?.find(
             (price) => price.interval === billingInterval
@@ -219,49 +223,47 @@ const Pricing = ({
             minimumFractionDigits: 0,
           }).format((price?.unit_amount || 0) / 100);
 
+          const isPopular = product.name?.toLowerCase() === mostPopularProduct.toLowerCase();
+          const isActive = product.name?.toLowerCase() === activeProduct.toLowerCase();
+
           return (
             <div
               key={product.id}
               className={cn(
-                "border bg-background rounded-xl shadow-sm divide-y divide-border h-fit",
-                product.name?.toLowerCase() === activeProduct.toLowerCase()
-                  ? "border-primary bg-background drop-shadow-md"
-                  : "border-border"
+                "border bg-background rounded-xl shadow-sm divide-y divide-border h-fit w-full transition-all duration-200 hover:shadow-md mb-6 sm:mb-0",
+                isActive
+                  ? "border-primary bg-background ring-1 ring-primary/20"
+                  : isPopular
+                  ? "border-primary/30 sm:scale-105 shadow-md"
+                  : "border-border hover:border-primary/20"
               )}
             >
-              <div className="p-6">
-                <h2 className="text-2xl leading-6 font-semibold text-foreground flex items-center justify-between">
+              {isPopular && (
+                <div className="bg-primary text-primary-foreground text-center py-1.5 text-xs sm:text-sm font-medium rounded-t-xl">
+                  Most Popular
+                </div>
+              )}
+              <div className="p-4 sm:p-6">
+                <h2 className="text-xl sm:text-2xl leading-6 font-semibold text-foreground flex items-center justify-between flex-wrap gap-2">
                   {product.name}
 
-                  {product.name?.toLowerCase() === activeProduct ? (
+                  {isActive && (
                     <Badge
-                      className="border-border font-semibold"
-                      variant={"default"}
+                      className="bg-primary/10 text-primary border-primary/20 font-semibold"
+                      variant={"outline"}
                     >
-                      Selected
+                      Current Plan
                     </Badge>
-                  ) : (
-                    ""
-                  )}
-                  {product.name?.toLowerCase() === mostPopularProduct ? (
-                    <Badge
-                      className="border-border font-semibold"
-                      variant={"default"}
-                    >
-                      Most Popular
-                    </Badge>
-                  ) : (
-                    ""
                   )}
                 </h2>
-                <p className="mt-4 text-sm text-muted-foreground">
+                <p className="mt-3 sm:mt-4 text-sm text-muted-foreground">
                   {product.description}
                 </p>
-                <p className="mt-8">
-                  <span className="text-4xl font-extrabold text-foreground">
+                <p className="mt-6 sm:mt-8 flex items-baseline">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-foreground">
                     {priceString}
                   </span>
-                  <span className="text-base font-medium text-muted-foreground">
+                  <span className="text-sm sm:text-base font-medium text-muted-foreground ml-2">
                     /{billingInterval === "year" ? "year" : "month"}
                   </span>
                 </p>
@@ -277,7 +279,31 @@ const Pricing = ({
                   handleStripeCheckout,
                 })}
               </div>
-             
+              <div className="pt-4 sm:pt-6 pb-6 sm:pb-8 px-4 sm:px-6">
+                <h3 className="text-xs font-medium text-foreground tracking-wide uppercase mb-3 sm:mb-4">
+                  What&apos;s included
+                </h3>
+                <ul role="list" className="mt-2 space-y-2 sm:space-y-3">
+                  {Object.values(product.metadata || {}).map(
+                    (feature, index) => {
+                      if (feature) {
+                        return (
+                          <li key={index} className="flex items-start">
+                            <div className="flex-shrink-0">
+                              <svg className="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                            <p className="ml-3 text-xs sm:text-sm text-muted-foreground">
+                              {feature ?? "Feature not available"}
+                            </p>
+                          </li>
+                        );
+                      }
+                    }
+                  )}
+                </ul>
+              </div>
             </div>
           );
         })}

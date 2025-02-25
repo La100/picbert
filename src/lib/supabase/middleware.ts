@@ -13,7 +13,15 @@ const PROTECTED_ROUTES = [
   '/account-settings',
   '/models',
   '/reset-password',
+  '/video-generation',
+  '/video-library',
   // Add more protected routes here
+]
+
+// Routes that require subscription for full functionality
+// These routes are accessible but with limited functionality
+const SUBSCRIPTION_REQUIRED_ROUTES: string[] = [
+  // Removed video routes from here to allow access
 ]
 
 const PUBLIC_ROUTES = [
@@ -63,6 +71,10 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith(route)
   )
 
+  const isSubscriptionRequiredRoute = SUBSCRIPTION_REQUIRED_ROUTES.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  )
+
   const isAuthRoute = PUBLIC_ROUTES.some(route => 
     request.nextUrl.pathname.startsWith(route)
   )
@@ -83,6 +95,30 @@ export async function updateSession(request: NextRequest) {
     return redirectResponse
   }
 
+  // Check subscription for subscription-required routes
+  if (user && isSubscriptionRequiredRoute) {
+    // Check if user has active subscription
+    const { data: subscription } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .in('status', ['trialing', 'active'])
+      .maybeSingle();
+
+    if (!subscription) {
+      // Redirect to billing page if no subscription
+      const url = request.nextUrl.clone()
+      url.pathname = '/billing'
+      const redirectResponse = NextResponse.redirect(url)
+      
+      // Copy all cookies from the original response
+      supabaseResponse.cookies.getAll().forEach(cookie => {
+        redirectResponse.cookies.set(cookie.name, cookie.value)
+      })
+      
+      return redirectResponse
+    }
+  }
+
   // Redirect authenticated users away from auth pages
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone()
@@ -96,30 +132,6 @@ export async function updateSession(request: NextRequest) {
     
     return redirectResponse
   }
-
-  // if (
-  //   !user &&
-  //   !request.nextUrl.pathname.startsWith('/login') &&
-  //   !request.nextUrl.pathname.startsWith('/auth')
-  // ) {
-  //   // no user, potentially respond by redirecting the user to the login page
-  //   const url = request.nextUrl.clone()
-  //   url.pathname = '/login'
-  //   return NextResponse.redirect(url)
-  // }
-
-  // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-  // creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
 
   return supabaseResponse
 }

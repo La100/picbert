@@ -253,6 +253,23 @@ export async function checkAndUpdateVideoCredits(): Promise<{
     };
   }
 
+  // Check if user has subscription
+  const supabase = await createClient();
+  const { data: subscription } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .in('status', ['trialing', 'active'])
+    .maybeSingle();
+
+  // If no subscription, prevent video generation
+  if (!subscription) {
+    return { 
+      hasCredits: false, 
+      credits: credits.data, 
+      error: "Video generation requires a subscription. Please subscribe to continue." 
+    };
+  }
+
   const currentCount = credits.data.video_generation_count ?? 0;
   const maxCount = credits.data.max_video_generation_count ?? 0;
 
@@ -264,7 +281,6 @@ export async function checkAndUpdateVideoCredits(): Promise<{
     };
   }
 
-  const supabase = await createClient();
   const { error } = await supabase
     .from("credits")
     .update({ 

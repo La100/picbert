@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -26,6 +26,9 @@ import { fal } from "@/lib/fal";
 import { toast } from "sonner";
 import { PromptStarterSelector } from "./PromptStarter";
 import { Checkbox } from "../ui/checkbox";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { checkSubscriptionStatus } from "@/app/actions/subscription-actions";
+import { getCredits } from "@/app/actions/credit-actions";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -44,6 +47,23 @@ const Configurations = () => {
   const generateImage = useGenerateStore((state) => state.generateImage);
   const loading = useGenerateStore((state) => state.loading);
   const setLoading = useGenerateStore((state) => state.setLoading);
+  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
+  const [imageCount, setImageCount] = useState<number | null>(null);
+  
+  useEffect(() => {
+    const checkStatus = async () => {
+      const { isSubscribed } = await checkSubscriptionStatus();
+      setIsSubscribed(isSubscribed);
+      
+      const credits = await getCredits();
+      if (credits.success && credits.data) {
+        setImageCount(credits.data.image_generation_count || 0);
+      }
+    };
+    
+    checkStatus();
+  }, []);
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -113,6 +133,17 @@ const Configurations = () => {
         onSubmit={form.handleSubmit(onSubmit)}
         className="grid w-full max-w-2xl mx-auto items-start gap-6 xl:pt-20"
       >
+        {isSubscribed === false && (
+          <Alert className="bg-amber-50 border-amber-200">
+            <AlertTitle className="text-amber-800">Free Account Limitations</AlertTitle>
+            <AlertDescription className="text-amber-700">
+              Free users are limited to 3 image generations. You have used {imageCount || 0}/3 generations.
+              <br />
+              <a href="/billing" className="underline font-medium">Subscribe</a> to unlock unlimited image generations and video features.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <fieldset className="grid gap-6 rounded-lg border p-4 bg-white">
           <legend className="-ml-1 px-1 text-base font-medium">Image Generation</legend>
 

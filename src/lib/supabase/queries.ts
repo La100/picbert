@@ -20,6 +20,12 @@ export const getSubscription = cache(async (supabase: SupabaseClient) => {
   return subscription;
 });
 
+// Check if user has an active subscription
+export const hasActiveSubscription = async (supabase: SupabaseClient) => {
+  const subscription = await getSubscription(supabase);
+  return !!subscription;
+};
+
 export const getProducts = cache(async (supabase: SupabaseClient) => {
   const { data: products } = await supabase
     .from('products')

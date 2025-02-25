@@ -223,17 +223,29 @@ export async function checkAndUpdateCredits(): Promise<{
   }
 
   const currentCount = credits.data.image_generation_count ?? 0;
-  const maxCount = credits.data.max_image_generation_count ?? 0;
+  let maxCount = credits.data.max_image_generation_count ?? 0;
+
+  // Check if user has subscription
+  const supabase = await createClient();
+  const { data: subscription } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .in('status', ['trialing', 'active'])
+    .maybeSingle();
+
+  // If no subscription, limit to 3 images
+  if (!subscription) {
+    maxCount = Math.min(maxCount, 3);
+  }
 
   if (currentCount >= maxCount) {
     return { 
       hasCredits: false, 
       credits: credits.data, 
-      error: "No credits remaining" 
+      error: subscription ? "No credits remaining" : "Free users are limited to 3 images. Please subscribe for more." 
     };
   }
 
-  const supabase = await createClient();
   const { error } = await supabase
     .from("credits")
     .update({ 
