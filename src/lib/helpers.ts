@@ -31,13 +31,13 @@ export const toDateTime = (secs: number) => {
 export const calculateTrialEndUnixTimestamp = (
   trialPeriodDays: number | null | undefined
 ) => {
-  // Check if trialPeriodDays is null, undefined, or less than 2 days
+  // If trialPeriodDays is 0, null, or undefined, return 'now' (no trial period)
   if (
     trialPeriodDays === null ||
     trialPeriodDays === undefined ||
-    trialPeriodDays < 2
+    trialPeriodDays === 0
   ) {
-    return undefined;
+    return Math.floor(Date.now() / 1000); // Current time in Unix timestamp (seconds)
   }
 
   const currentDate = new Date(); // Current date and time
