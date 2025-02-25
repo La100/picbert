@@ -28,25 +28,6 @@ export const toDateTime = (secs: number) => {
   return t;
 };
 
-export const calculateTrialEndUnixTimestamp = (
-  trialPeriodDays: number | null | undefined
-) => {
-  // If trialPeriodDays is 0, null, or undefined, return 'now' (no trial period)
-  if (
-    trialPeriodDays === null ||
-    trialPeriodDays === undefined ||
-    trialPeriodDays === 0
-  ) {
-    return Math.floor(Date.now() / 1000); // Current time in Unix timestamp (seconds)
-  }
-
-  const currentDate = new Date(); // Current date and time
-  const trialEnd = new Date(
-    currentDate.getTime() + (trialPeriodDays + 1) * 24 * 60 * 60 * 1000
-  ); // Add trial days
-  return Math.floor(trialEnd.getTime() / 1000); // Convert to Unix timestamp in seconds
-};
-
 // the following toastKeyMap is used to map the toast type to the keys used in the redirect path
 const toastKeyMap: { [key: string]: string[] } = {
   status: ['status', 'status_description'],

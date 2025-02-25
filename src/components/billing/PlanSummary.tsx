@@ -6,6 +6,7 @@ import { Tables } from "@database.types";
 import PricingSheet from "./PricingSheet";
 import { User } from "@supabase/supabase-js";
 import { format } from "date-fns";
+import ManageBillingButton from "./ManageBillingButton";
 
 type Subscription = Tables<"subscriptions">;
 type Product = Tables<"products">;
@@ -142,6 +143,11 @@ const PlanSummary = ({
             </div>
           </div>
         </CardContent>
+        <CardFooter className="border-t border-border px-4 py-3">
+          <span className="flex flex-col gap-2 sm:ml-auto sm:flex-row">
+            <ManageBillingButton />
+          </span>
+        </CardFooter>
       </Card>
     );
   }

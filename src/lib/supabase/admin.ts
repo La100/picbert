@@ -7,8 +7,6 @@ import { revalidateTag } from 'next/cache';
 
 type Product = Tables<'products'>;
 type Price = Tables<'prices'>;
-// Change to control trial period length
-const TRIAL_PERIOD_DAYS = 0;
 
 // Note: supabaseAdmin uses the SERVICE_ROLE_KEY which you must only use in a secure server-side context
 // as it has admin privileges and overwrites RLS policies!
@@ -49,7 +47,7 @@ const upsertPriceRecord = async (
     unit_amount: price.unit_amount ?? null,
     interval: price.recurring?.interval ?? null,
     interval_count: price.recurring?.interval_count ?? null,
-    trial_period_days: price.recurring?.trial_period_days ?? TRIAL_PERIOD_DAYS,
+    trial_period_days: price.recurring?.trial_period_days ?? 0,
     description: null,
     metadata: price.metadata ?? null
   };

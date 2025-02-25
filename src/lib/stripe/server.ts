@@ -6,8 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createOrRetrieveCustomer } from '@/lib/supabase/admin';
 import {
   getURL,
-  getErrorRedirect,
-  calculateTrialEndUnixTimestamp
+  getErrorRedirect
 } from '@/lib/helpers';
 import { Tables } from '@database.types';
 
@@ -71,16 +70,13 @@ export async function checkoutWithStripe(
     };
 
     console.log(
-      'Trial end:',
-      calculateTrialEndUnixTimestamp(price.trial_period_days)
+      'Creating checkout session for price:',
+      price.id
     );
     if (price.type === 'recurring') {
       params = {
         ...params,
-        mode: 'subscription',
-        subscription_data: {
-          trial_end: calculateTrialEndUnixTimestamp(price.trial_period_days)
-        }
+        mode: 'subscription'
       };
     } else if (price.type === 'one_time') {
       params = {
