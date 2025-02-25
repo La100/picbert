@@ -31,9 +31,6 @@ interface PlanSummaryProps {
 const PlanSummary = ({
   credits,
   subscription,
-  user,
-  products,
-  targetId = "available-plans",
 }: PlanSummaryProps) => {
   const {
     products: subscriptionProduct,
@@ -94,7 +91,7 @@ const PlanSummary = ({
               <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 flex items-start">
                 <AlertCircle className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0 mt-0.5" />
                 <p className="text-xs sm:text-sm text-amber-800">
-                  You're running low on credits. Your plan will renew automatically on {format(new Date(subscription.current_period_end), "MMMM d, yyyy")}.
+                  You&apos;re running low on credits. Your plan will renew automatically on {format(new Date(subscription.current_period_end), "MMMM d, yyyy")}.
                 </p>
               </div>
             )}

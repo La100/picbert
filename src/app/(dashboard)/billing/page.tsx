@@ -83,7 +83,7 @@ export default async function BillingPage() {
                       <AlertCircle className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0 mt-0.5" />
                       <div className="space-y-2">
                         <p className="text-sm">
-                          You currently don't have an active subscription. Choose a plan below to unlock all features and start creating amazing AI-generated images.
+                          You currently don&apos;t have an active subscription. Choose a plan below to unlock all features and start creating amazing AI-generated images.
                         </p>
                         <ul className="text-sm list-disc pl-5 space-y-1">
                           <li>Generate custom AI images with your own models</li>
