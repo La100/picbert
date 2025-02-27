@@ -4,6 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 import type { Database, Json, Tables, TablesInsert } from '@database.types';
 import { revalidateTag } from 'next/cache';
+import { sendSubscriptionConfirmationEmail } from '@/lib/email';
+import { format } from 'date-fns';
 
 type Product = Tables<'products'>;
 type Price = Tables<'prices'>;
@@ -244,7 +246,7 @@ const manageSubscriptionStatusChange = async (
   const { id: uuid } = customerData!;
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-    expand: ['default_payment_method']
+    expand: ['default_payment_method', 'items.data.price.product']
   });
   // Upsert the latest status of the subscription object.
   const subscriptionData: TablesInsert<'subscriptions'> = {
@@ -295,6 +297,68 @@ const manageSubscriptionStatusChange = async (
       uuid,
       subscription.default_payment_method as Stripe.PaymentMethod
     );
+    
+  // Send confirmation email for new subscriptions or when subscription is updated to active status
+  if ((createAction || subscription.status === 'active') && uuid) {
+    try {
+      // Get user data from the users table
+      const { data: userData, error: userError } = await supabaseAdmin
+        .from('users')
+        .select('full_name')
+        .eq('id', uuid)
+        .single();
+        
+      if (userError) {
+        console.error('Error fetching user data for email:', userError);
+      } else {
+        // Get user email from auth
+        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(uuid);
+        
+        if (authError || !authUser) {
+          console.error('Error fetching auth user data:', authError || 'User not found');
+          return;
+        }
+        
+        const userEmail = authUser.user.email;
+        if (!userEmail) {
+          console.error('User email not found');
+          return;
+        }
+        
+        // Get product details
+        const product = subscription.items.data[0].price.product as Stripe.Product;
+        const planName = product.name || 'Premium Plan';
+        
+        // Format dates - ensure they are strings
+        const startDate = format(
+          new Date(subscriptionData.current_period_start as string), 
+          'MMMM d, yyyy'
+        );
+        const endDate = format(
+          new Date(subscriptionData.current_period_end as string), 
+          'MMMM d, yyyy'
+        );
+        
+        // Send confirmation email
+        const emailResult = await sendSubscriptionConfirmationEmail({
+          to: userEmail,
+          userName: userData?.full_name || userEmail.split('@')[0] || 'Valued Customer',
+          planName,
+          startDate,
+          endDate
+        });
+        
+        if (!emailResult.success) {
+          console.error('Failed to send subscription confirmation email:', emailResult.error);
+        } else {
+          console.log(`Subscription confirmation email sent to ${userEmail}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error sending subscription confirmation email:', error);
+      // Don't throw error here to avoid disrupting the subscription process
+    }
+  }
 };
 
 
@@ -303,26 +367,56 @@ const updateUserCredits = async (
   userId: string,
   metadata: Json
 ) => {
-
-  const creditsData: TablesInsert<'credits'> = {
-    image_generation_count: (metadata as { image_generation_count?: number })?.image_generation_count ?? 0,
+  // Extract token amount from metadata
+  const tokenAmount = (metadata as { tokens?: number })?.tokens ?? 0;
   
-    max_image_generation_count: (metadata as { image_generation_count?: number })?.image_generation_count ?? 0,
+  if (tokenAmount <= 0) {
+    console.log(`No tokens to add for user: ${userId}`);
+    return;
+  }
   
-  };
-
-  const { error: upsertError } = await supabaseAdmin
+  // Get current tokens
+  const { data: currentCredits, error: fetchError } = await supabaseAdmin
     .from('credits')
-    .upsert(creditsData)
-    .eq('user_id', userId);
-
-    revalidateTag('credits');
-
-  if (upsertError) {
-    throw new Error(`Credits update failed: ${upsertError.message}`);
+    .select('tokens')
+    .eq('user_id', userId)
+    .single();
+  
+  if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 is the "no rows returned" error
+    console.error(`Error fetching current credits: ${fetchError.message}`);
+    throw new Error(`Credits fetch failed: ${fetchError.message}`);
+  }
+  
+  const currentTokens = currentCredits?.tokens || 0;
+  const newTokens = currentTokens + tokenAmount;
+  
+  console.log(`Adding ${tokenAmount} tokens to user ${userId}. Current: ${currentTokens}, New: ${newTokens}`);
+  
+  // Try to update existing record first
+  const { error: updateError, data: updateData } = await supabaseAdmin
+    .from('credits')
+    .update({ tokens: newTokens })
+    .eq('user_id', userId)
+    .select();
+  
+  // If no rows were updated (user doesn't have a credits record yet), insert one
+  if (updateData && updateData.length === 0) {
+    const { error: insertError } = await supabaseAdmin
+      .from('credits')
+      .insert([{ user_id: userId, tokens: tokenAmount }]);
+    
+    if (insertError) {
+      throw new Error(`Credits insert failed: ${insertError.message}`);
+    }
+    
+    console.log(`Created new credits record for user: ${userId} with ${tokenAmount} tokens`);
+  } else if (updateError) {
+    throw new Error(`Credits update failed: ${updateError.message}`);
+  } else {
+    console.log(`Updated credits for user: ${userId} from ${currentTokens} to ${newTokens} tokens`);
   }
 
-  console.log(`Updated credits for user: ${userId}`);
+  revalidateTag('credits');
 };
 
 export {

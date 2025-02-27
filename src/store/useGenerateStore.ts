@@ -33,6 +33,8 @@ const useGenerateStore = create<GenerateState>((set) => ({
 
       // Check credits before proceeding
       const creditCheck = await checkAndUpdateCredits();
+      console.log("Credit check result:", creditCheck);
+      
       if (!creditCheck.hasCredits) {
         toast.error(creditCheck.error || "No credits available", { id: toastId });
         set({ error: creditCheck.error || "No credits available", loading: false });
@@ -48,15 +50,24 @@ const useGenerateStore = create<GenerateState>((set) => ({
         raw: values.raw,
       }))
 
+      console.log("Storing images...");
       // Store the generated images
-      await storeImages(imageUrls)
+      const storeResult = await storeImages(imageUrls)
+      console.log("Store result:", storeResult);
+      
+      if (!storeResult.success) {
+        console.error("Failed to store images:", storeResult.error)
+        toast.error("Failed to save image to your gallery. Please try again.", { id: toastId })
+        set({ error: storeResult.error || 'Failed to store image', loading: false })
+        return
+      }
       
       // Update the state with new images
       set({ images: imageUrls, loading: false, error: null })
-      toast.success("Image processed successfully", { id: toastId })
+      toast.success("Image processed and saved to your gallery", { id: toastId })
 
     } catch (error) {
-      console.error(error)
+      console.error("Error in generateImage:", error)
       set({ error: 'Failed to process image. Please try again.', loading: false, images: [] })
       toast.error("Failed to process image. Please try again.")
     }

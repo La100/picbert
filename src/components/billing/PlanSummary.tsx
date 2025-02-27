@@ -1,12 +1,11 @@
 import React from "react";
-import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
 import { Card, CardContent } from "../ui/card";
 import { Tables } from "@database.types";
 import { User } from "@supabase/supabase-js";
 import { format } from "date-fns";
 import ManageBillingButton from "./ManageBillingButton";
-import { CreditCard, Zap, Calendar, AlertCircle } from "lucide-react";
+import { CreditCard, Calendar } from "lucide-react";
 
 type Subscription = Tables<"subscriptions">;
 type Product = Tables<"products">;
@@ -45,9 +44,8 @@ const PlanSummary = ({
     return null;
   }
 
+  // Handle the case where these properties might not exist yet
   const imageGenerationCount = credits?.image_generation_count ?? 0;
-  const maxImageGenerationCount = credits?.max_image_generation_count ?? 0;
-  const percentUsed = maxImageGenerationCount > 0 ? (imageGenerationCount / maxImageGenerationCount) * 100 : 0;
   
   const priceString = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -73,45 +71,21 @@ const PlanSummary = ({
           <div className="flex flex-col space-y-3 sm:space-y-4">
             <div>
               <span className="text-sm font-medium text-muted-foreground">
-                Image Generation Credits
+                Images Generated
               </span>
               <div className="flex items-center justify-between mt-1">
                 <span className="text-xl sm:text-2xl font-bold">{imageGenerationCount}</span>
-                <span className="text-sm text-muted-foreground">of {maxImageGenerationCount} available</span>
-              </div>
-              <div className="mt-2">
-                <Progress 
-                  value={percentUsed} 
-                  className={`h-2 ${percentUsed < 30 ? 'bg-green-100' : percentUsed < 70 ? 'bg-amber-100' : 'bg-red-100'}`} 
-                />
               </div>
             </div>
-            
-            {percentUsed > 80 && (
-              <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 flex items-start">
-                <AlertCircle className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0 mt-0.5" />
-                <p className="text-xs sm:text-sm text-amber-800">
-                  You&apos;re running low on credits. Your plan will renew automatically on {format(new Date(subscription.current_period_end), "MMMM d, yyyy")}.
-                </p>
-              </div>
-            )}
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 bg-muted/30 p-3 sm:p-4 rounded-lg">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 bg-muted/30 p-3 sm:p-4 rounded-lg">
             <div className="flex flex-col">
               <div className="flex items-center text-sm font-medium text-muted-foreground mb-1">
                 <CreditCard className="h-4 w-4 mr-1" />
                 <span>Price</span>
               </div>
               <span className="text-base sm:text-lg font-semibold">{priceString}/mo</span>
-            </div>
-            
-            <div className="flex flex-col">
-              <div className="flex items-center text-sm font-medium text-muted-foreground mb-1">
-                <Zap className="h-4 w-4 mr-1" />
-                <span>Credits</span>
-              </div>
-              <span className="text-base sm:text-lg font-semibold">{maxImageGenerationCount}</span>
             </div>
             
             <div className="flex flex-col">

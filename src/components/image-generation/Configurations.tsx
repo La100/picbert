@@ -29,6 +29,7 @@ import { Checkbox } from "../ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { checkSubscriptionStatus } from "@/app/actions/subscription-actions";
 import { getCredits } from "@/app/actions/credit-actions";
+import { IMAGE_TOKEN_COST } from "@/lib/constants";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -48,7 +49,7 @@ const Configurations = () => {
   const loading = useGenerateStore((state) => state.loading);
   const setLoading = useGenerateStore((state) => state.setLoading);
   const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
-  const [imageCount, setImageCount] = useState<number | null>(null);
+  const [tokenCount, setTokenCount] = useState<number | null>(null);
   
   useEffect(() => {
     const checkStatus = async () => {
@@ -57,7 +58,7 @@ const Configurations = () => {
       
       const credits = await getCredits();
       if (credits.success && credits.data) {
-        setImageCount(credits.data.image_generation_count || 0);
+        setTokenCount(credits.data.tokens || 0);
       }
     };
     
@@ -82,6 +83,14 @@ const Configurations = () => {
   async function onSubmit(values: FormValues) {
     try {
       setLoading(true);
+      
+      // Check if user has enough tokens for image generation
+      if (tokenCount !== null && tokenCount < IMAGE_TOKEN_COST) {
+        toast.error(`Not enough tokens. Image generation requires ${IMAGE_TOKEN_COST} tokens.`);
+        setLoading(false);
+        return;
+      }
+
       const finalPrompt = values.selfie 
         ? values.prompt + ", selfie, full body visible, 4k high resolution"
         : values.prompt;
@@ -137,15 +146,22 @@ const Configurations = () => {
           <Alert className="bg-amber-50 border-amber-200">
             <AlertTitle className="text-amber-800">Free Account Limitations</AlertTitle>
             <AlertDescription className="text-amber-700">
-              Free users are limited to 3 image generations. You have used {imageCount || 0}/3 generations.
+              Free users have limited tokens. You currently have {tokenCount || 0} tokens.
               <br />
-              <a href="/billing" className="underline font-medium">Subscribe</a> to unlock unlimited image generations and video features.
+              <a href="/billing" className="underline font-medium">Subscribe</a> to unlock more tokens and additional features.
             </AlertDescription>
           </Alert>
         )}
         
         <fieldset className="grid gap-6 rounded-lg border p-4 bg-white">
           <legend className="-ml-1 px-1 text-base font-medium">Image Generation</legend>
+
+          <div className="flex justify-between items-center">
+            <div className="text-sm font-medium">Available Tokens: <span className="font-bold">{tokenCount || 0}</span></div>
+            <div className="text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">
+              Cost: {IMAGE_TOKEN_COST} tokens per image
+            </div>
+          </div>
 
           <div className="space-y-2">
             <FormLabel className="font-medium">Prompt Starters</FormLabel>

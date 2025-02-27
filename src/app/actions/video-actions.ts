@@ -3,10 +3,11 @@
 import { Database } from "@database.types";
 import { randomUUID } from "crypto";
 import { revalidateTag } from "next/cache";
-import { getCredits } from "./credit-actions";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { createClientWithOptions } from "@/lib/supabase/server-fetch";
 import { fal } from "@/lib/fal";
+import { processTokenOperation } from "./token-actions";
+import { VIDEO_TOKEN_COST } from "@/lib/constants";
 
 
 interface VideoResponse {
@@ -243,65 +244,7 @@ export async function checkAndUpdateVideoCredits(): Promise<{
   credits: Database["public"]["Tables"]["credits"]["Row"] | null;
   error: string | null;
 }> {
-  const credits = await getCredits();
-  
-  if (!credits || credits.error || !credits.data) {
-    return { 
-      hasCredits: false, 
-      credits: null, 
-      error: credits?.error || "Failed to fetch credits" 
-    };
-  }
-
-  // Check if user has subscription
-  const supabase = await createClient();
-  const { data: subscription } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .in('status', ['trialing', 'active'])
-    .maybeSingle();
-
-  // If no subscription, prevent video generation
-  if (!subscription) {
-    return { 
-      hasCredits: false, 
-      credits: credits.data, 
-      error: "Video generation requires a subscription. Please subscribe to continue." 
-    };
-  }
-
-  const currentCount = credits.data.video_generation_count ?? 0;
-  const maxCount = credits.data.max_video_generation_count ?? 0;
-
-  if (currentCount >= maxCount) {
-    return { 
-      hasCredits: false, 
-      credits: credits.data, 
-      error: "No video credits remaining" 
-    };
-  }
-
-  const { error } = await supabase
-    .from("credits")
-    .update({ 
-      video_generation_count: currentCount + 1 
-    })
-    .eq("user_id", credits.data.user_id);
-
-  if (error) {
-    return { 
-      hasCredits: false, 
-      credits: credits.data, 
-      error: "Failed to update video credits" 
-    };
-  }
-
-  revalidateTag("credits");
-  return { 
-    hasCredits: true, 
-    credits: credits.data, 
-    error: null 
-  };
+  return processTokenOperation('deduct', VIDEO_TOKEN_COST, 'video generation');
 }
 
 export async function queueVideoGeneration(

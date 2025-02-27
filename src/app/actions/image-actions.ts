@@ -8,6 +8,8 @@ import { getCredits } from "./credit-actions";
 import { createClient } from "@/lib/supabase/server";
 import { createClientWithOptions } from "@/lib/supabase/server-fetch";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { checkTokens, deductTokens } from "./token-actions";
+import { IMAGE_TOKEN_COST } from "@/lib/constants";
 
 interface ImageResponse {
   error: string | null;
@@ -22,10 +24,13 @@ type StoreImageInput = {
 export async function storeImages(
   data: StoreImageInput[],
 ): Promise<ImageResponse> {
+  console.log("Starting storeImages with data:", data.length, "images");
+  
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
+    console.error("No authenticated user found");
     return {
       error: "Unauthorized",
       success: false,
@@ -34,60 +39,106 @@ export async function storeImages(
   }
 
   const uploadResults = [];
+  let hasErrors = false;
 
   for (const img of data) {
-    const arrayBuffer = await imgUrlToBlob(img.url);
-    const { width, height, type } = imageMeta(new Uint8Array(arrayBuffer));
+    try {
+      console.log("Processing image with URL:", img.url.substring(0, 50) + "...");
+      
+      // Convert image URL to blob
+      const arrayBuffer = await imgUrlToBlob(img.url);
+      if (!arrayBuffer) {
+        console.error("Failed to convert image URL to blob");
+        hasErrors = true;
+        uploadResults.push({
+          error: "Failed to process image data",
+          success: false,
+          data: null,
+        });
+        continue;
+      }
 
-    const fileName = `image_${randomUUID()}.${type}`;
-    const filePath = `${user.id}/${fileName}`;
+      // Get image metadata
+      const { width, height, type } = imageMeta(new Uint8Array(arrayBuffer));
+      console.log("Image metadata:", { width, height, type });
 
-    const { error: storageError } = await supabase.storage
-      .from("generated_images")
-      .upload(filePath, arrayBuffer, {
-        contentType: `image/${type}`,
-        cacheControl: "3600",
-        upsert: false,
-      });
+      const fileName = `image_${randomUUID()}.${type}`;
+      const filePath = `${user.id}/${fileName}`;
+      console.log("Generated file path:", filePath);
 
-    if (storageError) {
+      // Upload to storage
+      const { error: storageError } = await supabase.storage
+        .from("generated_images")
+        .upload(filePath, arrayBuffer, {
+          contentType: `image/${type}`,
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (storageError) {
+        console.error("Storage error:", storageError);
+        hasErrors = true;
+        uploadResults.push({
+          fileName,
+          error: storageError.message,
+          success: false,
+          data: null,
+        });
+        continue;
+      }
+      
+      console.log("Successfully uploaded image to storage");
+
+      // Insert record in database
+      const { data: dbData, error: dbError } = await supabase
+        .from("generated_images")
+        .insert([{
+          user_id: user.id,
+          prompt: img.prompt,
+          aspect_ratio: img.aspect_ratio,
+          image_name: fileName,
+          width,
+          height,
+        }])
+        .select();
+
+      if (dbError) {
+        console.error("Database error:", dbError);
+        hasErrors = true;
+      } else {
+        console.log("Successfully inserted image record in database");
+      }
+
       uploadResults.push({
         fileName,
-        error: storageError.message,
+        error: dbError?.message || null,
+        success: !dbError,
+        data: dbData || null,
+      });
+    } catch (error) {
+      console.error("Error in storeImages:", error);
+      hasErrors = true;
+      uploadResults.push({
+        error: error instanceof Error ? error.message : "Unknown error",
         success: false,
         data: null,
       });
-      continue;
     }
-
-    const { data: dbData, error: dbError } = await supabase
-      .from("generated_images")
-      .insert([{
-        user_id: user.id,
-      
-        prompt: img.prompt,
-        aspect_ratio: img.aspect_ratio,
-    
-        image_name: fileName,
-        width,
-        height,
-      }])
-      .select();
-
-    uploadResults.push({
-      fileName,
-      error: dbError?.message || null,
-      success: !dbError,
-      data: dbData || null,
-    });
   }
 
+  // Revalidate cache tags
   revalidateTag("gallery-images");
   revalidateTag("dashboard-images");
+  revalidateTag("credits");
+  
+  console.log("Completed storeImages with results:", { 
+    success: !hasErrors, 
+    resultsCount: uploadResults.length 
+  });
 
   return {
-    error: null,
-    success: true,
+    error: hasErrors ? "Some images failed to upload" : null,
+    success: !hasErrors,
     data: { results: uploadResults },
   };
 }
@@ -212,59 +263,84 @@ export async function checkAndUpdateCredits(): Promise<{
   credits: Database["public"]["Tables"]["credits"]["Row"] | null;
   error: string | null;
 }> {
-  const credits = await getCredits();
-  
-  if (!credits || credits.error || !credits.data) {
+  try {
+    // First check if user has enough tokens
+    const checkResult = await checkTokens(IMAGE_TOKEN_COST);
+    
+    if (!checkResult.success) {
+      console.log("Not enough tokens for image generation:", checkResult);
+      return { 
+        hasCredits: false, 
+        credits: null, 
+        error: checkResult.error || "Not enough tokens for image generation" 
+      };
+    }
+    
+    // If they have enough tokens, deduct them directly
+    const deductResult = await deductTokens(IMAGE_TOKEN_COST);
+    console.log("Token deduction result:", deductResult);
+    
+    if (!deductResult.success) {
+      console.error("Failed to deduct tokens:", deductResult.error);
+      return { 
+        hasCredits: false, 
+        credits: null, 
+        error: deductResult.error || "Failed to deduct tokens" 
+      };
+    }
+    
+    // Update image generation count
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+      try {
+        // Get current credits
+        const { data: creditsData } = await supabase
+          .from('credits')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+          
+        if (creditsData) {
+          // Update image generation count
+          try {
+            const { error: updateError } = await supabase
+              .from('credits')
+              .update({ 
+                image_generation_count: (creditsData.image_generation_count || 0) + 1 
+              })
+              .eq('user_id', user.id);
+              
+            if (updateError) {
+              console.error("Error updating image_generation_count:", updateError);
+            } else {
+              console.log("Updated image_generation_count successfully");
+            }
+          } catch (updateError) {
+            // Log error but don't fail the operation
+            console.error("Failed to update image_generation_count:", updateError);
+          }
+        }
+      } catch (creditsError) {
+        console.error("Error fetching/updating credits:", creditsError);
+      }
+    }
+    
+    // Get updated credits
+    const credits = await getCredits();
+    
     return { 
-      hasCredits: false, 
-      credits: null, 
-      error: credits?.error || "Failed to fetch credits" 
+      hasCredits: true, 
+      credits: credits.data || null, 
+      error: null 
+    };
+  } catch (error) {
+    console.error("Error in checkAndUpdateCredits:", error);
+    return {
+      hasCredits: false,
+      credits: null,
+      error: error instanceof Error ? error.message : "Failed to process tokens"
     };
   }
-
-  const currentCount = credits.data.image_generation_count ?? 0;
-  let maxCount = credits.data.max_image_generation_count ?? 0;
-
-  // Check if user has subscription
-  const supabase = await createClient();
-  const { data: subscription } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .in('status', ['trialing', 'active'])
-    .maybeSingle();
-
-  // If no subscription, limit to 3 images
-  if (!subscription) {
-    maxCount = Math.min(maxCount, 3);
-  }
-
-  if (currentCount >= maxCount) {
-    return { 
-      hasCredits: false, 
-      credits: credits.data, 
-      error: subscription ? "No credits remaining" : "Free users are limited to 3 images. Please subscribe for more." 
-    };
-  }
-
-  const { error } = await supabase
-    .from("credits")
-    .update({ 
-      image_generation_count: currentCount + 1 
-    })
-    .eq("user_id", credits.data.user_id);
-
-  if (error) {
-    return { 
-      hasCredits: false, 
-      credits: credits.data, 
-      error: "Failed to update credits" 
-    };
-  }
-
-  revalidateTag("credits");
-  return { 
-    hasCredits: true, 
-    credits: credits.data, 
-    error: null 
-  };
 }
