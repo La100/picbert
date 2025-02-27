@@ -88,8 +88,9 @@ export function SignupForm() {
     setIsGoogleLoading(true)
     try {
       await loginWithGoogle()
-    } catch (error) {
+    } catch (err) {
       toast.error("Failed to login with Google")
+      console.error("Google login error:", err)
     } finally {
       setIsGoogleLoading(false)
     }
