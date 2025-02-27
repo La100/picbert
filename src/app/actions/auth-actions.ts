@@ -135,3 +135,20 @@ export async function updatePassword(
     data: data || null,
   };
 }
+
+export async function loginWithGoogle(): Promise<void> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  redirect(data.url);
+}
