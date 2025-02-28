@@ -17,9 +17,10 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { changePassword } from "@/app/actions/auth-actions";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 const passwordValidationRegex = new RegExp(
   "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
@@ -51,7 +52,9 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function ChangePasswordForm({ className = "" }: { className?: string }) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [token, setToken] = React.useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,18 +64,42 @@ export function ChangePasswordForm({ className = "" }: { className?: string }) {
   });
   const toastId = React.useId();
 
+  // Extract token from URL on component mount
+  React.useEffect(() => {
+    const urlToken = searchParams.get("token");
+    if (urlToken) {
+      setToken(urlToken);
+    }
+  }, [searchParams]);
+
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
 
     toast.loading("Changing password...", { id: toastId });
 
     try {
-      const { success, error } = await changePassword(values.password);
-      if (success) {
-        toast.success("Password changed successfully", { id: toastId });
-        router.push("/login");
+      // If we have a token from the URL, use it to reset the password
+      if (token) {
+        const supabase = createClient();
+        const { error } = await supabase.auth.updateUser({
+          password: values.password,
+        });
+
+        if (error) {
+          toast.error(error.message, { id: toastId });
+        } else {
+          toast.success("Password changed successfully", { id: toastId });
+          router.push("/login");
+        }
       } else {
-        toast.error(String(error), { id: toastId });
+        // Use the existing changePassword function for logged-in users
+        const { success, error } = await changePassword(values.password);
+        if (success) {
+          toast.success("Password changed successfully", { id: toastId });
+          router.push("/login");
+        } else {
+          toast.error(String(error), { id: toastId });
+        }
       }
     } catch (error) {
       toast.error("Failed to change password", { id: toastId });

@@ -1,8 +1,9 @@
- 
- "use server";
+"use server";
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { INITIAL_USER_TOKENS } from "@/lib/constants";
+import { createServiceClient } from "@/lib/supabase/server";
 
 interface AuthResponse {
   error: null | string;
@@ -37,6 +38,30 @@ export async function signup(formData: FormData): Promise<AuthResponse> {
   };
 
   const { data: signupData, error } = await supabase.auth.signUp(data);
+
+  // If signup was successful, create a credits record with initial tokens
+  if (!error && signupData?.user) {
+    try {
+      // Use service client to bypass RLS policies
+      const serviceClient = createServiceClient();
+      
+      // Create a credits record with initial tokens
+      const { error: creditsError } = await serviceClient
+        .from("credits")
+        .insert([{ 
+          user_id: signupData.user.id, 
+          tokens: INITIAL_USER_TOKENS 
+        }]);
+      
+      if (creditsError) {
+        console.error("Failed to create initial credits:", creditsError.message);
+      } else {
+        console.log(`Created initial credits (${INITIAL_USER_TOKENS} tokens) for user: ${signupData.user.id}`);
+      }
+    } catch (creditsError) {
+      console.error("Error creating initial credits:", creditsError);
+    }
+  }
 
   return {
     error: error?.message || "There was an error signing up!",

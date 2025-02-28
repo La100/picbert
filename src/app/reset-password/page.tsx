@@ -9,7 +9,11 @@ export const metadata: Metadata = {
   description: "Reset password form built using the components.",
 };
 
-export default async function ResetPasswordPage() {
+export default async function ResetPasswordPage({
+  searchParams,
+}: {
+  searchParams: { token?: string };
+}) {
   return (
     <>
       <div className=" relative h-full md:h-screen flex-col items-center justify-center grid grid-cols-1  md:grid-cols-2 md:px-0">

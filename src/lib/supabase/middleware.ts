@@ -12,7 +12,6 @@ const PROTECTED_ROUTES = [
   '/billing',
   '/account-settings',
   '/models',
-  '/reset-password',
   '/video-generation',
   '/video-library',
   // Add more protected routes here
@@ -27,7 +26,7 @@ const SUBSCRIPTION_REQUIRED_ROUTES: string[] = [
 const PUBLIC_ROUTES = [
   '/login',
   '/auth',
-  // '/reset-password',
+  '/reset-password',
   // Add more public routes here
 ]
 
