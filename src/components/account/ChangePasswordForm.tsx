@@ -50,9 +50,15 @@ const formSchema = z
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function ChangePasswordForm({ className = "" }: { className?: string }) {
+export function ChangePasswordForm({ 
+  className = "",
+  initialToken = null 
+}: { 
+  className?: string;
+  initialToken?: string | null;
+}) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [token, setToken] = React.useState<string | null>(null);
+  const [token, setToken] = React.useState<string | null>(initialToken);
   const router = useRouter();
   const searchParams = useSearchParams();
   const form = useForm<FormValues>({
@@ -64,13 +70,17 @@ export function ChangePasswordForm({ className = "" }: { className?: string }) {
   });
   const toastId = React.useId();
 
-  // Extract token from URL on component mount
+  // Extract token from URL on component mount if not provided via props
   React.useEffect(() => {
-    const urlToken = searchParams.get("token");
-    if (urlToken) {
-      setToken(urlToken);
+    if (initialToken) {
+      setToken(initialToken);
+    } else {
+      const urlToken = searchParams.get("token");
+      if (urlToken) {
+        setToken(urlToken);
+      }
     }
-  }, [searchParams]);
+  }, [searchParams, initialToken]);
 
   async function onSubmit(values: FormValues) {
     setIsLoading(true);

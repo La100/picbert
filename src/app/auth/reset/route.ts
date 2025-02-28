@@ -4,7 +4,6 @@ export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const { searchParams } = requestUrl
   const token = searchParams.get('token')
-  const type = searchParams.get('type')
   
   // If we have a token, redirect to the reset-password page with the token
   if (token) {
