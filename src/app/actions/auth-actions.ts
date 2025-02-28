@@ -1,4 +1,5 @@
-"use server";
+ 
+ "use server";
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -33,11 +34,6 @@ export async function signup(formData: FormData): Promise<AuthResponse> {
   const data = {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
-    options: {
-      data: {
-        full_name: formData.get("full_name") as string,
-      },
-    },
   };
 
   const { data: signupData, error } = await supabase.auth.signUp(data);
