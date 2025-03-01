@@ -75,25 +75,18 @@ export async function resetPassword(
 ): Promise<AuthResponse> {
   const supabase = await createClient();
 
-  // Determine the base URL based on environment
-  let baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  
-  // If we're in development and have an ngrok URL, use it
-  if (process.env.NODE_ENV === 'development' && process.env.NGROK_HOST) {
-    baseUrl = process.env.NGROK_HOST;
-  }
-  
-  // Fallback to localhost if no URL is set
-  if (!baseUrl) {
-    baseUrl = 'http://localhost:3000';
-  }
+  // Use only the site URL from environment variables
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://facesfactory.com';
+  const resetPasswordUrl = `${baseUrl}/reset-password`;
 
   const { data, error } = await supabase.auth.resetPasswordForEmail(
     values.email,
     {
-      redirectTo: `${baseUrl}/reset-password`,
+      redirectTo: resetPasswordUrl,
     }
   );
+
+  console.log(`Password reset email sent with redirectTo: ${resetPasswordUrl}`);
 
   return {
     error: error?.message ||
