@@ -75,8 +75,24 @@ export async function resetPassword(
 ): Promise<AuthResponse> {
   const supabase = await createClient();
 
+  // Determine the base URL based on environment
+  let baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  
+  // If we're in development and have an ngrok URL, use it
+  if (process.env.NODE_ENV === 'development' && process.env.NGROK_HOST) {
+    baseUrl = process.env.NGROK_HOST;
+  }
+  
+  // Fallback to localhost if no URL is set
+  if (!baseUrl) {
+    baseUrl = 'http://localhost:3000';
+  }
+
   const { data, error } = await supabase.auth.resetPasswordForEmail(
     values.email,
+    {
+      redirectTo: `${baseUrl}/reset-password`,
+    }
   );
 
   return {
@@ -126,22 +142,6 @@ export async function logout(): Promise<void> {
 }
 
 export async function changePassword(
-  newPassword: string,
-): Promise<AuthResponse> {
-  const supabase = await createClient();
-
-  const { error, data } = await supabase.auth.updateUser({
-    password: newPassword,
-  });
-
-  return {
-    error: error?.message || "There was an error changing the password!",
-    success: !error,
-    data: data || null,
-  };
-}
-
-export async function updatePassword(
   newPassword: string,
 ): Promise<AuthResponse> {
   const supabase = await createClient();

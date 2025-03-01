@@ -7,11 +7,11 @@ import { NextResponse, type NextRequest } from 'next/server'
 const PROTECTED_ROUTES = [
   '/dashboard',
   '/image-generation',
-  '/model-training',
+  // '/model-training', - Removed unused route
   '/gallery',
   '/billing',
   '/account-settings',
-  '/models',
+  // '/models', - Removed unused route
   '/video-generation',
   '/video-library',
   // Add more protected routes here

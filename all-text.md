@@ -7,7 +7,7 @@
 
 ## Auth Page Quote
 
-“Pictoria AI is a game changer for me. I have been able to generate high quality professional headshots within minutes. It has saved me countless hours of work and cost as well.”
+"Pictoria AI is a game changer for me. I have been able to generate high quality professional headshots within minutes. It has saved me countless hours of work and cost as well."
 
 David S.
 
@@ -204,7 +204,6 @@ const reviews = [
 
 - Pro
 - A plan designed for artists and professionals to elevate their creative projects.
-    - 2 trained models
     - 300 images per month
     - Advanced analytics
     - Priority support
@@ -212,11 +211,10 @@ const reviews = [
 
 - Enterprise
 - Tailored for businesses and advanced creators looking to make an impact.
-    - 5 trained models
     - Unlimited images
     - In-depth analytics
     - 1-hour, dedicated support response time
-    - Custom integrations   
+    - Custom integrations
 
 ## FAQ Section
 

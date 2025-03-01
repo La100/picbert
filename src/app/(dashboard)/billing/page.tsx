@@ -86,7 +86,7 @@ export default async function BillingPage() {
                           You currently don&apos;t have an active subscription. Choose a plan below to unlock all features and start creating amazing AI-generated images.
                         </p>
                         <ul className="text-sm list-disc pl-5 space-y-1">
-                          <li>Generate custom AI images with your own models</li>
+                          <li>Generate high-quality AI images</li>
                           <li>Access to premium features and higher quality outputs</li>
                           <li>Create more images with higher credit limits</li>
                         </ul>

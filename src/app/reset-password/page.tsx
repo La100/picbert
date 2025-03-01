@@ -3,23 +3,19 @@ import Logo from "@/components/Logo";
 import { Metadata } from "next";
 import AuthBg from "@/public/Abstract Curves and Colors.jpeg";
 import Image from "next/image";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Reset Password | Pictoria AI",
   description: "Reset password form built using the components.",
 };
 
-export default function ResetPasswordPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const token = typeof searchParams.token === 'string' ? searchParams.token : null;
-  
+// Use the standard Next.js page props pattern
+export default function ResetPasswordPage() {
   return (
     <>
       <div className=" relative h-full md:h-screen flex-col items-center justify-center grid grid-cols-1  md:grid-cols-2 md:px-0">
-        <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r md:flex">
+        <div className="relative hidden h-full flex-col bg-muted p-10 text-white md:flex">
           <div className="w-full h-[30%] bg-gradient-to-t from-transparent to-black/50 absolute top-0 left-0 z-10" />
           <div className="w-full h-[40%] bg-gradient-to-b from-transparent to-black/50 absolute bottom-0 left-0 z-10" />
           <div className="absolute inset-0">
@@ -53,7 +49,9 @@ export default function ResetPasswordPage({
             </div>
           </div>
           <div className="mt-12 md:mt-0  mx-auto flex w-full flex-col justify-center space-y-6 max-w-xl sm:w-[350px]">
-            <ChangePasswordForm initialToken={token} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <ChangePasswordForm />
+            </Suspense>
           </div>
         </div>
       </div>

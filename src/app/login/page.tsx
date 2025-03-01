@@ -24,7 +24,7 @@ export default async function AuthenticationPage({
   return (
     <>
       <div className=" relative h-full md:h-screen flex-col items-center justify-center grid grid-cols-1  md:grid-cols-2 md:px-0">
-        <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r md:flex">
+        <div className="relative hidden h-full flex-col bg-muted p-10 text-white md:flex">
           <div className="w-full h-[30%] bg-gradient-to-t from-transparent to-black/50 absolute top-0 left-0 z-10" />
           <div className="w-full h-[40%] bg-gradient-to-b from-transparent to-black/50 absolute bottom-0 left-0 z-10" />
 

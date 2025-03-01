@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
-import { changePassword } from "@/app/actions/auth-actions";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 
@@ -51,16 +50,15 @@ const formSchema = z
 type FormValues = z.infer<typeof formSchema>;
 
 export function ChangePasswordForm({ 
-  className = "",
-  initialToken = null 
+  className = ""
 }: { 
   className?: string;
-  initialToken?: string | null;
 }) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [token, setToken] = React.useState<string | null>(initialToken);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [token, setToken] = React.useState<string | null>(null);
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -69,18 +67,14 @@ export function ChangePasswordForm({
     },
   });
   const toastId = React.useId();
-
-  // Extract token from URL on component mount if not provided via props
+  
+  // Pobierz token z URL przy pierwszym renderowaniu
   React.useEffect(() => {
-    if (initialToken) {
-      setToken(initialToken);
-    } else {
-      const urlToken = searchParams.get("token");
-      if (urlToken) {
-        setToken(urlToken);
-      }
+    const urlToken = searchParams.get("token");
+    if (urlToken) {
+      setToken(urlToken);
     }
-  }, [searchParams, initialToken]);
+  }, [searchParams]);
 
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
@@ -88,28 +82,24 @@ export function ChangePasswordForm({
     toast.loading("Changing password...", { id: toastId });
 
     try {
-      // If we have a token from the URL, use it to reset the password
+      const supabase = createClient();
+      
+      // Jeśli mamy token, najpierw ustawiamy sesję
       if (token) {
-        const supabase = createClient();
-        const { error } = await supabase.auth.updateUser({
-          password: values.password,
-        });
+        console.log("Using token from URL for password reset");
+      }
+      
+      // Update the user's password
+      // Token jest automatycznie używany przez Supabase, jeśli jest obecny w URL
+      const { error } = await supabase.auth.updateUser({
+        password: values.password,
+      });
 
-        if (error) {
-          toast.error(error.message, { id: toastId });
-        } else {
-          toast.success("Password changed successfully", { id: toastId });
-          router.push("/login");
-        }
+      if (error) {
+        toast.error(error.message, { id: toastId });
       } else {
-        // Use the existing changePassword function for logged-in users
-        const { success, error } = await changePassword(values.password);
-        if (success) {
-          toast.success("Password changed successfully", { id: toastId });
-          router.push("/login");
-        } else {
-          toast.error(String(error), { id: toastId });
-        }
+        toast.success("Password changed successfully", { id: toastId });
+        router.push("/login");
       }
     } catch (error) {
       toast.error("Failed to change password", { id: toastId });
