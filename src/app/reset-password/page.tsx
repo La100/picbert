@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Reset Password | Pictoria AI",
+  title: "Reset Password | Faces Factory",
   description: "Reset password form built using the components.",
 };
 
@@ -34,7 +34,7 @@ export default function ResetPasswordPage() {
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                &ldquo;Pictoria AI is a game changer for me. I have been able to
+                &ldquo;Faces Factory is a game changer for me. I have been able to
                 generate high quality professional headshots within minutes. It
                 has saved me countless hours of work and cost as well.&rdquo;
               </p>

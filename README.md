@@ -1,6 +1,6 @@
-# Pictoria AI - Personalized AI Photo Generation Platform
+# Faces Factory - Personalized AI Photo Generation Platform
 
-Transform your photos with the power of AI! Pictoria AI is your ultimate solution for creating/generating professional AI-generated photos, similar to the popular PhotoAI platform. Perfect for LinkedIn headshots, Instagram content, dating profile pictures, and professional portraits. Train AI model on your personal images and generate stunning, high-quality AI-generated photos within minutes.
+Transform your photos with the power of AI! Faces Factory is your ultimate solution for creating/generating professional AI-generated photos, similar to the popular PhotoAI platform. Perfect for LinkedIn headshots, Instagram content, dating profile pictures, and professional portraits. Train AI model on your personal images and generate stunning, high-quality AI-generated photos within minutes.
 
 [![Watch Tutorial Video](https://img.shields.io/badge/Watch-Tutorial%20Video-red)](https://www.youtube.com/watch?v=7AQNeii5K7E)
 [![GitHub Stars](https://img.shields.io/github/stars/codebucks27/Pictoria-AI-Starter-Code?style=social)](https://github.com/codebucks27/Pictoria-AI-Starter-Code)
@@ -51,7 +51,7 @@ Before you begin, ensure you have:
 ### 1. Clone the Repository
 
 ```bash
-cd Pictoria-AI # change to your project directory
+cd Faces-Factory # change to your project directory
 ```
 
 ### 2. Install Dependencies

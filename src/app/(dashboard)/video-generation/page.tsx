@@ -7,8 +7,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const maxDuration = 30;
 
 export const metadata: Metadata = {
-  title: "Video Generation | Pictoria AI",
-  description: "Video generation for Pictoria AI",
+  title: "Video Generation | Faces Factory",
+  description: "Video generation for Faces Factory",
 }
 
 function VideoConfigurationsSkeleton() {

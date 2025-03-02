@@ -6,8 +6,8 @@ import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export const metadata: Metadata = {
-  title: "Videos Gallery | Pictoria AI",
-  description: "Videos Gallery for Pictoria AI",
+  title: "Videos Gallery | Faces Factory",
+  description: "Videos Gallery for Faces Factory",
 };
 
 const GalleryLoading = () => (

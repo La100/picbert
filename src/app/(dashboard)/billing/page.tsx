@@ -9,8 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Billing | Pictoria AI",
-  description: "Billing for Pictoria AI",
+  title: "Billing | Faces Factory",
+  description: "Billing for Faces Factory",
 };
 
 export default async function BillingPage() {
@@ -78,7 +78,7 @@ export default async function BillingPage() {
               <CardContent className="px-4 sm:px-6 py-5 sm:py-6">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="flex-1">
-                    <h2 className="text-xl font-semibold mb-2">Welcome to Pictoria AI</h2>
+                    <h2 className="text-xl font-semibold mb-2">Welcome to Faces Factory</h2>
                     <div className="bg-muted/50 p-3 sm:p-4 rounded-lg flex items-start">
                       <AlertCircle className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0 mt-0.5" />
                       <div className="space-y-2">

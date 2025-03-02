@@ -103,21 +103,44 @@ const VideoConfigurations = () => {
   }, [form]);
 
   async function onSubmit(values: FormValues) {
-    // Check if user has enough tokens for video generation
-    if (tokenCount !== null && tokenCount < VIDEO_TOKEN_COST) {
-      toast.error(`Not enough tokens. Video generation requires ${VIDEO_TOKEN_COST} tokens.`);
-      return;
-    }
-    
     try {
       setLoading(true);
+      
+      // Check if user has enough tokens for video generation
+      if (tokenCount !== null && tokenCount < VIDEO_TOKEN_COST) {
+        toast.error(`Not enough tokens. Video generation requires ${VIDEO_TOKEN_COST} tokens.`);
+        setLoading(false);
+        return;
+      }
+
+      // Deduct tokens first
+      const deductResult = await fetch('/api/credits/deduct', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount: VIDEO_TOKEN_COST }),
+      });
+
+      if (!deductResult.ok) {
+        const error = await deductResult.text();
+        toast.error(error || 'Failed to deduct tokens');
+        setLoading(false);
+        return;
+      }
+
+      // Update local token count
+      setTokenCount(prev => prev !== null ? prev - VIDEO_TOKEN_COST : null);
+
+      const finalPrompt = values.prompt;
+
       toast.info("Starting video generation. This process takes around 5 minutes...", {
         duration: 10000,
       });
 
       // Queue the video generation
       const result = await queueVideoGeneration({
-        prompt: values.prompt,
+        prompt: finalPrompt,
         input_image: values.input_image,
         aspect_ratio: values.aspect_ratio,
         duration: values.duration,

@@ -5,7 +5,7 @@ import { LockedContent } from "@/components/ui/locked-content";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Video Library | Pictoria AI",
+  title: "Video Library | Faces Factory",
   description: "Video Library for clients",
 };
 

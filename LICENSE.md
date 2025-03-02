@@ -1,4 +1,4 @@
-# Pictoria AI Project (Commercial Use License)
+# Faces Factory Project (Commercial Use License)
 
 Copyright (c) 2024 CodeBucks
 

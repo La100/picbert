@@ -91,6 +91,25 @@ const Configurations = () => {
         return;
       }
 
+      // Deduct tokens first
+      const deductResult = await fetch('/api/credits/deduct', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount: IMAGE_TOKEN_COST }),
+      });
+
+      if (!deductResult.ok) {
+        const error = await deductResult.text();
+        toast.error(error || 'Failed to deduct tokens');
+        setLoading(false);
+        return;
+      }
+
+      // Update local token count
+      setTokenCount(prev => prev !== null ? prev - IMAGE_TOKEN_COST : null);
+
       const finalPrompt = values.selfie 
         ? values.prompt + ", selfie, full body visible, 4k high resolution"
         : values.prompt;

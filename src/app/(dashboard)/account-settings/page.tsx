@@ -7,8 +7,8 @@ import { redirect } from "next/navigation";
 
 
 export const metadata: Metadata = {
-  title: "Account Settings | Pictoria AI",
-  description: "Account settings for Pictoria AI",
+  title: "Account Settings | Faces Factory",
+  description: "Account settings for Faces Factory",
 }
 
 export default async function AccountSettingsPage() {
