@@ -14,12 +14,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { AuthError } from "@supabase/supabase-js";
 
 const passwordValidationRegex = new RegExp(
   "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
@@ -70,40 +70,38 @@ export function ChangePasswordForm({
   
   // Pobierz token z URL przy pierwszym renderowaniu
   React.useEffect(() => {
-    const urlToken = searchParams.get("token");
-    if (urlToken) {
-      setToken(urlToken);
+    const code = searchParams.get("code");
+    if (code) {
+      setToken(code);
     }
   }, [searchParams]);
 
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
-
     toast.loading("Changing password...", { id: toastId });
 
     try {
       const supabase = createClient();
       
-      // Jeśli mamy token, najpierw ustawiamy sesję
-      if (token) {
-        console.log("Using token from URL for password reset");
+      if (!token) {
+        throw new Error("No reset code found");
       }
-      
-      // Update the user's password
-      // Token jest automatycznie używany przez Supabase, jeśli jest obecny w URL
-      const { error } = await supabase.auth.updateUser({
-        password: values.password,
+
+      // Update the password directly with the recovery token
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: values.password
       });
 
-      if (error) {
-        toast.error(error.message, { id: toastId });
-      } else {
-        toast.success("Password changed successfully", { id: toastId });
-        router.push("/login");
+      if (updateError) {
+        throw updateError;
       }
+
+      toast.success("Password changed successfully", { id: toastId });
+      router.push("/login");
     } catch (error) {
-      toast.error("Failed to change password", { id: toastId });
-      console.error(error);
+      console.error("Password reset error:", error);
+      const errorMessage = error instanceof AuthError ? error.message : "Failed to change password";
+      toast.error(errorMessage, { id: toastId });
     } finally {
       setIsLoading(false);
     }
@@ -135,9 +133,6 @@ export function ChangePasswordForm({
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>
-                  Enter a strong password that meets the requirements above
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -155,9 +150,6 @@ export function ChangePasswordForm({
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>
-                  Re-enter your new password to confirm
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -167,9 +159,6 @@ export function ChangePasswordForm({
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isLoading ? "Changing Password..." : "Change Password"}
             </Button>
-          </div>
-          <div className="text-center text-sm text-muted-foreground">
-            Make sure to remember your new password or store it securely
           </div>
         </form>
       </Form>

@@ -77,7 +77,7 @@ export async function resetPassword(
 
   // Use only the site URL from environment variables
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://facesfactory.com';
-  const resetPasswordUrl = `${baseUrl}/reset-password`;
+  const resetPasswordUrl = `${baseUrl}/auth/reset`;
 
   const { data, error } = await supabase.auth.resetPasswordForEmail(
     values.email,
