@@ -73,27 +73,52 @@ export async function signup(formData: FormData): Promise<AuthResponse> {
 export async function resetPassword(
   values: { email: string },
 ): Promise<AuthResponse> {
+  console.log("Starting password reset email process for:", values.email);
   const supabase = await createClient();
 
   // Use only the site URL from environment variables
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://facesfactory.com';
-  const resetPasswordUrl = `${baseUrl}/auth/reset`;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const resetPasswordUrl = `${baseUrl}/reset-password`;
+  
+  console.log("Using reset password URL:", resetPasswordUrl);
 
-  const { data, error } = await supabase.auth.resetPasswordForEmail(
-    values.email,
-    {
-      redirectTo: resetPasswordUrl,
+  try {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(
+      values.email,
+      {
+        redirectTo: resetPasswordUrl,
+      }
+    );
+
+    if (error) {
+      console.error("Failed to send reset password email:", error);
+      return {
+        error: error.message,
+        success: false,
+        data: null,
+      };
     }
-  );
 
-  console.log(`Password reset email sent with redirectTo: ${resetPasswordUrl}`);
+    console.log("Password reset email sent successfully");
+    console.log("Reset password flow:", {
+      email: values.email,
+      redirectUrl: resetPasswordUrl,
+      timestamp: new Date().toISOString()
+    });
 
-  return {
-    error: error?.message ||
-      "There was an error sending the reset password email!",
-    success: !error,
-    data: data || null,
-  };
+    return {
+      error: null,
+      success: true,
+      data: data || null,
+    };
+  } catch (error) {
+    console.error("Unexpected error during password reset:", error);
+    return {
+      error: "There was an unexpected error sending the reset password email!",
+      success: false,
+      data: null,
+    };
+  }
 }
 
 export async function updateProfile(

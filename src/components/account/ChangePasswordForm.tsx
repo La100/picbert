@@ -72,37 +72,48 @@ export function ChangePasswordForm({
   React.useEffect(() => {
     const code = searchParams.get("code");
     if (code) {
+      console.log("Reset password code/token found in URL");
       setToken(code);
+    } else {
+      console.warn("No reset password code/token found in URL");
     }
   }, [searchParams]);
 
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
+    console.log("Starting password reset process...");
     toast.loading("Changing password...", { id: toastId });
 
     try {
       const supabase = createClient();
       
       if (!token) {
+        console.error("No reset code/token found in state");
         throw new Error("No reset code found");
       }
 
-      // Update the password directly with the recovery token
+      console.log("Attempting to update password with reset token");
+
+      // Update the password - token jest automatycznie używany z URL
       const { error: updateError } = await supabase.auth.updateUser({
         password: values.password
       });
 
       if (updateError) {
+        console.error("Failed to update password:", updateError);
         throw updateError;
       }
 
+      console.log("Password updated successfully");
       toast.success("Password changed successfully", { id: toastId });
       router.push("/login");
     } catch (error) {
       console.error("Password reset error:", error);
       const errorMessage = error instanceof AuthError ? error.message : "Failed to change password";
+      console.error("Displaying error to user:", errorMessage);
       toast.error(errorMessage, { id: toastId });
     } finally {
+      console.log("Password reset process completed");
       setIsLoading(false);
     }
   }
