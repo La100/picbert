@@ -2,12 +2,22 @@ import { create } from 'zustand'
 import { toast } from 'sonner'
 import { checkAndUpdateCredits, storeImages } from '@/app/actions/image-actions'
 
+interface StoreResult {
+  results: Array<{
+    fileName?: string;
+    error: string | null;
+    success: boolean;
+    data: Array<{ id: string }> | null;
+  }>;
+}
+
 interface GenerateState {
   loading: boolean
   images: Array<{ 
     url: string;
     width: number;
     height: number;
+    id?: string;
   } & GenerateFormValues>
   error: string | null
   setLoading: (loading: boolean) => void
@@ -61,9 +71,16 @@ const useGenerateStore = create<GenerateState>((set) => ({
         set({ error: storeResult.error || 'Failed to store image', loading: false })
         return
       }
+
+      // Add IDs to the images from the store result
+      const storeData = storeResult.data as unknown as StoreResult;
+      const imagesWithIds = imageUrls.map((img, index) => ({
+        ...img,
+        id: storeData.results[index]?.data?.[0]?.id
+      }))
       
       // Update the state with new images
-      set({ images: imageUrls, loading: false, error: null })
+      set({ images: imagesWithIds, loading: false, error: null })
       toast.success("Image processed and saved to your gallery", { id: toastId })
 
     } catch (error) {

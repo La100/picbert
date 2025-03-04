@@ -3,7 +3,7 @@ import React from "react";
 import useGenerateStore from "@/store/useGenerateStore";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
-import { Download } from "lucide-react";
+import { Download, Video } from "lucide-react";
 import { LoadingAnimation } from "../shared/LoadingAnimation";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -12,6 +12,7 @@ interface GeneratedImage {
   width: number;
   height: number;
   output_format?: string;
+  id?: string;
 }
 
 const GeneratedImages = () => {
@@ -78,6 +79,18 @@ const GeneratedImages = () => {
                       <Download className="mr-2 h-4 w-4" />
                       Download
                     </Button>
+                    {image.id && (
+                      <Button
+                        variant="default"
+                        className="w-fit"
+                        onClick={() => {
+                          window.location.href = `/video-generation?input_image=${encodeURIComponent(image.url)}`;
+                        }}
+                      >
+                        <Video className="mr-2 h-4 w-4" />
+                        Generate Video
+                      </Button>
+                    )}
                   </div>
                 </>
               )}

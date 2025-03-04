@@ -219,24 +219,49 @@ export async function deleteVideo(id: string, videoName: string) {
     };
   }
 
-  const { error, data } = await supabase
-    .from("generated_videos")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", user.id);
+  try {
+    // First check if the file exists in storage
+    const { data: storageFiles } = await supabase.storage
+      .from("generated_videos")
+      .list(user.id);
 
-  if (error) {
-    return { error: error.message, success: false, data: null };
+    const fileExists = storageFiles?.some(file => file.name === videoName);
+
+    // Delete from database first
+    const { error: dbError, data } = await supabase
+      .from("generated_videos")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.id);
+
+    if (dbError) {
+      return { error: dbError.message, success: false, data: null };
+    }
+
+    // Only try to delete from storage if the file exists
+    if (fileExists) {
+      const { error: storageError } = await supabase.storage
+        .from("generated_videos")
+        .remove([`${user.id}/${videoName}`]);
+
+      if (storageError) {
+        console.error("Storage deletion error:", storageError);
+        // Don't return error here as the database record is already deleted
+      }
+    }
+
+    revalidateTag("dashboard-videos");
+    revalidateTag("gallery-videos");
+
+    return { error: null, success: true, data: data };
+  } catch (error) {
+    console.error("Error in deleteVideo:", error);
+    return { 
+      error: error instanceof Error ? error.message : "Failed to delete video", 
+      success: false, 
+      data: null 
+    };
   }
-
-  await supabase.storage
-    .from("generated_videos")
-    .remove([`${user.id}/${videoName}`]);
-
-  revalidateTag("dashboard-videos");
-  revalidateTag("gallery-videos");
-
-  return { error: null, success: true, data: data };
 }
 
 export async function checkAndUpdateVideoCredits(): Promise<{ 
