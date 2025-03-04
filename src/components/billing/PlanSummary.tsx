@@ -1,11 +1,9 @@
 import React from "react";
-import { Badge } from "../ui/badge";
 import { Card, CardContent } from "../ui/card";
 import { Tables } from "@database.types";
 import { User } from "@supabase/supabase-js";
 import { format } from "date-fns";
 import ManageBillingButton from "./ManageBillingButton";
-import { CreditCard, Calendar } from "lucide-react";
 
 type Subscription = Tables<"subscriptions">;
 type Product = Tables<"products">;
