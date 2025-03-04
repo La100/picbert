@@ -78,8 +78,6 @@ export async function resetPassword(
 
   // Use only the site URL from environment variables
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-  
-  // The reset URL should point to our reset-password page
   const resetPasswordUrl = `${baseUrl}/reset-password`;
   
   console.log("Using reset password URL:", resetPasswordUrl);

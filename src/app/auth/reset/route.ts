@@ -24,24 +24,33 @@ export async function GET(request: NextRequest) {
   // Handle PKCE flow token
   if (tokenHash && type === 'email') {
     const redirectUrl = new URL('/reset-password', request.url);
-    redirectUrl.searchParams.set('token_hash', tokenHash);
-    console.log("Redirecting to reset password page with token_hash:", redirectUrl.toString());
+    // Preserve all original parameters
+    searchParams.forEach((value, key) => {
+      redirectUrl.searchParams.set(key, value);
+    });
+    console.log("Redirecting to reset password page with all parameters:", redirectUrl.toString());
     return NextResponse.redirect(redirectUrl);
   }
   
   // Handle recovery token
   if (token && type === 'recovery') {
     const redirectUrl = new URL('/reset-password', request.url);
-    redirectUrl.searchParams.set('token', token);
-    console.log("Redirecting to reset password page with recovery token:", redirectUrl.toString());
+    // Preserve all original parameters
+    searchParams.forEach((value, key) => {
+      redirectUrl.searchParams.set(key, value);
+    });
+    console.log("Redirecting to reset password page with all parameters:", redirectUrl.toString());
     return NextResponse.redirect(redirectUrl);
   }
   
   // Handle direct code
   if (code) {
     const redirectUrl = new URL('/reset-password', request.url);
-    redirectUrl.searchParams.set('code', code);
-    console.log("Redirecting to reset password page with code:", redirectUrl.toString());
+    // Preserve all original parameters
+    searchParams.forEach((value, key) => {
+      redirectUrl.searchParams.set(key, value);
+    });
+    console.log("Redirecting to reset password page with all parameters:", redirectUrl.toString());
     return NextResponse.redirect(redirectUrl);
   }
   

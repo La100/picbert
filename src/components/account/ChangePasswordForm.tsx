@@ -74,11 +74,18 @@ export function ChangePasswordForm({
     const token = searchParams.get('token');
     const code = searchParams.get('code');
     
+    console.log("Reset password parameters:", {
+      tokenHash,
+      token,
+      code,
+      allParams: Object.fromEntries(searchParams.entries())
+    });
+    
     // Try to get token in order of priority
     const resetToken = tokenHash || token || code;
     
     if (resetToken) {
-      console.log("Reset password token found in URL");
+      console.log("Reset password token found:", resetToken);
       setToken(resetToken);
     } else {
       console.warn("No reset password token found in URL");

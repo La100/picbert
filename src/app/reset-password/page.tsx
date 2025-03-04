@@ -4,6 +4,8 @@ import { Metadata } from "next";
 import AuthBg from "@/public/Abstract Curves and Colors.jpeg";
 import Image from "next/image";
 import { Suspense } from "react";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Reset Password | Faces Factory",
@@ -11,7 +13,16 @@ export const metadata: Metadata = {
 };
 
 // Use the standard Next.js page props pattern
-export default function ResetPasswordPage() {
+export default async function ResetPasswordPage() {
+  const cookieStore = await cookies();
+  const authCookie = cookieStore.get("auth")?.value;
+
+  // Check if user is allowed to reset password
+  if (!authCookie || authCookie !== "ALLOWED_TO_RESET_PASSWORD") {
+    console.log("Unauthorized password reset attempt");
+    redirect("/");
+  }
+
   return (
     <>
       <div className=" relative h-full md:h-screen flex-col items-center justify-center grid grid-cols-1  md:grid-cols-2 md:px-0">
