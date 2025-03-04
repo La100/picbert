@@ -30,7 +30,7 @@ export default function HelpPage() {
       <section className="mt-8">
         <h2>Contact Support</h2>
         <p>
-          If you need additional help, please don't hesitate to contact our support team at{" "}
+          If you need additional help, please don&apos;t hesitate to contact our support team at{" "}
           <a href="mailto:support@facesfactory.ai">support@facesfactory.ai</a>
         </p>
       </section>
