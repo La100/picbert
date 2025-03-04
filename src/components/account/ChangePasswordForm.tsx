@@ -68,16 +68,24 @@ export function ChangePasswordForm({
   });
   const toastId = React.useId();
   
-  // Pobierz token z URL przy pierwszym renderowaniu
+  // Get token from URL on first render
   React.useEffect(() => {
-    const code = searchParams.get("code");
-    if (code) {
-      console.log("Reset password code/token found in URL");
-      setToken(code);
+    const tokenHash = searchParams.get('token_hash');
+    const token = searchParams.get('token');
+    const code = searchParams.get('code');
+    
+    // Try to get token in order of priority
+    const resetToken = tokenHash || token || code;
+    
+    if (resetToken) {
+      console.log("Reset password token found in URL");
+      setToken(resetToken);
     } else {
-      console.warn("No reset password code/token found in URL");
+      console.warn("No reset password token found in URL");
+      toast.error("Invalid password reset link. Please request a new one.");
+      router.push('/login');
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
@@ -88,13 +96,13 @@ export function ChangePasswordForm({
       const supabase = createClient();
       
       if (!token) {
-        console.error("No reset code/token found in state");
-        throw new Error("No reset code found");
+        console.error("No reset token found in state");
+        throw new Error("Invalid password reset link. Please request a new one.");
       }
 
       console.log("Attempting to update password with reset token");
 
-      // Update the password - token jest automatycznie używany z URL
+      // Update the password
       const { error: updateError } = await supabase.auth.updateUser({
         password: values.password
       });
@@ -105,11 +113,13 @@ export function ChangePasswordForm({
       }
 
       console.log("Password updated successfully");
-      toast.success("Password changed successfully", { id: toastId });
+      toast.success("Password changed successfully! Please log in with your new password.", { id: toastId });
       router.push("/login");
     } catch (error) {
       console.error("Password reset error:", error);
-      const errorMessage = error instanceof AuthError ? error.message : "Failed to change password";
+      const errorMessage = error instanceof AuthError 
+        ? error.message 
+        : "Failed to change password. Please try again or request a new reset link.";
       console.error("Displaying error to user:", errorMessage);
       toast.error(errorMessage, { id: toastId });
     } finally {

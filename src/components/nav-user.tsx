@@ -5,6 +5,8 @@ import {
   Settings,
   CreditCard,
   LogOut,
+  HelpCircle,
+  Info,
 } from "lucide-react"
 
 import {
@@ -19,6 +21,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu"
 import {
   SidebarMenu,
@@ -87,6 +92,38 @@ export function NavUser({
               <DropdownMenuItem className="cursor-pointer">
                 <CreditCard />
                   Billing
+                </DropdownMenuItem>
+              </Link>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="cursor-pointer">
+                  <Info className="size-4 mr-2" />
+                  Learn More
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <Link href="/privacy-policy" className="w-full">
+                    <DropdownMenuItem className="cursor-pointer">
+                      Privacy Policy
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/terms-of-use" className="w-full">
+                    <DropdownMenuItem className="cursor-pointer">
+                      Terms of Use
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/about" className="w-full">
+                    <DropdownMenuItem className="cursor-pointer">
+                      About Faces Factory
+                    </DropdownMenuItem>
+                  </Link>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <Link href="/help" className="w-full cursor-pointer">
+                <DropdownMenuItem>
+                  <HelpCircle className="size-4" />
+                  Get Help
                 </DropdownMenuItem>
               </Link>
             </DropdownMenuGroup>

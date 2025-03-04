@@ -5,35 +5,47 @@ export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const { searchParams } = requestUrl
   
-  // Sprawdź wszystkie możliwe parametry z Supabase
+  // Check all possible token parameters from Supabase
   const token = searchParams.get('token')
+  const tokenHash = searchParams.get('token_hash')
   const type = searchParams.get('type')
   const code = searchParams.get('code')
   
   console.log("Received reset password request:", {
     url: request.url,
     hasToken: !!token,
+    hasTokenHash: !!tokenHash,
     type: type,
     hasCode: !!code,
     allParams: Object.fromEntries(searchParams.entries()),
     timestamp: new Date().toISOString()
   });
   
-  // Jeśli mamy token z Supabase verify endpoint
-  if (token && type === 'recovery') {
-    const redirectUrl = new URL(`/reset-password?code=${token}`, request.url);
-    console.log("Redirecting to reset password page with token:", redirectUrl.toString());
+  // Handle PKCE flow token
+  if (tokenHash && type === 'email') {
+    const redirectUrl = new URL('/reset-password', request.url);
+    redirectUrl.searchParams.set('token_hash', tokenHash);
+    console.log("Redirecting to reset password page with token_hash:", redirectUrl.toString());
     return NextResponse.redirect(redirectUrl);
   }
   
-  // Jeśli mamy bezpośredni kod
+  // Handle recovery token
+  if (token && type === 'recovery') {
+    const redirectUrl = new URL('/reset-password', request.url);
+    redirectUrl.searchParams.set('token', token);
+    console.log("Redirecting to reset password page with recovery token:", redirectUrl.toString());
+    return NextResponse.redirect(redirectUrl);
+  }
+  
+  // Handle direct code
   if (code) {
-    const redirectUrl = new URL(`/reset-password?code=${code}`, request.url);
+    const redirectUrl = new URL('/reset-password', request.url);
+    redirectUrl.searchParams.set('code', code);
     console.log("Redirecting to reset password page with code:", redirectUrl.toString());
     return NextResponse.redirect(redirectUrl);
   }
   
-  // Jeśli nie ma ani tokenu ani kodu, przekieruj do logowania
-  console.warn("No reset token or code provided, redirecting to login");
+  // If no valid token parameters found, redirect to login
+  console.warn("No valid reset token parameters found, redirecting to login");
   return NextResponse.redirect(new URL('/login', request.url));
 } 
