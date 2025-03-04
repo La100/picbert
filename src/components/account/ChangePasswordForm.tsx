@@ -73,11 +73,13 @@ export function ChangePasswordForm({
     const tokenHash = searchParams.get('token_hash');
     const token = searchParams.get('token');
     const code = searchParams.get('code');
+    const type = searchParams.get('type');
     
     console.log("Reset password parameters:", {
       tokenHash,
       token,
       code,
+      type,
       allParams: Object.fromEntries(searchParams.entries())
     });
     
@@ -107,7 +109,20 @@ export function ChangePasswordForm({
         throw new Error("Invalid password reset link. Please request a new one.");
       }
 
-      console.log("Attempting to update password with reset token");
+      console.log("Attempting to verify reset token");
+      
+      // First verify the token
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        token_hash: token,
+        type: 'email',
+      });
+
+      if (verifyError) {
+        console.error("Failed to verify reset token:", verifyError);
+        throw verifyError;
+      }
+
+      console.log("Reset token verified, updating password");
 
       // Update the password
       const { error: updateError } = await supabase.auth.updateUser({
