@@ -1,5 +1,5 @@
 import { type EmailOtpType } from '@supabase/supabase-js'
-import { type NextRequest } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -51,8 +51,26 @@ export async function GET(request: NextRequest) {
       } catch (creditsError) {
         console.error("Error creating initial credits for confirmed user:", creditsError)
       }
+
+      // Handle password recovery flow
+      if (type === "recovery") {
+        const response = NextResponse.redirect(new URL("/reset-password", request.url));
+        
+        // Set a secure cookie to allow password reset
+        response.cookies.set({
+          name: "auth",
+          value: "ALLOWED_TO_RESET_PASSWORD",
+          httpOnly: true,
+          path: '/',
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 60 * 5 // 5 minutes
+        });
+
+        return response;
+      }
       
-      // redirect user to specified redirect URL or root of app
+      // redirect user to specified redirect URL or root of app for other flows
       redirect(next)
     }
   }

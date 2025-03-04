@@ -29,7 +29,22 @@ export async function GET(request: NextRequest) {
       redirectUrl.searchParams.set(key, value);
     });
     console.log("Redirecting to reset password page with all parameters:", redirectUrl.toString());
-    return NextResponse.redirect(redirectUrl);
+    
+    // Create response with redirect
+    const response = NextResponse.redirect(redirectUrl);
+    
+    // Set a secure cookie to allow password reset
+    response.cookies.set({
+      name: "auth",
+      value: "ALLOWED_TO_RESET_PASSWORD",
+      httpOnly: true,
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 5 // 5 minutes
+    });
+
+    return response;
   }
   
   // Handle recovery token
@@ -40,7 +55,22 @@ export async function GET(request: NextRequest) {
       redirectUrl.searchParams.set(key, value);
     });
     console.log("Redirecting to reset password page with all parameters:", redirectUrl.toString());
-    return NextResponse.redirect(redirectUrl);
+    
+    // Create response with redirect
+    const response = NextResponse.redirect(redirectUrl);
+    
+    // Set a secure cookie to allow password reset
+    response.cookies.set({
+      name: "auth",
+      value: "ALLOWED_TO_RESET_PASSWORD",
+      httpOnly: true,
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 5 // 5 minutes
+    });
+
+    return response;
   }
   
   // Handle direct code
@@ -51,7 +81,22 @@ export async function GET(request: NextRequest) {
       redirectUrl.searchParams.set(key, value);
     });
     console.log("Redirecting to reset password page with all parameters:", redirectUrl.toString());
-    return NextResponse.redirect(redirectUrl);
+    
+    // Create response with redirect
+    const response = NextResponse.redirect(redirectUrl);
+    
+    // Set a secure cookie to allow password reset
+    response.cookies.set({
+      name: "auth",
+      value: "ALLOWED_TO_RESET_PASSWORD",
+      httpOnly: true,
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 5 // 5 minutes
+    });
+
+    return response;
   }
   
   // If no valid token parameters found, redirect to login
