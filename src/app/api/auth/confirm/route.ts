@@ -11,8 +11,6 @@ export async function GET(request: NextRequest) {
     allParams: Object.fromEntries(searchParams.entries())
   });
 
-  const redirectTo = request.nextUrl.clone();
-
   // Handle password recovery flow
   if (type === "recovery") {
     const response = NextResponse.redirect(new URL("/reset-password", request.url));
