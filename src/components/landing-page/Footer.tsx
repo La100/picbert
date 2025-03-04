@@ -8,10 +8,10 @@ const Footer = () => {
         © {new Date().getFullYear()} Faces Factory Inc. All rights reserved.
       </p>
       <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-        <Link className="text-xs hover:underline underline-offset-4" href="#">
+        <Link className="text-xs hover:underline underline-offset-4" href="/terms-of-use">
           Terms of Service
         </Link>
-        <Link className="text-xs hover:underline underline-offset-4" href="#">
+        <Link className="text-xs hover:underline underline-offset-4" href="/privacy-policy">
           Privacy
         </Link>
       </nav>

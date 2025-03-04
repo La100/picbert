@@ -121,7 +121,7 @@ export function NavUser({
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
               <Link href="/help" className="w-full cursor-pointer">
-                <DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
                   <HelpCircle className="size-4" />
                   Get Help
                 </DropdownMenuItem>

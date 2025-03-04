@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/form"
 import { resetPassword } from "@/app/actions/auth-actions"
 import { toast } from "sonner"
-import { redirect } from "next/navigation"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -29,6 +28,7 @@ type FormValues = z.infer<typeof formSchema>
 
 export function ResetPasswordForm() {
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const toastId = React.useId()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -36,7 +36,6 @@ export function ResetPasswordForm() {
       email: "",
     },
   })
-  const toastId = React.useId()
 
   async function onSubmit(values: FormValues) {
     toast.loading("Sending reset email...", { id: toastId })
@@ -46,15 +45,15 @@ export function ResetPasswordForm() {
       if (!success) {
         toast.error(String(error), { id: toastId })
       } else {
-        toast.success("Reset email sent", { id: toastId })
-        redirect('/')
+        toast.dismiss(toastId)
+        toast.success("We have sent you a password reset email. Please check your inbox and spam folder.", {
+          duration: 5000 // Show for 5 seconds
+        })
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error)
       toast.error("Failed to send reset email", { id: toastId })
     } finally {
-      toast.dismiss(toastId)
       setIsLoading(false)
     }
   }

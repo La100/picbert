@@ -45,7 +45,6 @@ const navMain =  [
       url: "/video-generation",
       icon: FileVideo,
     },
-  
     {
       title: "Your Images",
       url: "/gallery/images",

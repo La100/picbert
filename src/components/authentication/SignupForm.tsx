@@ -17,8 +17,7 @@ import {
 } from "@/components/ui/form"
 import { signup, loginWithGoogle } from "@/app/actions/auth-actions"
 import { toast } from "sonner"
-import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 const passwordValidationRegex = new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})');
 // The above regex ensures that the password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.
@@ -46,6 +45,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 export function SignupForm() {
+  const router = useRouter()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false)
 
@@ -60,23 +60,20 @@ export function SignupForm() {
   const toastId = React.useId();
 
   async function onSubmit(values: FormValues) {
-  
     setIsLoading(true)
     toast.loading("Signing up...", { id: toastId })
     const formData = new FormData()
     formData.append("email", values.email)
     formData.append("password", values.password)
-    // await signup(formData)
     const {success, error} = await signup(formData);
     if (!success) {
       toast.error(String(error), { id: toastId })
+      setIsLoading(false)
     } else {
       toast.success("Signed up successfully! Please confirm your email address.", { id: toastId })
-      revalidatePath("/", "layout");
-      redirect("/login");
+      router.push("/login")
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   async function handleGoogleLogin() {

@@ -9,6 +9,7 @@ import { deleteImage } from "@/app/actions/image-actions";
 import { toast } from "sonner";
 import { PaginationComponent } from "../ui/pagination";
 import Image from "next/image";
+import { EmptyState } from "../ui/empty-state";
 
 type ImageProps = {
   url: string | undefined;
@@ -26,6 +27,10 @@ export function Gallery({ images, currentPage, totalCount, pageSize = 12 }: Gall
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
   const totalPages = Math.ceil(totalCount / pageSize);
+
+  if (images.length === 0) {
+    return <EmptyState type="image" />;
+  }
 
   const handlePageChange = (page: number) => {
     router.push(`?page=${page}`);

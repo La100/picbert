@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/supabase/queries";
 import { AccountForm } from "@/components/account/AccountForm";
-import { SecuritySettings } from "@/components/account/SecuritySettings";
+import { DataDeletionSettings } from "@/components/account/DataDeletionSettings";
 import { Metadata } from 'next'
 import { redirect } from "next/navigation";
 
@@ -30,7 +30,7 @@ export default async function AccountSettingsPage() {
 
       <div className="grid gap-8">
         <AccountForm user={user} />
-        <SecuritySettings user={user} />
+        <DataDeletionSettings user={user} />
       </div>
     </div>
   );

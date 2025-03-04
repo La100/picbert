@@ -12,49 +12,52 @@ const GeneratedVideos = () => {
 
   if (!loading && videos.length === 0) return null;
 
-  const video = videos[0];
-
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.3 }}
-        className="w-full"
-      >
-        <Card className="w-full max-w-2xl mx-auto">
-          <CardContent className="p-1">
-            <div 
-              className={cn(
-                "relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px]",
-                {
-                  "aspect-video": video?.aspect_ratio === "16:9",
-                  "aspect-[9/16]": video?.aspect_ratio === "9:16",
-                  "aspect-square": video?.aspect_ratio === "1:1",
-                }
-              )}
-            >
-              {loading ? (
-                <LoadingAnimation />
-              ) : (
-                <motion.video
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                  src={video.url}
-                  controls
-                  autoPlay
-                  loop
-                  muted
-                  className="w-full h-full object-contain"
-                />
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </AnimatePresence>
+    <div className="space-y-4">
+      <AnimatePresence mode="wait">
+        {videos.map((video, index) => (
+          <motion.div
+            key={video.url}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="w-full"
+          >
+            <Card className="w-full max-w-2xl mx-auto">
+              <CardContent className="p-1">
+                <div 
+                  className={cn(
+                    "relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px]",
+                    {
+                      "aspect-video": video?.aspect_ratio === "16:9",
+                      "aspect-[9/16]": video?.aspect_ratio === "9:16",
+                      "aspect-square": video?.aspect_ratio === "1:1",
+                    }
+                  )}
+                >
+                  {loading && index === 0 ? (
+                    <LoadingAnimation />
+                  ) : (
+                    <motion.video
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                      src={video.url}
+                      controls
+                      autoPlay
+                      loop
+                      muted
+                      className="w-full h-full object-contain"
+                    />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
   );
 };
 

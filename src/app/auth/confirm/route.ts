@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = requestUrl
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
-  const next = searchParams.get('next') ?? '/'
+  const next = searchParams.get('next') ?? '/dashboard'
 
   if (token_hash && type) {
     const supabase = await createClient()
@@ -70,8 +70,13 @@ export async function GET(request: NextRequest) {
         return response;
       }
       
-      // redirect user to specified redirect URL or root of app for other flows
-      redirect(next)
+      // For email verification, redirect to dashboard
+      if (type === "signup") {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+      }
+      
+      // For other flows, use the specified redirect URL
+      return NextResponse.redirect(new URL(next, request.url));
     }
   }
 

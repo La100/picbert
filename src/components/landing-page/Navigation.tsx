@@ -43,12 +43,18 @@ const Navigation = () => {
       >
         FAQs
       </Link>
-      <Link
-        className="text-sm font-medium hover:underline underline-offset-4"
-        href="/login?state=signup"
-      >
-        <Button>Sign up</Button>
-      </Link>
+      <div className="flex items-center gap-4">
+        <Link href="/login">
+          <Button variant="outline" className="text-sm">
+            Login
+          </Button>
+        </Link>
+        <Link href="/login?state=signup">
+          <Button className="text-sm">
+            Get Started
+          </Button>
+        </Link>
+      </div>
     </>
   );
 

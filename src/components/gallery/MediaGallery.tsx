@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { PaginationComponent } from "../ui/pagination";
 import Image from "next/image";
+import { EmptyState } from "../ui/empty-state";
 
 type VideoItem = {
   url: string | undefined;
@@ -27,6 +28,10 @@ export function MediaGallery({ items, currentPage, totalCount, pageSize }: Media
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
   const totalPages = Math.ceil(totalCount / pageSize);
+
+  if (items.length === 0) {
+    return <EmptyState type="video" />;
+  }
 
   const handlePageChange = (page: number) => {
     router.push(`?page=${page}`);
