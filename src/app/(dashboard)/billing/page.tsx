@@ -42,36 +42,13 @@ export default async function BillingPage() {
 
       <div className="grid gap-8 md:gap-12 relative">
         {hasActiveSubscription ? (
-          <>
-            <PlanSummary
-              credits={Array.isArray(credits) ? credits[0] : credits}
-              subscription={subscription}
-              user={user}
-              products={products ?? []}
-              targetId="other-plans"
-            />
-            
-            <div id="other-plans" className="bg-muted/50 py-8 md:py-10 px-4 rounded-xl border border-border/40 shadow-sm">
-              <div className="text-center max-w-2xl mx-auto mb-6 md:mb-8">
-                <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-3">Other Available Plans</h2>
-                <p className="text-muted-foreground text-sm md:text-base">
-                  Compare your current plan with other options
-                </p>
-              </div>
-              
-              <Pricing
-                user={user}
-                products={products ?? []}
-                subscription={subscription}
-                showInterval={true}
-                className="!p-0 max-w-full"
-                activeProduct={
-                  subscription?.prices?.products?.name?.toLowerCase() || ""
-                }
-                mostPopularProduct="pro"
-              />
-            </div>
-          </>
+          <PlanSummary
+            credits={Array.isArray(credits) ? credits[0] : credits}
+            subscription={subscription}
+            user={user}
+            products={products ?? []}
+            targetId="other-plans"
+          />
         ) : (
           <>
             <Card className="max-w-5xl mx-auto border-2 border-dashed">

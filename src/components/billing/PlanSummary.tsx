@@ -45,7 +45,7 @@ const PlanSummary = ({
   }
 
   // Handle the case where these properties might not exist yet
-  const imageGenerationCount = credits?.image_generation_count ?? 0;
+  const tokenCount = credits?.tokens ?? 0;
   
   const priceString = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -54,48 +54,72 @@ const PlanSummary = ({
   }).format((unit_amount || 0) / 100);
   
   return (
-    <Card className="max-w-5xl mx-auto border-primary/20 shadow-sm">
-      <CardContent className="px-4 sm:px-6 py-5 sm:py-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <h3 className="text-lg sm:text-xl font-semibold flex flex-wrap items-center gap-x-2">
-            <span>Current Plan</span>
-            <Badge className="bg-primary/10 text-primary border-primary/20">
+    <Card className="max-w-5xl mx-auto bg-gradient-to-br from-background to-muted/50 border border-primary/10 shadow-lg">
+      <CardContent className="p-8">
+        {/* Plan Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10">
+          <div className="space-y-1 mb-4 sm:mb-0">
+            <h3 className="text-2xl font-bold tracking-tight">
               {subscriptionProduct?.name} Plan
-            </Badge>
-          </h3>
-          
-          <ManageBillingButton className="bg-background w-full sm:w-auto" />
+            </h3>
+            <p className="text-muted-foreground">
+              Your subscription renews on {format(new Date(subscription.current_period_end), "MMMM d, yyyy")}
+            </p>
+          </div>
+          <ManageBillingButton className="bg-primary/10 hover:bg-primary/20 text-primary border-0" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <div className="flex flex-col space-y-3 sm:space-y-4">
-            <div>
-              <span className="text-sm font-medium text-muted-foreground">
-                Images Generated
-              </span>
-              <div className="flex items-center justify-between mt-1">
-                <span className="text-xl sm:text-2xl font-bold">{imageGenerationCount}</span>
-              </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Credits Card */}
+          <div className="bg-background rounded-xl p-6 border border-border/50 shadow-sm">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-sm font-medium text-muted-foreground">Available Credits</h4>
+              <p className="text-3xl font-bold">{tokenCount}</p>
             </div>
+            <p className="text-xs text-muted-foreground">
+              1 image = 6 credits • 1 video = 50 credits
+            </p>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 bg-muted/30 p-3 sm:p-4 rounded-lg">
-            <div className="flex flex-col">
-              <div className="flex items-center text-sm font-medium text-muted-foreground mb-1">
-                <CreditCard className="h-4 w-4 mr-1" />
-                <span>Price</span>
+
+          {/* Price Card */}
+          <div className="bg-background rounded-xl p-6 border border-border/50 shadow-sm">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-sm font-medium text-muted-foreground">Monthly Price</h4>
+              <div className="flex items-baseline gap-1">
+                <p className="text-3xl font-bold">{priceString}</p>
+                <span className="text-muted-foreground">/mo</span>
               </div>
-              <span className="text-base sm:text-lg font-semibold">{priceString}/mo</span>
             </div>
-            
-            <div className="flex flex-col">
-              <div className="flex items-center text-sm font-medium text-muted-foreground mb-1">
-                <Calendar className="h-4 w-4 mr-1" />
-                <span>Renews</span>
-              </div>
-              <span className="text-base sm:text-lg font-semibold">
-                {format(new Date(subscription.current_period_end), "MMM d")}
-              </span>
+            <p className="text-xs text-muted-foreground">
+              Next billing cycle starts on {format(new Date(subscription.current_period_end), "MMM d")}
+            </p>
+          </div>
+
+          {/* Features Card */}
+          <div className="bg-background rounded-xl p-6 border border-border/50 shadow-sm">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-sm font-medium text-muted-foreground">Plan Features</h4>
+              <ul className="space-y-2 mt-2">
+                <li className="text-sm flex items-center gap-2">
+                  <svg className="h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  High-quality AI generation
+                </li>
+                <li className="text-sm flex items-center gap-2">
+                  <svg className="h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Priority support
+                </li>
+                <li className="text-sm flex items-center gap-2">
+                  <svg className="h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Commercial license
+                </li>
+              </ul>
             </div>
           </div>
         </div>
