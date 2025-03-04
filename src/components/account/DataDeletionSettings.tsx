@@ -10,8 +10,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import { deleteAllVideos, deleteAllPhotos } from "@/app/actions/data-deletion-actions"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,41 +34,11 @@ export function DataDeletionSettings({ user }: DataDeletionSettingsProps) {
 
   const handleDeletePhotos = async () => {
     setIsDeleting(true)
-    const supabase = createClient()
-    
     try {
-      // First check if there are any photos in storage
-      const { data: storageFiles, error: listError } = await supabase
-        .storage
-        .from('generated_images')
-        .list(user.id)
-
-      if (listError) {
-        console.error('Error listing photos:', listError)
-        throw listError
+      const result = await deleteAllPhotos(user.id)
+      if (result.error) {
+        throw new Error(result.error)
       }
-
-      // Delete all photos from storage if they exist
-      if (storageFiles && storageFiles.length > 0) {
-        const { error: storageError } = await supabase
-          .storage
-          .from('generated_images')
-          .remove(storageFiles.map(file => `${user.id}/${file.name}`))
-
-        if (storageError) {
-          console.error('Error deleting photos from storage:', storageError)
-          // Continue with database deletion even if storage deletion fails
-        }
-      }
-
-      // Delete all photo records from the database
-      const { error: dbError } = await supabase
-        .from('generated_images')
-        .delete()
-        .eq('user_id', user.id)
-
-      if (dbError) throw dbError
-
       toast.success("All photos have been deleted successfully")
       router.refresh()
     } catch (error) {
@@ -81,41 +51,11 @@ export function DataDeletionSettings({ user }: DataDeletionSettingsProps) {
 
   const handleDeleteVideos = async () => {
     setIsDeleting(true)
-    const supabase = createClient()
-    
     try {
-      // First check if there are any videos in storage
-      const { data: storageFiles, error: listError } = await supabase
-        .storage
-        .from('generated_videos')
-        .list(user.id)
-
-      if (listError) {
-        console.error('Error listing videos:', listError)
-        throw listError
+      const result = await deleteAllVideos(user.id)
+      if (result.error) {
+        throw new Error(result.error)
       }
-
-      // Delete all videos from storage if they exist
-      if (storageFiles && storageFiles.length > 0) {
-        const { error: storageError } = await supabase
-          .storage
-          .from('generated_videos')
-          .remove(storageFiles.map(file => `${user.id}/${file.name}`))
-
-        if (storageError) {
-          console.error('Error deleting videos from storage:', storageError)
-          // Continue with database deletion even if storage deletion fails
-        }
-      }
-
-      // Delete all video records from the database
-      const { error: dbError } = await supabase
-        .from('generated_videos')
-        .delete()
-        .eq('user_id', user.id)
-
-      if (dbError) throw dbError
-
       toast.success("All videos have been deleted successfully")
       router.refresh()
     } catch (error) {
