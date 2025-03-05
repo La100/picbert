@@ -1,6 +1,6 @@
 "use client";
 import { Tables } from "@database.types";
-import { Check, X, Coins, Film, FileCheck, Mail, Zap, Users } from "lucide-react";
+import { X, Coins, Film, FileCheck, Mail, Zap, Users } from "lucide-react";
 import React, { useState } from "react";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";

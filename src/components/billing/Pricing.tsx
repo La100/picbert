@@ -1,7 +1,7 @@
 "use client";
 import { Tables } from "@database.types";
 import { User } from "@supabase/supabase-js";
-import { Loader2, Check, X, Coins, Film, FileCheck, Mail, Zap, Users } from "lucide-react";
+import { Loader2, X, Coins, Film, FileCheck, Mail, Zap, Users } from "lucide-react";
 import React, { useState } from "react";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
@@ -14,7 +14,6 @@ import { getStripe } from "@/lib/stripe/client";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { revalidateTag } from "next/cache";
-import AnimatedGradientText from "../ui/animated-gradient-text";
 
 type Subscription = Tables<"subscriptions">;
 type Product = Tables<"products">;
