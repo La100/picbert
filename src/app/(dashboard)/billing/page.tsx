@@ -42,10 +42,8 @@ export default async function BillingPage() {
           <>
             <div className="rounded-xl w-full">
               <div className="text-center max-w-3xl mx-auto mb-4 md:mb-8 px-2 sm:px-4">
-                <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-3">Available Plans</h2>
-                <p className="text-muted-foreground text-sm md:text-base">
-                  Select the plan that best fits your creative needs and budget
-                </p>
+                <h1 className="text-4xl md:text-4xl font-bold mb-6 md:mb-6 -mt-10">Choose your plan</h1>
+               
               </div>
               
               <Pricing

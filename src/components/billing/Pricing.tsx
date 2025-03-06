@@ -248,7 +248,7 @@ const Pricing = ({
               Yearly
             </Label>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Save 16% with yearly billing
           </p>
         </div>
@@ -351,7 +351,7 @@ const Pricing = ({
                         )}
                       </div>
                       <p className={cn(
-                        "ml-3 text-xs sm:text-sm",
+                        "ml-3 text-sm ",
                         feature.included ? "text-muted-foreground" : "text-muted-foreground/60"
                       )}>
                         {feature.name}
