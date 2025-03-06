@@ -2,8 +2,8 @@
   "name": "faces-factory",
   "version": "1.0.0",
   "private": true,
-  "author": "CodeBucks",
-  "author_url": "https://devdreaming.com/about",
+  "author": "Cinu",
+  "author_url": "https://facesfactory.com",
   "scripts": {
     "dev": "next dev ",
     "build": "next build",

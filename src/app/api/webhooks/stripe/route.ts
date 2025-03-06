@@ -6,7 +6,8 @@ import {
   manageSubscriptionStatusChange,
   deleteProductRecord,
   deletePriceRecord,
-  updateUserCredits
+  updateUserCredits,
+  allocateTokensForSubscription
 } from '@/lib/supabase/admin';
 
 const relevantEvents = new Set([
@@ -20,7 +21,8 @@ const relevantEvents = new Set([
   'checkout.session.completed',
   'customer.subscription.created',
   'customer.subscription.updated',
-  'customer.subscription.deleted'
+  'customer.subscription.deleted',
+  'invoice.payment_succeeded'
 ]);
 
 export async function POST(req: Request) {
@@ -102,6 +104,34 @@ export async function POST(req: Request) {
               checkoutSession.client_reference_id as string,
               checkoutSession.metadata 
             );
+          }
+          break;
+        case 'invoice.payment_succeeded':
+          const invoice = event.data.object as Stripe.Invoice;
+          
+          // Only process if this is a subscription invoice
+          if (invoice.subscription) {
+            console.log(`Processing subscription invoice payment: ${invoice.id}`);
+            
+            // Get the subscription details
+            const subscription = await stripe.subscriptions.retrieve(
+              invoice.subscription as string,
+              {
+                expand: ['items.data.price', 'customer']
+              }
+            );
+            
+            // For yearly subscriptions, allocate tokens on each invoice payment
+            // This is typically only the initial payment and renewal payments
+            if (subscription.items.data[0].price.recurring?.interval === 'year') {
+              console.log(`Yearly subscription payment succeeded: ${subscription.id}`);
+              
+              // Allocate tokens for the yearly subscription
+              await allocateTokensForSubscription(
+                subscription.id,
+                subscription.customer as string
+              );
+            }
           }
           break;
         default:

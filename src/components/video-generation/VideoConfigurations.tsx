@@ -4,7 +4,7 @@ import { Upload, Sparkles } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -27,7 +27,6 @@ import {
   SelectValue,
 } from "../ui/select";
 
-import { revalidateTag } from "next/cache";
 import { queueVideoGeneration, getVideoRequestStatus } from "@/app/actions/video-actions";
 import { GalleryImagePicker } from "@/components/gallery/GalleryImagePicker";
 import Image from "next/image";
@@ -56,6 +55,7 @@ const VideoConfigurations = () => {
   const [isUploading, setIsUploading] = React.useState(false);
   const [tokenCount, setTokenCount] = useState<number | null>(null);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const inputImageFromUrl = searchParams.get('input_image');
 
   const form = useForm<FormValues>({
@@ -175,9 +175,8 @@ const VideoConfigurations = () => {
             clearInterval(pollInterval);
             setLoading(false);
             toast.success("Video generated successfully!");
-            // Trigger a refresh of the video list
-            revalidateTag("gallery-videos");
-            revalidateTag("dashboard-videos");
+            // Instead of using revalidateTag, refresh the page or navigate
+            router.refresh(); // This will refresh the current route
             break;
           case "failed":
             clearInterval(pollInterval);

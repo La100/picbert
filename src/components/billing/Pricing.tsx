@@ -13,7 +13,6 @@ import { getErrorRedirect } from "@/lib/helpers";
 import { getStripe } from "@/lib/stripe/client";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
-import { revalidateTag } from "next/cache";
 
 type Subscription = Tables<"subscriptions">;
 type Product = Tables<"products">;
@@ -198,7 +197,6 @@ const Pricing = ({
     stripe?.redirectToCheckout({ sessionId });
 
     setPriceIdLoading(undefined);
-    revalidateTag("credits");
   };
 
   const handleStripePortalRequest = async () => {

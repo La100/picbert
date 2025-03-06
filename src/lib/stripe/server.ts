@@ -47,13 +47,20 @@ export async function checkoutWithStripe(
       throw new Error('Unable to access customer record.');
     }
 
+    // Calculate token amount based on subscription type
+    const tokenAmount = (price.metadata as { tokens?: number })?.tokens ?? 0;
+    
+    // No longer dividing tokens for yearly subscriptions
+    // We'll use the same token amount as specified in the metadata
+    console.log(`Subscription: Allocating tokens: ${tokenAmount}`);
+
     let params: Stripe.Checkout.SessionCreateParams = {
       allow_promotion_codes: true,
       billing_address_collection: 'required',
       customer,
       client_reference_id: user?.id,
       metadata: {
-        tokens: (price.metadata as { tokens?: number })?.tokens ?? 0,
+        tokens: tokenAmount,
       },
       customer_update: {
         address: 'auto'

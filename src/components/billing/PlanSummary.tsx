@@ -1,3 +1,4 @@
+'use client'
 import React from "react";
 import { Card, CardContent } from "../ui/card";
 import { Tables } from "@database.types";
@@ -33,6 +34,7 @@ const PlanSummary = ({
     products: subscriptionProduct,
     unit_amount,
     currency,
+    interval
   } = subscription?.prices ?? {};
 
   const hasActiveSubscription = subscription && subscription.status === "active";
@@ -51,6 +53,9 @@ const PlanSummary = ({
     minimumFractionDigits: 0,
   }).format((unit_amount || 0) / 100);
   
+  // Check if this is a yearly subscription
+  const isYearlySubscription = interval === 'year';
+  
   return (
     <Card className="max-w-5xl mx-auto bg-gradient-to-br from-background to-muted/50 border border-primary/10 shadow-lg">
       <CardContent className="p-8">
@@ -61,8 +66,16 @@ const PlanSummary = ({
               {subscriptionProduct?.name} Plan
             </h3>
             <p className="text-muted-foreground">
-              Your subscription renews on {format(new Date(subscription.current_period_end), "MMMM d, yyyy")}
+              {subscription.cancel_at_period_end 
+                ? `Your subscription ends on ${format(new Date(subscription.current_period_end), "MMMM d, yyyy")}`
+                : `Your subscription renews on ${format(new Date(subscription.current_period_end), "MMMM d, yyyy")}`
+              }
             </p>
+            {isYearlySubscription && (
+              <p className="text-sm text-primary mt-1">
+                Yearly subscription
+              </p>
+            )}
           </div>
           <ManageBillingButton className="bg-primary/10 hover:bg-primary/20 text-primary border-0" />
         </div>
@@ -83,14 +96,21 @@ const PlanSummary = ({
           {/* Price Card */}
           <div className="bg-background rounded-xl p-6 border border-border/50 shadow-sm">
             <div className="space-y-1 mb-4">
-              <h4 className="text-sm font-medium text-muted-foreground">Monthly Price</h4>
+              <h4 className="text-sm font-medium text-muted-foreground">
+                {isYearlySubscription ? "Yearly Price" : "Monthly Price"}
+              </h4>
               <div className="flex items-baseline gap-1">
                 <p className="text-3xl font-bold">{priceString}</p>
-                <span className="text-muted-foreground">/mo</span>
+                <span className="text-muted-foreground">
+                  {isYearlySubscription ? "/year" : "/mo"}
+                </span>
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Next billing cycle starts on {format(new Date(subscription.current_period_end), "MMM d")}
+              {subscription.cancel_at_period_end
+                ? `Subscription valid until ${format(new Date(subscription.current_period_end), "MMM d, yyyy")}`
+                : `Subscription renews on ${format(new Date(subscription.current_period_end), "MMM d, yyyy")}`
+              }
             </p>
           </div>
 

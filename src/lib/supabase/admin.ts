@@ -2,7 +2,7 @@ import { toDateTime } from '@/lib/helpers';
 import { stripe } from '@/lib/stripe/config';
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
-import type { Database, Json, Tables, TablesInsert } from '@database.types';
+import type { Database, Tables, TablesInsert } from '@database.types';
 import { revalidateTag } from 'next/cache';
 import { sendSubscriptionConfirmationEmail } from '@/lib/email';
 import { format } from 'date-fns';
@@ -363,60 +363,170 @@ const manageSubscriptionStatusChange = async (
 
 
 
+/**
+ * Update user credits based on checkout session metadata
+ */
 const updateUserCredits = async (
   userId: string,
-  metadata: Json
+  metadata: Stripe.Metadata | null
 ) => {
-  // Extract token amount from metadata
-  const tokenAmount = (metadata as { tokens?: number })?.tokens ?? 0;
-  
-  if (tokenAmount <= 0) {
-    console.log(`No tokens to add for user: ${userId}`);
+  if (!metadata || !metadata.tokens) {
+    console.log('No token metadata found in checkout session');
     return;
   }
-  
-  // Get current tokens
-  const { data: currentCredits, error: fetchError } = await supabaseAdmin
-    .from('credits')
-    .select('tokens')
-    .eq('user_id', userId)
-    .single();
-  
-  if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 is the "no rows returned" error
-    console.error(`Error fetching current credits: ${fetchError.message}`);
-    throw new Error(`Credits fetch failed: ${fetchError.message}`);
-  }
-  
-  const currentTokens = currentCredits?.tokens || 0;
-  const newTokens = currentTokens + tokenAmount;
-  
-  console.log(`Adding ${tokenAmount} tokens to user ${userId}. Current: ${currentTokens}, New: ${newTokens}`);
-  
-  // Try to update existing record first
-  const { error: updateError, data: updateData } = await supabaseAdmin
-    .from('credits')
-    .update({ tokens: newTokens })
-    .eq('user_id', userId)
-    .select();
-  
-  // If no rows were updated (user doesn't have a credits record yet), insert one
-  if (updateData && updateData.length === 0) {
-    const { error: insertError } = await supabaseAdmin
-      .from('credits')
-      .insert([{ user_id: userId, tokens: tokenAmount }]);
-    
-    if (insertError) {
-      throw new Error(`Credits insert failed: ${insertError.message}`);
-    }
-    
-    console.log(`Created new credits record for user: ${userId} with ${tokenAmount} tokens`);
-  } else if (updateError) {
-    throw new Error(`Credits update failed: ${updateError.message}`);
-  } else {
-    console.log(`Updated credits for user: ${userId} from ${currentTokens} to ${newTokens} tokens`);
+
+  const tokenAmount = parseInt(metadata.tokens as string, 10);
+  if (isNaN(tokenAmount) || tokenAmount <= 0) {
+    console.log(`Invalid token amount: ${metadata.tokens}`);
+    return;
   }
 
-  revalidateTag('credits');
+  console.log(`Adding ${tokenAmount} tokens to user ${userId}`);
+
+  try {
+    // First check if the user already has a credits record
+    const { data: existingCredits, error: fetchError } = await supabaseAdmin
+      .from('credits')
+      .select('tokens')
+      .eq('user_id', userId)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      throw new Error(`Error fetching user credits: ${fetchError.message}`);
+    }
+
+    let currentTokens = 0;
+    if (existingCredits) {
+      // User has an existing credits record
+      currentTokens = existingCredits.tokens || 0;
+    }
+
+    const newTokenAmount = currentTokens + tokenAmount;
+
+    if (existingCredits) {
+      // Update existing record
+      const { error: updateError } = await supabaseAdmin
+        .from('credits')
+        .update({ tokens: newTokenAmount })
+        .eq('user_id', userId);
+
+      if (updateError) {
+        throw new Error(`Error updating user credits: ${updateError.message}`);
+      }
+    } else {
+      // Create new record
+      const { error: insertError } = await supabaseAdmin
+        .from('credits')
+        .insert([{ user_id: userId, tokens: newTokenAmount }]);
+
+      if (insertError) {
+        throw new Error(`Error inserting user credits: ${insertError.message}`);
+      }
+    }
+
+    console.log(`Successfully updated tokens for user ${userId}: ${newTokenAmount}`);
+  } catch (error) {
+    console.error('Error updating user credits:', error);
+    throw error;
+  }
+};
+
+/**
+ * Allocate tokens for a yearly subscription
+ * This function is called when an invoice.payment_succeeded event is received for a yearly subscription
+ */
+const allocateTokensForSubscription = async (
+  subscriptionId: string,
+  customerId: string
+) => {
+  try {
+    // Get customer's UUID from mapping table
+    const { data: customerData, error: noCustomerError } = await supabaseAdmin
+      .from('customers')
+      .select('id')
+      .eq('stripe_customer_id', customerId)
+      .single();
+
+    if (noCustomerError) {
+      throw new Error(`Customer lookup failed: ${noCustomerError.message}`);
+    }
+
+    const { id: userId } = customerData!;
+
+    // Get subscription details
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+      expand: ['items.data.price.product']
+    });
+
+    // Get the product details
+    const product = subscription.items.data[0].price.product as Stripe.Product;
+    
+    // Get tokens from product metadata
+    // First check price metadata, then product metadata
+    const priceMetadata = subscription.items.data[0].price.metadata as { tokens?: string };
+    const productMetadata = product.metadata as { tokens?: string };
+    
+    // Try to get tokens from price metadata first, then from product metadata
+    const tokens = parseInt(priceMetadata?.tokens || productMetadata?.tokens || '0', 10);
+    
+    if (tokens <= 0) {
+      console.log(`No tokens defined for product: ${product.id}`);
+      return;
+    }
+    
+    // No longer dividing by 12 - using the full token amount as specified in metadata
+    const monthlyTokens = tokens;
+    
+    console.log(`Allocating ${monthlyTokens} tokens for subscription: ${subscriptionId}`);
+    
+    // Add the tokens to the user's account
+    // Get current tokens
+    const { data: currentCredits, error: fetchError } = await supabaseAdmin
+      .from('credits')
+      .select('tokens')
+      .eq('user_id', userId)
+      .single();
+    
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error(`Error fetching current credits: ${fetchError.message}`);
+      throw new Error(`Credits fetch failed: ${fetchError.message}`);
+    }
+    
+    const currentTokens = currentCredits?.tokens || 0;
+    const newTokens = currentTokens + monthlyTokens;
+    
+    console.log(`Adding ${monthlyTokens} tokens to user ${userId}. Current: ${currentTokens}, New: ${newTokens}`);
+    
+    // Update the user's tokens
+    const { error: updateError, data: updateData } = await supabaseAdmin
+      .from('credits')
+      .update({ tokens: newTokens })
+      .eq('user_id', userId)
+      .select();
+    
+    // If no rows were updated (user doesn't have a credits record yet), insert one
+    if (updateData && updateData.length === 0) {
+      const { error: insertError } = await supabaseAdmin
+        .from('credits')
+        .insert([{ user_id: userId, tokens: monthlyTokens }]);
+      
+      if (insertError) {
+        throw new Error(`Credits insert failed: ${insertError.message}`);
+      }
+      
+      console.log(`Created new credits record for user: ${userId} with ${monthlyTokens} tokens`);
+    } else if (updateError) {
+      throw new Error(`Credits update failed: ${updateError.message}`);
+    } else {
+      console.log(`Updated credits for user: ${userId} from ${currentTokens} to ${newTokens} tokens`);
+    }
+    
+    revalidateTag('credits');
+    
+  } catch (error) {
+    console.error('Error allocating monthly tokens for subscription:', error);
+    throw error;
+  }
 };
 
 export {
@@ -426,5 +536,6 @@ export {
   deletePriceRecord,
   createOrRetrieveCustomer,
   manageSubscriptionStatusChange,
-  updateUserCredits
+  updateUserCredits,
+  allocateTokensForSubscription
 };
