@@ -11,6 +11,11 @@ body {
   letter-spacing: 0.02em;
 }
 
+/* Prevent zooming on input fields on mobile */
+input, select, textarea {
+  font-size: 16px !important; /* Prevents iOS zoom */
+}
+
 .subHeading {
   @apply text-2xl xs:text-3xl sm:text-4xl font-bold;
 }
@@ -50,7 +55,7 @@ body {
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
     --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
+    --muted-foreground: 0 0% 0%;
     --accent: 0 0% 96.1%;
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;

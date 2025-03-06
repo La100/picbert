@@ -209,12 +209,12 @@ const Pricing = ({
     <div
       id="pricing-plans"
       className={cn(
-        "max-w-7xl mx-auto py-8 sm:py-16 px-2 sm:px-4 md:px-6 lg:px-8 flex flex-col",
+        "max-w-7xl mx-auto py-4 sm:py-8 md:py-12 px-0 sm:px-2 md:px-4 lg:px-6 flex flex-col",
         className
       )}
     >
       {showInterval && (
-        <div className="flex flex-col items-center space-y-2 py-4 sm:py-8">
+        <div className="flex flex-col items-center space-y-2 py-3 sm:py-6">
           <div className="flex items-center space-x-4">
             <Label 
               htmlFor="yearly-pricing" 
@@ -254,7 +254,7 @@ const Pricing = ({
         </div>
       )}
 
-      <div className="space-y-6 sm:space-y-0 grid-cols-1 sm:grid sm:grid-cols-2 lg:grid-cols-2 sm:gap-4 md:gap-6 lg:gap-8 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3 place-items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8 w-full">
         {products.map((product) => {
           const price = product?.prices?.find(
             (price) => price.interval === billingInterval
@@ -276,11 +276,11 @@ const Pricing = ({
             <div
               key={product.id}
               className={cn(
-                "border bg-background rounded-xl shadow-sm divide-y divide-border h-fit w-full transition-all duration-200 hover:shadow-md mb-6 sm:mb-0",
+                "border bg-background rounded-xl shadow-sm divide-y divide-border h-full w-full transition-all duration-200 hover:shadow-md mx-auto max-w-md lg:max-w-full",
                 isActive
                   ? "border-primary bg-background ring-1 ring-primary/20"
                   : isPopular
-                  ? "border-primary/30 sm:scale-105 shadow-md"
+                  ? "border-primary/30 lg:scale-105 shadow-md"
                   : "border-border hover:border-primary/20"
               )}
             >
@@ -289,7 +289,7 @@ const Pricing = ({
                   Most Popular
                 </div>
               )}
-              <div className="p-4 sm:p-6">
+              <div className="p-4 sm:p-5 md:p-6">
                 <h2 className="text-xl sm:text-2xl leading-6 font-semibold text-foreground flex items-center justify-between flex-wrap gap-2">
                   {product.name}
 
@@ -305,7 +305,7 @@ const Pricing = ({
                 <p className="mt-3 sm:mt-4 text-sm text-muted-foreground">
                   {product.description}
                 </p>
-                <p className="mt-6 sm:mt-8 flex items-baseline">
+                <p className="mt-5 sm:mt-6 flex items-baseline">
                   <span className="text-3xl sm:text-4xl font-extrabold text-foreground">
                     {priceString}
                   </span>
@@ -330,7 +330,7 @@ const Pricing = ({
                   handleStripeCheckout,
                 })}
               </div>
-              <div className="pt-4 sm:pt-6 pb-6 sm:pb-8 px-4 sm:px-6">
+              <div className="pt-4 sm:pt-5 md:pt-6 pb-5 sm:pb-6 md:pb-8 px-4 sm:px-5 md:px-6">
                 <h3 className="text-xs font-medium text-foreground tracking-wide uppercase mb-3 sm:mb-4">
                   What&apos;s included
                 </h3>

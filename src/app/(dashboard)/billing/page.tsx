@@ -26,12 +26,10 @@ export default async function BillingPage() {
   const hasActiveSubscription = subscription && subscription.status === "active";
 
   return (
-    <div className="container mx-auto py-6 md:py-8 space-y-8 md:space-y-12 relative px-4 sm:px-6">
+    <div className="container mx-auto  md:py-8 space-y-8 md:space-y-12 relative px-3 sm:px-4 md:px-6">
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
       
-     
-
-      <div className="grid gap-8 md:gap-12 relative">
+      <div className="grid gap-6 md:gap-12 relative">
         {hasActiveSubscription ? (
           <PlanSummary
             credits={Array.isArray(credits) ? credits[0] : credits}
@@ -42,10 +40,8 @@ export default async function BillingPage() {
           />
         ) : (
           <>
-            
-
-            <div className=" py-8 md:py-10 px-4 rounded-xl ">
-              <div className="text-center max-w-2xl mx-auto mb-6 md:mb-8">
+            <div className="rounded-xl w-full">
+              <div className="text-center max-w-3xl mx-auto mb-4 md:mb-8 px-2 sm:px-4">
                 <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-3">Available Plans</h2>
                 <p className="text-muted-foreground text-sm md:text-base">
                   Select the plan that best fits your creative needs and budget
