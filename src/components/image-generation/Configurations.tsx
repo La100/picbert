@@ -119,6 +119,7 @@ const Configurations = () => {
           prompt: finalPrompt,
           aspect_ratio: values.aspect_ratio,
           raw: true,
+          enable_safety_checker:false,
         },
         logs: true,
       });
