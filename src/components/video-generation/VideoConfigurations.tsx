@@ -113,24 +113,33 @@ const VideoConfigurations = () => {
         return;
       }
 
-      // Deduct tokens first
-      const deductResult = await fetch('/api/credits/deduct', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ amount: VIDEO_TOKEN_COST }),
-      });
+      try {
+        // Deduct tokens first
+        const deductResult = await fetch('/api/credits/deduct', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ amount: VIDEO_TOKEN_COST }),
+          cache: 'no-store',
+        });
 
-      if (!deductResult.ok) {
-        const error = await deductResult.text();
-        toast.error(error || 'Failed to deduct tokens');
+        if (!deductResult.ok) {
+          const errorText = await deductResult.text();
+          toast.error(errorText || 'Failed to deduct tokens');
+          setLoading(false);
+          return;
+        }
+
+        const deductData = await deductResult.json();
+        
+        // Update local token count
+        setTokenCount(deductData.tokensRemaining);
+      } catch (deductError) {
+        toast.error('Failed to deduct tokens due to network error');
         setLoading(false);
         return;
       }
-
-      // Update local token count
-      setTokenCount(prev => prev !== null ? prev - VIDEO_TOKEN_COST : null);
 
       const finalPrompt = values.prompt;
 

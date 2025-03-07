@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { deductTokens } from '@/app/actions/token-actions';
 import { createClient } from '@/lib/supabase/server';
 
+// Prevent caching in development mode
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -10,7 +13,7 @@ export async function POST(request: Request) {
     if (!user) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
-
+    
     const { amount } = await request.json();
 
     if (!amount || typeof amount !== 'number' || amount <= 0) {

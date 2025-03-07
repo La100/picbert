@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidateTag } from "next/cache";
 import { getCredits } from "./credit-actions";
 import { Database } from "@database.types";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 /**
  * Response interface for token operations
@@ -36,6 +37,15 @@ export async function manageTokens(
   }
 
   const currentTokens = credits.data.tokens ?? 0;
+  const userId = credits.data.user_id;
+  
+  if (!userId) {
+    return {
+      success: false,
+      tokensRemaining: currentTokens,
+      error: "No user ID found"
+    };
+  }
   
   // For check and deduct operations, verify sufficient tokens
   if ((operation === 'check' || operation === 'deduct') && currentTokens < tokenAmount) {
@@ -60,26 +70,36 @@ export async function manageTokens(
     ? currentTokens + tokenAmount 
     : currentTokens - tokenAmount;
   
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("credits")
-    .update({ tokens: newTokenAmount })
-    .eq("user_id", credits.data.user_id);
-
-  if (error) {
+  try {
+    // Use admin client to bypass RLS policies
+    const { error } = await supabaseAdmin
+      .from("credits")
+      .update({ tokens: newTokenAmount })
+      .eq("user_id", userId);
+    
+    if (error) {
+      return { 
+        success: false, 
+        tokensRemaining: currentTokens, 
+        error: `Failed to ${operation} tokens: ${error.message}` 
+      };
+    }
+    
+    // Force revalidation of the credits tag
+    revalidateTag("credits");
+    
+    return { 
+      success: true, 
+      tokensRemaining: newTokenAmount, 
+      error: null 
+    };
+  } catch (dbError) {
     return { 
       success: false, 
       tokensRemaining: currentTokens, 
-      error: `Failed to ${operation} tokens` 
+      error: `Database error: ${dbError instanceof Error ? dbError.message : String(dbError)}` 
     };
   }
-
-  revalidateTag("credits");
-  return { 
-    success: true, 
-    tokensRemaining: newTokenAmount, 
-    error: null 
-  };
 }
 
 /**

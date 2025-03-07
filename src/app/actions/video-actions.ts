@@ -287,15 +287,9 @@ export async function queueVideoGeneration(
   }
 
   try {
-    // Check credits first
-    const creditCheck = await checkAndUpdateVideoCredits();
-    if (!creditCheck.hasCredits) {
-      return {
-        error: creditCheck.error || "Insufficient credits",
-        success: false,
-        data: null,
-      };
-    }
+    // Credits are already checked and deducted in the VideoConfigurations component
+    // No need to check or deduct credits again here
+    console.log("Queuing video generation - tokens already deducted in frontend");
 
     // Get webhook URL from environment
     const webhookUrl = process.env.NEXT_PUBLIC_VIDEO_WEBHOOK_URL;

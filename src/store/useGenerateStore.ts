@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { toast } from 'sonner'
-import { checkAndUpdateCredits, storeImages } from '@/app/actions/image-actions'
+import { storeImages } from '@/app/actions/image-actions'
+import { getCredits } from '@/app/actions/credit-actions'
+import { IMAGE_TOKEN_COST } from '@/lib/constants'
 
 interface StoreResult {
   results: Array<{
@@ -41,15 +43,9 @@ const useGenerateStore = create<GenerateState>((set) => ({
       set({ error: null, images: [] })
       const toastId = toast.loading('Processing generated image...')
 
-      // Check credits before proceeding
-      const creditCheck = await checkAndUpdateCredits();
-      console.log("Credit check result:", creditCheck);
-      
-      if (!creditCheck.hasCredits) {
-        toast.error(creditCheck.error || "No credits available", { id: toastId });
-        set({ error: creditCheck.error || "No credits available", loading: false });
-        return;
-      }
+      // Credits are already checked and deducted in the Configurations component
+      // No need to check or deduct credits again here
+      console.log("Processing generated image - tokens already deducted in frontend");
 
       const imageUrls = values.data.images.map((img) => ({
         url: img.url,
