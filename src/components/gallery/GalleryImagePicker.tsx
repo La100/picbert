@@ -32,6 +32,7 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const pageSize = 20;
+  const [lastImagesCount, setLastImagesCount] = useState(6);
 
   const loadImages = async (page: number) => {
     try {
@@ -40,6 +41,7 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
       if (response.success && response.data) {
         setImages(response.data);
         setTotalCount(response.count || 0);
+        setLastImagesCount(response.data.length);
       }
     } finally {
       setIsLoading(false);
@@ -73,14 +75,12 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
         <div className="space-y-6">
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
             {isLoading ? (
-              // Skeleton grid
-              Array.from({ length: pageSize }).map((_, index) => (
+              Array.from({ length: Math.min(lastImagesCount, 12) }).map((_, index) => (
                 <div key={index} className="relative aspect-square">
                   <Skeleton className="w-full h-full rounded" />
                 </div>
               ))
             ) : (
-              // Actual images
               images.map((image, index) => (
                 <div
                   key={`${image.id}-${index}`}

@@ -9,6 +9,11 @@ const nextConfig:NextConfig = {
     serverActions: {
       bodySizeLimit: '10mb',
     },
+    turbo: {
+      resolveAlias: {
+        // Add any custom module resolutions if needed
+      },
+    },
   },
   images: {
     unoptimized: true,
