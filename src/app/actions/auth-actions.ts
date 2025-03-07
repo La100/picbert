@@ -2,7 +2,6 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { createServiceClient } from "@/lib/supabase/server";
 
 interface AuthResponse {
   error: null | string;
