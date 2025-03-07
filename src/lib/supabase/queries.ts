@@ -32,8 +32,16 @@ export const getProducts = cache(async (supabase: SupabaseClient) => {
     .select('*, prices(*)')
     .eq('active', true)
     .eq('prices.active', true)
-    .order('id') 
     .order('unit_amount', { referencedTable: 'prices' });
+
+  // Sort products in the desired order: Hobby, Pro, Business
+  if (products) {
+    const productOrder = { 'Hobby': 1, 'Pro': 2, 'Business': 3 };
+    products.sort((a, b) => {
+      return (productOrder[a.name as keyof typeof productOrder] || 999) - 
+             (productOrder[b.name as keyof typeof productOrder] || 999);
+    });
+  }
 
   return products;
 });

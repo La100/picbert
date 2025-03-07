@@ -5,6 +5,7 @@ interface SubscriptionConfirmationProps {
   planName: string;
   startDate: string;
   endDate: string;
+  paymentAmount: string;
 }
 
 const SubscriptionConfirmation: React.FC<Readonly<SubscriptionConfirmationProps>> = ({
@@ -12,6 +13,7 @@ const SubscriptionConfirmation: React.FC<Readonly<SubscriptionConfirmationProps>
   planName,
   startDate,
   endDate,
+  paymentAmount,
 }) => (
   <div style={{ fontFamily: "Arial, sans-serif", color: "#333", maxWidth: "600px", margin: "0 auto" }}>
     <div style={{ padding: "20px", backgroundColor: "#f9f9f9", borderRadius: "8px", marginBottom: "20px" }}>
@@ -24,6 +26,9 @@ const SubscriptionConfirmation: React.FC<Readonly<SubscriptionConfirmationProps>
         <h2 style={{ fontSize: "18px", color: "#4f46e5", marginBottom: "12px" }}>Subscription Details</h2>
         <p style={{ margin: "8px 0", fontSize: "14px" }}>
           <strong>Plan:</strong> {planName}
+        </p>
+        <p style={{ margin: "8px 0", fontSize: "14px" }}>
+          <strong>Payment Amount:</strong> {paymentAmount}
         </p>
         <p style={{ margin: "8px 0", fontSize: "14px" }}>
           <strong>Start Date:</strong> {startDate}

@@ -3,8 +3,6 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { createServiceClient } from '@/lib/supabase/server'
-import { INITIAL_USER_TOKENS } from '@/lib/constants'
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
@@ -22,36 +20,6 @@ export async function GET(request: NextRequest) {
     })
     
     if (!error && data?.user) {
-      try {
-        // Use service client to bypass RLS policies
-        const serviceClient = createServiceClient()
-        
-        // Check if user already has a credits record
-        const { data: existingCredits } = await serviceClient
-          .from("credits")
-          .select("*")
-          .eq("user_id", data.user.id)
-          .single()
-        
-        // Only create credits record if user doesn't have one yet
-        if (!existingCredits) {
-          const { error: creditsError } = await serviceClient
-            .from("credits")
-            .insert([{ 
-              user_id: data.user.id, 
-              tokens: INITIAL_USER_TOKENS 
-            }])
-          
-          if (creditsError) {
-            console.error("Failed to create initial credits:", creditsError.message)
-          } else {
-            console.log(`Created initial credits (${INITIAL_USER_TOKENS} tokens) for confirmed user: ${data.user.id}`)
-          }
-        }
-      } catch (creditsError) {
-        console.error("Error creating initial credits for confirmed user:", creditsError)
-      }
-
       // Handle password recovery flow
       if (type === "recovery") {
         const response = NextResponse.redirect(new URL("/reset-password", request.url));

@@ -56,12 +56,14 @@ export async function sendSubscriptionConfirmationEmail({
   planName,
   startDate,
   endDate,
+  paymentAmount,
 }: {
   to: string;
   userName: string;
   planName: string;
   startDate: string;
   endDate: string;
+  paymentAmount: string;
 }) {
   return sendEmail({
     to,
@@ -71,6 +73,7 @@ export async function sendSubscriptionConfirmationEmail({
       planName,
       startDate,
       endDate,
+      paymentAmount,
     }),
   });
 }

@@ -329,6 +329,19 @@ const manageSubscriptionStatusChange = async (
         const product = subscription.items.data[0].price.product as Stripe.Product;
         const planName = product.name || 'Premium Plan';
         
+        // Get price details and format payment amount
+        const price = subscription.items.data[0].price;
+        const currency = price.currency || 'usd';
+        const unitAmount = price.unit_amount || 0;
+        const interval = price.recurring?.interval || 'month';
+        
+        // Format payment amount with currency symbol
+        const paymentAmount = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: currency,
+          minimumFractionDigits: 0
+        }).format(unitAmount / 100) + (interval === 'month' ? '/month' : interval === 'year' ? '/year' : '');
+        
         // Format dates - ensure they are strings
         const startDate = format(
           new Date(subscriptionData.current_period_start as string), 
@@ -345,7 +358,8 @@ const manageSubscriptionStatusChange = async (
           userName: userData?.full_name || userEmail.split('@')[0] || 'Valued Customer',
           planName,
           startDate,
-          endDate
+          endDate,
+          paymentAmount
         });
         
         if (!emailResult.success) {
