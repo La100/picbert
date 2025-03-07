@@ -1,6 +1,5 @@
 'use server'
 
-import { createClient } from "@/lib/supabase/server";
 import { revalidateTag } from "next/cache";
 import { getCredits } from "./credit-actions";
 import { Database } from "@database.types";

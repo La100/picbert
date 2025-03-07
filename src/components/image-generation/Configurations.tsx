@@ -91,33 +91,38 @@ const Configurations = () => {
         return;
       }
 
-      try {
-        // Deduct tokens first
-        const deductResult = await fetch('/api/credits/deduct', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ amount: IMAGE_TOKEN_COST }),
-          cache: 'no-store',
-        });
-
-        if (!deductResult.ok) {
-          const errorText = await deductResult.text();
-          toast.error(errorText || 'Failed to deduct tokens');
-          setLoading(false);
-          return;
+      // Deduct tokens first
+      fetch('/api/credits/deduct', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount: IMAGE_TOKEN_COST }),
+        cache: 'no-store',
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.text().then(errorText => {
+            throw new Error(errorText || 'Failed to deduct tokens');
+          });
         }
-
-        const deductData = await deductResult.json();
-        
+        return response.json();
+      })
+      .then(deductData => {
         // Update local token count
         setTokenCount(deductData.tokensRemaining);
-      } catch (deductError) {
+        
+        // Update global token state
+        return import('@/store/useTokenStore').then(module => {
+          const useTokenStore = module.default;
+          useTokenStore.getState().setTokenCount(deductData.tokensRemaining);
+        });
+      })
+      .catch(() => {
         toast.error('Failed to deduct tokens due to network error');
         setLoading(false);
         return;
-      }
+      });
 
       const finalPrompt = values.selfie 
         ? values.prompt + ", selfie, full body visible, 4k high resolution"

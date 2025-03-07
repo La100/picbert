@@ -1,8 +1,6 @@
 import { create } from 'zustand'
 import { toast } from 'sonner'
 import { storeImages } from '@/app/actions/image-actions'
-import { getCredits } from '@/app/actions/credit-actions'
-import { IMAGE_TOKEN_COST } from '@/lib/constants'
 
 interface StoreResult {
   results: Array<{
