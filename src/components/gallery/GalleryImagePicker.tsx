@@ -18,7 +18,7 @@ import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type ImageProps = {
-  url: string | undefined;
+  url: string | undefined | null;
 } & Tables<"generated_images">;
 
 interface GalleryImagePickerProps {

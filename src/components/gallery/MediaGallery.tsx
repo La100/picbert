@@ -12,8 +12,8 @@ import Image from "next/image";
 import { EmptyState } from "../ui/empty-state";
 
 type VideoItem = {
-  url: string | undefined;
-  input_image: string;
+  url: string | undefined | null;
+  input_image: string | null;
 } & Tables<"generated_videos">;
 
 interface MediaGalleryProps {
@@ -78,7 +78,7 @@ export function MediaGallery({ items, currentPage, totalCount, pageSize }: Media
                 className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
               >
                 <Image
-                  src={item.input_image}
+                  src={item.input_image || ""}
                   alt={item.prompt || "Video thumbnail"}
                   fill
                   className="object-cover"

@@ -12,7 +12,7 @@ import Image from "next/image";
 import { EmptyState } from "../ui/empty-state";
 
 type ImageProps = {
-  url: string | undefined;
+  url: string | undefined | null;
 } & Tables<"generated_images">;
 
 interface GalleryProps {

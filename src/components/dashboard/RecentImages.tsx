@@ -18,7 +18,7 @@ import Image from "next/image";
 interface RecentImagesProps {
   images: Array<
     Tables<"generated_images"> & {
-      url: string | undefined;
+      url: string | undefined | null;
     }
   >;
 }

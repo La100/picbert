@@ -25,16 +25,16 @@ import { MediaPopup } from "@/components/ui/media-popup";
 interface RecentVideosProps {
   videos: Array<
     Tables<"generated_videos"> & {
-      url: string | undefined;
-      input_image: string;
+      url: string | undefined | null;
+      input_image: string | null;
     }
   >;
 }
 
 export function RecentVideos({ videos }: RecentVideosProps) {
   const [selectedVideo, setSelectedVideo] = useState<(Tables<"generated_videos"> & {
-    url: string | undefined;
-    input_image: string;
+    url: string | undefined | null;
+    input_image: string | null;
   }) | null>(null);
 
   if (videos.length === 0) {
