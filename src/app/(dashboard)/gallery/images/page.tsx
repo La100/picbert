@@ -1,6 +1,6 @@
 import React from "react";
 import { Gallery } from "@/components/gallery/Gallery";
-import { getImages } from "@/app/actions/image-actions";
+import { getCachedImages } from "@/app/actions/image-actions";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
@@ -25,7 +25,7 @@ export default async function ImagesGalleryPage({ searchParams }: PageProps) {
   const currentPage = Number(params.page) || 1;
   const pageSize = 12;
 
-  const images = await getImages(currentPage, pageSize);
+  const images = await getCachedImages(currentPage, pageSize);
 
   return (
     <div className="container mx-auto">

@@ -4,9 +4,9 @@ import { StatsCards } from "@/components/dashboard/StatsCards";
 import { RecentImages } from "@/components/dashboard/RecentImages";
 import { RecentVideos } from "@/components/dashboard/RecentVideos";
 import { QuickActions } from "@/components/dashboard/QuickActions";
-import { getImages } from "@/app/actions/image-actions";
+import { getCachedImages } from "@/app/actions/image-actions";
 import { getCredits } from "@/app/actions/credit-actions";
-import { getVideos } from "@/app/actions/video-actions";
+import { getCachedVideos } from "@/app/actions/video-actions";
 
 import { Metadata } from "next";
 
@@ -27,8 +27,8 @@ export default async function Dashboard() {
   }
 
   const { data: credits } = await getCredits();
-  const { data: images } = await getImages();
-  const { data: videos } = await getVideos();
+  const { data: images } = await getCachedImages();
+  const { data: videos } = await getCachedVideos();
   const imageCount = images?.length || 0;
   const videoCount = videos?.length || 0;
 

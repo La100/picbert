@@ -6,10 +6,10 @@ import { revalidateTag } from "next/cache";
 import { imageMeta } from "image-meta";
 import { getCredits } from "./credit-actions";
 import { createClient } from "@/lib/supabase/server";
-import { createClientWithOptions } from "@/lib/supabase/server-fetch";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { checkTokens, deductTokens } from "./token-actions";
 import { IMAGE_TOKEN_COST } from "@/lib/constants";
+import { cache } from 'react';
 
 interface ImageResponse {
   error: string | null;
@@ -161,20 +161,13 @@ export async function getPresignedStorageUrl(filePath: string) {
   return { signedUrl: urlData?.signedUrl || "", error: error?.message || null };
 }
 
-export async function getImages(page = 1, limit = 12) {
-  const cacheOptions = {
-    cache: "force-cache",
-    next: {
-      tags: ["dashboard-images", "gallery-images"],
-    },
-  };
-
-  const supabase = await createClientWithOptions(cacheOptions);
+export async function getImages(page: number = 1, limit: number = 12) {
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return {
-      error: "Unauthorized",
+      error: "User not authenticated",
       success: false,
       data: null,
       count: 0,
@@ -187,7 +180,7 @@ export async function getImages(page = 1, limit = 12) {
   const { data, error, count } = await supabase
     .from("generated_images")
     .select("*", { count: "exact" })
-    .eq("user_id", user?.id || "")
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .range(start, end);
 
@@ -200,22 +193,26 @@ export async function getImages(page = 1, limit = 12) {
     };
   }
 
-  const imagesWithUrls = await Promise.all(
-    data.map(
-      async (
-        image: Database["public"]["Tables"]["generated_images"]["Row"],
-      ) => {
-        const { data: urlData } = await supabase
+  const imagesWithUrls = data.map(
+    (image: Database["public"]["Tables"]["generated_images"]["Row"]) => {
+      try {
+        const { data: urlData } = supabase
           .storage
           .from("generated_images")
-          .createSignedUrl(`${user?.id || ""}/${image.image_name}`, 3600);
+          .getPublicUrl(`${user.id}/${image.image_name}`);
 
         return {
           ...image,
-          url: urlData?.signedUrl,
+          url: urlData.publicUrl,
         };
-      },
-    ),
+      } catch (e) {
+        console.error(`Failed to get URL for image ${image.image_name}:`, e);
+        return {
+          ...image,
+          url: null,
+        };
+      }
+    }
   );
 
   return {
@@ -225,6 +222,10 @@ export async function getImages(page = 1, limit = 12) {
     count: count || 0,
   };
 }
+
+export const getCachedImages = cache(async (page?: number, limit: number = 12) => {
+  return getImages(page, limit);
+});
 
 export async function deleteImage(id: string, imageName: string) {
   const supabase = await createClient();

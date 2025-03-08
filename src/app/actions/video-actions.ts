@@ -4,10 +4,10 @@ import { Database } from "@database.types";
 import { randomUUID } from "crypto";
 import { revalidateTag } from "next/cache";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
-import { createClientWithOptions } from "@/lib/supabase/server-fetch";
 import { fal } from "@/lib/fal";
 import { processTokenOperation } from "./token-actions";
 import { VIDEO_TOKEN_COST } from "@/lib/constants";
+import { cache } from 'react';
 
 
 interface VideoResponse {
@@ -119,21 +119,13 @@ export async function storeVideo(
   }
 }
 
-export async function getVideos(page?: number, pageSize: number = 12) {
-  const cacheOptions = {
-    cache: "force-cache",
-    next: {
-      tags: ["dashboard-videos", "gallery-videos"],
-      revalidate: 3600,
-    },
-  };
-
-  const supabase = await createClientWithOptions(cacheOptions);
+export async function getVideos(page: number = 1, pageSize: number = 12) {
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return {
-      error: "Unauthorized",
+      error: "User not authenticated",
       success: false,
       data: null,
       count: 0,
@@ -143,7 +135,7 @@ export async function getVideos(page?: number, pageSize: number = 12) {
   let query = supabase
     .from("generated_videos")
     .select("*", { count: "exact" })
-    .eq("user_id", user?.id || "")
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
   if (page && pageSize) {
@@ -163,41 +155,66 @@ export async function getVideos(page?: number, pageSize: number = 12) {
     };
   }
 
-  // Create signed URLs for both videos and input images
-  const videosWithUrls = await Promise.all(
-    (data || []).map(async (video) => {
-      try {
-        // Get signed URL for video
-        const { data: videoUrlData } = await supabase
-          .storage
-          .from("generated_videos")
-          .createSignedUrl(`${user.id}/${video.video_name}`, 3600);
+  // Użyj getPublicUrl zamiast createSignedUrl
+  const videosWithUrls = (data || []).map((video) => {
+    try {
+      // Get public URL for video
+      const { data: videoUrlData } = supabase
+        .storage
+        .from("generated_videos")
+        .getPublicUrl(`${user.id}/${video.video_name}`);
 
-        // Extract image name from the input_image URL
+      // Obsługa input_image
+      let imageUrl = video.input_image;
+      
+      // Jeśli input_image jest ścieżką do pliku w storage
+      if (video.input_image && !video.input_image.startsWith('http')) {
+        // Extract image name from the input_image URL if it's a path
         const imageMatch = video.input_image.match(/\/([^\/]+?)(?:\?|$)/);
         const imageName = imageMatch ? imageMatch[1] : video.input_image;
-
-        // Get signed URL for input image
-        const { data: imageUrlData } = await supabase
+        
+        // Get public URL for input image
+        const { data: imageUrlData } = supabase
           .storage
           .from("generated_images")
-          .createSignedUrl(`${user.id}/${imageName}`, 3600);
-
-        return {
-          ...video,
-          url: videoUrlData?.signedUrl,
-          input_image: imageUrlData?.signedUrl || video.input_image,
-        };
-      } catch (e) {
-        console.error(`Failed to sign URLs for video ${video.video_name}:`, e);
-        return {
-          ...video,
-          url: null,
-          input_image: video.input_image,
-        };
+          .getPublicUrl(`${user.id}/${imageName}`);
+          
+        imageUrl = imageUrlData.publicUrl;
+      } 
+      // Jeśli input_image jest już pełnym URL-em
+      else if (video.input_image && video.input_image.includes('supabase.co/storage/v1/object/sign')) {
+        // Zamień signed URL na public URL
+        const urlParts = video.input_image.split('/');
+        const bucketIndex = urlParts.findIndex((part: string) => part === 'storage') + 2;
+        const pathIndex = bucketIndex + 1;
+        
+        if (bucketIndex > 0 && pathIndex < urlParts.length) {
+          const bucket = urlParts[bucketIndex];
+          const path = urlParts.slice(pathIndex).join('/').split('?')[0];
+          
+          const { data: imageUrlData } = supabase
+            .storage
+            .from(bucket)
+            .getPublicUrl(path);
+            
+          imageUrl = imageUrlData.publicUrl;
+        }
       }
-    })
-  );
+
+      return {
+        ...video,
+        url: videoUrlData.publicUrl,
+        input_image: imageUrl,
+      };
+    } catch (e) {
+      console.error(`Failed to get URLs for video ${video.video_name}:`, e);
+      return {
+        ...video,
+        url: null,
+        input_image: video.input_image,
+      };
+    }
+  });
 
   return {
     error: null,
@@ -206,6 +223,11 @@ export async function getVideos(page?: number, pageSize: number = 12) {
     count: count || 0,
   };
 }
+
+// Cachowana wersja getVideos
+export const getCachedVideos = cache(async (page: number = 1, pageSize: number = 12) => {
+  return getVideos(page, pageSize);
+});
 
 export async function deleteVideo(id: string, videoName: string) {
   const supabase = await createClient();

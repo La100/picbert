@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { createClientWithOptions } from "@/lib/supabase/server-fetch";
+import { cache } from 'react';
 
 export interface ClientVideo {
   id: string;
@@ -12,15 +12,8 @@ export interface ClientVideo {
 
 export async function getClientVideos(page?: number, selectedTags: string[] = []) {
   const ITEMS_PER_PAGE = 15;
-  const cacheOptions = {
-    cache: "force-cache",
-    next: {
-      tags: ["client-videos"],
-      revalidate: 3600,
-    },
-  };
-
-  const supabase = await createClientWithOptions(cacheOptions);
+  
+  const supabase = await createClient();
   
   let query = supabase
     .from("client_videos")
@@ -59,15 +52,15 @@ export async function getClientVideos(page?: number, selectedTags: string[] = []
           return video;
         }
         
-        // Otherwise, create a signed URL
-        const { data: urlData } = await supabase
+        // Otherwise, create a public URL
+        const { data: urlData } = supabase
           .storage
           .from("client_videos")
-          .createSignedUrl(video.video_url, 3600);
+          .getPublicUrl(video.video_url);
 
         return {
           ...video,
-          video_url: urlData?.signedUrl || video.video_url,
+          video_url: urlData.publicUrl || video.video_url,
         };
       } catch (e) {
         console.error(`Failed to sign URL for video ${video.id}:`, e);
@@ -83,6 +76,11 @@ export async function getClientVideos(page?: number, selectedTags: string[] = []
     count: count || 0,
   };
 }
+
+// Cachowana wersja getClientVideos
+export const getCachedClientVideos = cache(async (page?: number, selectedTags: string[] = []) => {
+  return getClientVideos(page, selectedTags);
+});
 
 export async function getAvailableTags() {
   const supabase = await createClient();

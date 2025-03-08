@@ -1,6 +1,6 @@
 import React from "react";
 import { MediaGallery } from "@/components/gallery/MediaGallery";
-import { getVideos } from "@/app/actions/video-actions";
+import { getCachedVideos } from "@/app/actions/video-actions";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
@@ -25,7 +25,7 @@ export default async function VideosGalleryPage({ searchParams }: PageProps) {
   const currentPage = Number(params.page) || 1;
   const pageSize = 12;
 
-  const videos = await getVideos(currentPage, pageSize);
+  const videos = await getCachedVideos(currentPage, pageSize);
   const videosWithType = videos.data?.map(video => ({ ...video, type: 'video' as const })) || [];
 
   return (
