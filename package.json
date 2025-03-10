@@ -5,7 +5,7 @@
   "author": "Cinu",
   "author_url": "https://facesfactory.com",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
