@@ -34,7 +34,9 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
                 alt="Video thumbnail"
                 fill
                 className="w-full h-full object-cover"
-                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                quality={80}
+                priority={index < 4}
               />
               
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">

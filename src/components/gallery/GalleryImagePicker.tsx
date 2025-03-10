@@ -102,6 +102,7 @@ export function GalleryImagePicker({ onImageSelect }: GalleryImagePickerProps) {
                       fill
                       className="object-cover rounded"
                       sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 16vw"
+                      quality={80}
                     />
                   </div>
                 </div>

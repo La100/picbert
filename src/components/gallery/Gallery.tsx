@@ -87,7 +87,9 @@ export function Gallery({ images, currentPage, totalCount, pageSize = 12 }: Gall
                   alt={image.prompt || "Generated image"}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  quality={80}
+                  priority={index < 4}
                   onError={() => {
                     const imgElement = document.querySelector(`[src="${image.url}"]`) as HTMLImageElement;
                     if (imgElement) imgElement.src = '/placeholder-image.png';

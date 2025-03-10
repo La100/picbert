@@ -76,7 +76,8 @@ export function RecentImages({ images }: RecentImagesProps) {
                       alt={image.prompt || "Generated image"}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      quality={80}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
