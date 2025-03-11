@@ -88,7 +88,8 @@ export function RecentVideos({ videos }: RecentVideosProps) {
                       alt={video.prompt || "Video thumbnail"}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      quality={80}
                     />
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">

@@ -2,6 +2,7 @@
 
 import { createClientWithOptions } from "@/lib/supabase/server-fetch";
 import { Tables } from "@database.types";
+import { getUser } from "@/lib/supabase/queries";
 
 interface CreditResponse {
   error: string | null;
@@ -9,9 +10,7 @@ interface CreditResponse {
   data: Tables<'credits'> | null;
 }
 
-
 export async function getCredits(): Promise<CreditResponse> {
-
   const cacheOptions = {
     cache: 'force-cache',
     next: {
@@ -21,7 +20,7 @@ export async function getCredits(): Promise<CreditResponse> {
   }
 
   const supabase = await createClientWithOptions(cacheOptions);
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getUser(supabase);
   
   if (!user) {
     return {
@@ -34,7 +33,7 @@ export async function getCredits(): Promise<CreditResponse> {
   const { data, error } = await supabase
   .from('credits')
   .select('*')
-  .eq('user_id', user?.id || '')
+  .eq('user_id', user.id)
   .single();
 
   if (error) {

@@ -2,7 +2,6 @@
 import type { NextConfig } from 'next'
 
 const nextConfig:NextConfig = {
-  output: 'standalone',
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
@@ -17,6 +16,7 @@ const nextConfig:NextConfig = {
     },
   },
   images: {
+   
     remotePatterns: [
       {
         protocol: "https",
@@ -28,11 +28,11 @@ const nextConfig:NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "vjvlsiuqjfotifoyqivh.supabase.co", // Update this to your supabase url
+        hostname: "api.facesfactory.com", // Update this to your supabase url
       },
       {
         protocol: "https",
-        hostname: "api.facesfactory.com",
+        hostname: "vjvlsiuqjfotifoyqivh.supabase.co", // Update this to your supabase url
       },
     ],
   },

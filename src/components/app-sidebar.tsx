@@ -20,11 +20,11 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
 import UpgradeBtn from "./billing/UpgradeBtn"
 import TokenDisplay from "./billing/TokenDisplay"
 import { getSubscription } from "@/lib/supabase/queries"
 import { getCredits } from "@/app/actions/credit-actions"
+import { User } from "@supabase/supabase-js"
 
 const navMain =  [
     {
@@ -59,15 +59,16 @@ const navMain =  [
     },
   ]
 
-export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const supabase = await createClient()
-  const { data:userData, error } = await supabase.auth.getUser()
-  if (error || !userData?.user) {
-    redirect('/login')
-  }
-  const user = {
-    name: userData.user.user_metadata.full_name,
-    email: userData.user.email ?? "",
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  user: User;
+}
+
+export async function AppSidebar({ user, ...props }: AppSidebarProps) {
+  const supabase = await createClient();
+  
+  const userData = {
+    name: user.user_metadata.full_name,
+    email: user.email ?? "",
   }
 
   const subscription = await getSubscription(supabase);
@@ -103,7 +104,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
           ? <TokenDisplay tokens={userTokens} />
           : <UpgradeBtn />
         }
-        <NavUser user={user} />
+        <NavUser user={userData} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
