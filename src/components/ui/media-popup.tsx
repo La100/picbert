@@ -160,11 +160,16 @@ export function MediaPopup({
                     <video
                       src={url}
                       controls
-                      autoPlay
-                      loop
-                      muted
+                      preload="metadata"
+                      playsInline
                       className="absolute inset-0 w-full h-full object-contain bg-transparent"
                       onLoadedData={() => setIsLoading(false)}
+                      onLoadStart={() => setIsLoading(true)}
+                      onError={(e) => {
+                        console.error("Video loading error:", e);
+                        toast.error("Error loading video");
+                        setIsLoading(false);
+                      }}
                     />
                   </div>
                 ) : (

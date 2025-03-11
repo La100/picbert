@@ -10,21 +10,6 @@ export const getUser = cache(async (supabase: SupabaseClient) => {
   return user;
 });
 
-// New comprehensive function that fetches both auth user and user details in one call
-// This reduces multiple database calls by combining them
-export const getUserWithDetails = cache(async (supabase: SupabaseClient) => {
-  // Use Promise.all to run both queries concurrently for better performance
-  const [userResponse, userDetailsResponse] = await Promise.all([
-    supabase.auth.getUser(),
-    supabase.from('users').select('*').single()
-  ]);
-
-  return {
-    user: userResponse.data.user,
-    details: userDetailsResponse.data
-  };
-});
-
 export const getSubscription = cache(async (supabase: SupabaseClient) => {
   const { data: subscription } = await supabase
     .from('subscriptions')

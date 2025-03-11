@@ -1,3 +1,5 @@
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { RecentImages } from "@/components/dashboard/RecentImages";
 import { RecentVideos } from "@/components/dashboard/RecentVideos";
@@ -14,6 +16,16 @@ export const metadata: Metadata = {
 };
 
 export default async function Dashboard() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  if (error || !user) {
+    redirect("/login");
+  }
+
   const { data: credits } = await getCredits();
   const { data: images } = await getCachedImages();
   const { data: videos } = await getCachedVideos();
@@ -24,7 +36,7 @@ export default async function Dashboard() {
     <div className="container mx-auto flex-1 space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-4xl font-bold tracking-tight">
-          Welcome back!
+          Welcome back, {user.user_metadata.full_name}
         </h2>
       </div>
       <StatsCards
