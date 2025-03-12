@@ -30,7 +30,7 @@ import {
 import { queueVideoGeneration, getVideoRequestStatus } from "@/app/actions/video-actions";
 import { GalleryImagePicker } from "@/components/gallery/GalleryImagePicker";
 import Image from "next/image";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+
 import { checkSubscriptionStatus } from "@/app/actions/subscription-actions";
 import { getCredits } from "@/app/actions/credit-actions";
 import { VIDEO_TOKEN_COST_5_SEC, VIDEO_TOKEN_COST_10_SEC } from "@/lib/constants";
