@@ -10,31 +10,38 @@ export const metadata: Metadata = {
 };
 
 export default async function VideoLibraryPage() {
-  // Check if user has subscription
+  // Create Supabase client
   const supabase = await createClient();
-  const { data: subscription } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .in('status', ['trialing', 'active'])
-    .maybeSingle();
+  
+  // Get user session
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  // Check if user has an active subscription
+  let hasActiveSubscription = false;
+  
+  if (session) {
+    const { data: subscription } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .eq('status', 'active')
+      .single();
+    
+    hasActiveSubscription = !!subscription;
+  }
 
-  const isSubscribed = !!subscription;
-
-  // Fetch videos from R2 bucket
-  const videos = isSubscribed ? await listVideos() : [];
+  // Fetch videos from R2 bucket (only if user has subscription to avoid unnecessary API calls)
+  const videos = hasActiveSubscription ? await listVideos() : [];
 
   return (
     <div className="container mx-auto p-6">
-      {isSubscribed ? (
+      {hasActiveSubscription ? (
         <VideoLibraryContent videos={videos} />
       ) : (
-        <div className="py-10">
-          <LockedContent
-            title="AI People Library"
-            description="Access our exclusive collection of AI-generated people videos for your projects. Subscribe to unlock this feature and enhance your creative possibilities."
-            onSubscribeClick={undefined}
-          />
-        </div>
+        <LockedContent 
+          title="Video Library" 
+          description="Subscribe to access our exclusive video library content."
+        />
       )}
     </div>
   );

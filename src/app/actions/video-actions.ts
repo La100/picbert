@@ -6,7 +6,7 @@ import { revalidateTag } from "next/cache";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { fal } from "@/lib/fal";
 import { processTokenOperation } from "./token-actions";
-import { VIDEO_TOKEN_COST } from "@/lib/constants";
+import { VIDEO_TOKEN_COST_5_SEC, VIDEO_TOKEN_COST_10_SEC } from "@/lib/constants";
 import { cache } from 'react';
 
 
@@ -286,12 +286,13 @@ export async function deleteVideo(id: string, videoName: string) {
   }
 }
 
-export async function checkAndUpdateVideoCredits(): Promise<{ 
+export async function checkAndUpdateVideoCredits(duration: "5" | "10" = "5"): Promise<{ 
   hasCredits: boolean; 
   credits: Database["public"]["Tables"]["credits"]["Row"] | null;
   error: string | null;
 }> {
-  return processTokenOperation('deduct', VIDEO_TOKEN_COST, 'video generation');
+  const tokenCost = duration === "5" ? VIDEO_TOKEN_COST_5_SEC : VIDEO_TOKEN_COST_10_SEC;
+  return processTokenOperation('deduct', tokenCost, `${duration}-second video generation`);
 }
 
 export async function queueVideoGeneration(

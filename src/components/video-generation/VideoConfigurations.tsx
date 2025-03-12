@@ -33,7 +33,7 @@ import Image from "next/image";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { checkSubscriptionStatus } from "@/app/actions/subscription-actions";
 import { getCredits } from "@/app/actions/credit-actions";
-import { VIDEO_TOKEN_COST } from "@/lib/constants";
+import { VIDEO_TOKEN_COST_5_SEC, VIDEO_TOKEN_COST_10_SEC } from "@/lib/constants";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -57,6 +57,8 @@ const VideoConfigurations = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const inputImageFromUrl = searchParams.get('input_image');
+  const [selectedDuration, setSelectedDuration] = useState<"5" | "10">("5");
+  const [tokenCost, setTokenCost] = useState<number>(VIDEO_TOKEN_COST_5_SEC);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -74,6 +76,24 @@ const VideoConfigurations = () => {
       form.setValue("input_image", inputImageFromUrl);
     }
   }, [inputImageFromUrl, form]);
+
+  // Effect to update token cost when duration changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "duration") {
+        const duration = value.duration as "5" | "10";
+        setSelectedDuration(duration);
+        setTokenCost(duration === "5" ? VIDEO_TOKEN_COST_5_SEC : VIDEO_TOKEN_COST_10_SEC);
+      }
+    });
+    
+    // Set initial values
+    const currentDuration = form.getValues("duration") as "5" | "10";
+    setSelectedDuration(currentDuration);
+    setTokenCost(currentDuration === "5" ? VIDEO_TOKEN_COST_5_SEC : VIDEO_TOKEN_COST_10_SEC);
+    
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   useEffect(() => {
     const checkStatus = async () => {
@@ -106,9 +126,12 @@ const VideoConfigurations = () => {
     try {
       setLoading(true);
       
+      // Calculate token cost based on duration
+      const cost = values.duration === "5" ? VIDEO_TOKEN_COST_5_SEC : VIDEO_TOKEN_COST_10_SEC;
+      
       // Check if user has enough tokens for video generation
-      if (tokenCount !== null && tokenCount < VIDEO_TOKEN_COST) {
-        toast.error(`Not enough tokens. Video generation requires ${VIDEO_TOKEN_COST} tokens.`);
+      if (tokenCount !== null && tokenCount < cost) {
+        toast.error(`Not enough tokens. ${values.duration}-second video generation requires ${cost} tokens.`);
         setLoading(false);
         return;
       }
@@ -119,7 +142,7 @@ const VideoConfigurations = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ amount: VIDEO_TOKEN_COST }),
+        body: JSON.stringify({ amount: cost }),
         cache: 'no-store',
       })
       .then(response => {
@@ -235,24 +258,13 @@ const VideoConfigurations = () => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="grid w-full max-w-2xl mx-auto items-start gap-6 xl:pt-20"
         >
-          {isSubscribed === false && (
-            <Alert className="bg-gradient-to-r from-amber-50 to-red-50 border-amber-200">
-              <AlertTitle className="text-amber-800">Try Video Generation</AlertTitle>
-              <AlertDescription className="text-amber-700">
-                You can explore the video generation interface, but generating videos requires a subscription.
-                <br />
-                <a href="/billing" className="underline font-medium">Subscribe now</a> to unlock this powerful feature.
-              </AlertDescription>
-            </Alert>
-          )}
-          
           <fieldset className="grid gap-6 rounded-lg border p-4 bg-white">
             <legend className="-ml-1 px-1 text-base font-medium">Video Generation</legend>
 
             <div className="flex justify-between items-center">
               <div className="text-sm font-medium">Available Tokens: <span className="font-bold">{tokenCount || 0}</span></div>
               <div className="text-sm bg-purple-50 text-purple-700 px-3 py-1 rounded-full font-medium">
-                Cost: {VIDEO_TOKEN_COST} tokens per video
+                Cost: {tokenCost} tokens for {selectedDuration}s video
               </div>
             </div>
 
@@ -387,7 +399,7 @@ const VideoConfigurations = () => {
             <div className="space-y-2">
               <Button 
                 type="submit" 
-                disabled={loading || isUploading || isSubscribed === false} 
+                disabled={loading || isUploading} 
                 className="w-full font-medium gap-2"
               >
                 {loading ? "Processing..." : (
@@ -397,9 +409,9 @@ const VideoConfigurations = () => {
                   </>
                 )}
               </Button>
-              {isSubscribed === false && (
+              {tokenCount !== null && tokenCount < tokenCost && (
                 <p className="text-xs text-center text-muted-foreground">
-                  Please subscribe to generate videos
+                  Not enough tokens. You need {tokenCost} tokens to generate a {selectedDuration}-second video.
                 </p>
               )}
             </div>

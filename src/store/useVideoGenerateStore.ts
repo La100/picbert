@@ -35,9 +35,9 @@ const useVideoGenerateStore = create<VideoGenerateStore>((set) => ({
       const toastId = toast.loading('Processing generated video...');
 
       // Check credits before proceeding
-      const creditCheck = await checkAndUpdateVideoCredits();
+      const creditCheck = await checkAndUpdateVideoCredits(data.data.video.duration);
       if (!creditCheck.hasCredits) {
-        toast.error(creditCheck.error || "No video credits available", { id: toastId });
+        toast.error(creditCheck.error || `No video credits available for ${data.data.video.duration}-second video`, { id: toastId });
         set({ loading: false });
         return;
       }

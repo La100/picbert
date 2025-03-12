@@ -7,14 +7,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 const PROTECTED_ROUTES = [
   '/dashboard',
   '/image-generation',
- 
   '/gallery',
   '/billing',
   '/account-settings',
-  
-  '/video-generation',
-  '/video-library',
- 
 ]
 
 // Routes that require subscription for full functionality
