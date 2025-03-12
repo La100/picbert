@@ -3,16 +3,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { ClientVideo } from "@/app/actions/client-video-actions";
-import { Badge } from "@/components/ui/badge";
+import { VideoData } from "@/lib/cloudflare/r2";
 import { MediaPopup } from "../ui/media-popup";
 
 interface VideoLibraryGridProps {
-  videos: ClientVideo[];
+  videos: VideoData[];
 }
 
 export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
-  const [selectedVideo, setSelectedVideo] = useState<ClientVideo | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
 
   return (
     <>
@@ -29,25 +28,13 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
             <div 
               className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
             >
-              <Image 
-                src={video.poster_url || `${video.video_url}#t=0.001`}
-                alt="Video thumbnail"
-                fill
+              <video
+                src={video.video_url}
                 className="w-full h-full object-cover"
-                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                quality={80}
-                priority={index < 4}
+                preload="metadata"
+                playsInline
+                muted
               />
-              
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
-                <div className="flex flex-wrap gap-1">
-                  {video.tags.map((tag: string) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
             </div>
           </motion.div>
         ))}
@@ -57,8 +44,6 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
         <MediaPopup
           url={selectedVideo.video_url}
           onClose={() => setSelectedVideo(null)}
-     
-       
           type="video"
         />
       )}

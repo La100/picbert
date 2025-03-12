@@ -21,7 +21,7 @@ const S3 = new S3Client({
 export interface VideoData {
   id: string;
   video_url: string;
-  tags: string[];
+  poster_url: string;
   lastModified?: Date;
   size?: number;
 }
@@ -35,14 +35,12 @@ export async function listVideos(): Promise<VideoData[]> {
     const response = await S3.send(command);
     const videos = response.Contents?.map((object) => {
       const key = object.Key || '';
-      // Extract tags from the filename or key structure
-      // Assuming files are named like: category1-category2-filename.mp4
-      const tags = key.split('.')[0].split('-').slice(0, -1);
+      const videoUrl = `https://bucket.facesfactory.com/${encodeURIComponent(key)}`;
       
       return {
         id: key,
-        video_url: `https://${R2_BUCKET_NAME}.${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${key}`,
-        tags: tags.length > 0 ? tags : ['uncategorized'],
+        video_url: videoUrl,
+        poster_url: `${videoUrl}?poster=true`,
         lastModified: object.LastModified,
         size: object.Size,
       };

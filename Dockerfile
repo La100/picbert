@@ -1,4 +1,5 @@
 FROM node:20-alpine AS base
+RUN npm install -g pnpm
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -6,8 +7,8 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies
-COPY package.json bun.lock ./
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -22,7 +23,7 @@ ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 # Build the project
-RUN npm run build
+RUN pnpm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner

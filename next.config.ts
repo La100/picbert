@@ -36,7 +36,7 @@ const nextConfig:NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "facesfactory.bb4be4706863711bab16632895c4fab3.r2.cloudflarestorage.com", // Update this to your supabase url
+        hostname: "bucket.facesfactory.com", // Update this to your supabase url
       },
     ],
   },
