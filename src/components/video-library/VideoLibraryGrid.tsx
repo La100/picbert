@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
+
 import { VideoData } from "@/lib/cloudflare/r2";
 import { MediaPopup } from "../ui/media-popup";
 
