@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import { VideoLibraryContent } from "@/components/video-library/VideoLibraryContent";
-import { videoLibraryData } from "@/data/video-library";
 import { LockedContent } from "@/components/ui/locked-content";
 import { createClient } from "@/lib/supabase/server";
+import { listVideos } from "@/lib/cloudflare/r2";
 
 export const metadata: Metadata = {
   title: "Video Library | Faces Factory",
@@ -20,10 +20,13 @@ export default async function VideoLibraryPage() {
 
   const isSubscribed = !!subscription;
 
+  // Fetch videos from R2 bucket
+  const videos = isSubscribed ? await listVideos() : [];
+
   return (
     <div className="container mx-auto p-6">
       {isSubscribed ? (
-        <VideoLibraryContent videos={videoLibraryData} />
+        <VideoLibraryContent videos={videos} />
       ) : (
         <div className="py-10">
           <LockedContent

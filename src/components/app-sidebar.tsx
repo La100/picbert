@@ -68,6 +68,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const user = {
     name: userData.user.user_metadata.full_name,
     email: userData.user.email ?? "",
+    picture: userData.user.user_metadata.picture ?? null,
   }
 
   const subscription = await getSubscription(supabase);

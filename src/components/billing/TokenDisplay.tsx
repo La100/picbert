@@ -42,7 +42,7 @@ export default function TokenDisplay({ tokens }: TokenDisplayProps) {
         "border border-border/40"
       )}>
         <Coins className="h-4 w-4 text-primary" />
-        <span>{displayTokens.toLocaleString()} Tokens</span>
+        <span>{displayTokens.toLocaleString('en-US')} Tokens</span>
       </div>
     </Link>
   )
