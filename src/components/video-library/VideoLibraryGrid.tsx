@@ -32,6 +32,7 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
                 src={video.video_url}
                 className="w-full h-full object-cover"
                 preload="metadata"
+                poster={`${video.video_url}?poster=true`}
                 playsInline
                 muted
               />
