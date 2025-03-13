@@ -163,9 +163,9 @@ export async function getPresignedStorageUrl(filePath: string) {
 
 export async function getImages(page: number = 1, limit: number = 12) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
 
-  if (!user) {
+  if (!session?.user) {
     return {
       error: "User not authenticated",
       success: false,
@@ -180,7 +180,7 @@ export async function getImages(page: number = 1, limit: number = 12) {
   const { data, error, count } = await supabase
     .from("generated_images")
     .select("*", { count: "exact" })
-    .eq("user_id", user.id)
+    .eq("user_id", session.user.id)
     .order("created_at", { ascending: false })
     .range(start, end);
 
@@ -199,7 +199,7 @@ export async function getImages(page: number = 1, limit: number = 12) {
         const { data: urlData } = supabase
           .storage
           .from("generated_images")
-          .getPublicUrl(`${user.id}/${image.image_name}`);
+          .getPublicUrl(`${session.user.id}/${image.image_name}`);
 
         return {
           ...image,
@@ -229,10 +229,9 @@ export const getCachedImages = cache(async (page?: number, limit: number = 12) =
 
 export async function deleteImage(id: string, imageName: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
 
-  if (!user) {
-    // throw new Error("Unauthorized");
+  if (!session?.user) {
     return {
       error: "Unauthorized",
       success: false,
@@ -243,14 +242,14 @@ export async function deleteImage(id: string, imageName: string) {
   const { error, data } = await supabase.from("generated_images").delete().eq(
     "id",
     id,
-  ).eq("user_id", user.id);
+  ).eq("user_id", session.user.id);
 
   if (error) {
     return { error: error.message, success: false, data: null };
   }
 
   await supabase.storage.from("generated_images").remove([
-    `${user.id}/${imageName}`,
+    `${session.user.id}/${imageName}`,
   ]);
 
   revalidateTag("dashboard-images");

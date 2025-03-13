@@ -25,6 +25,9 @@ const useTokenStore = create<TokenState>((set) => ({
   refreshTokens: async () => {
     try {
       set({ isLoading: true, error: null });
+      
+      // Get fresh data by calling getCredits
+      // getCredits is already configured to use no-store caching strategy
       const credits = await getCredits();
       
       if (credits.success && credits.data) {

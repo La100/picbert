@@ -2,7 +2,7 @@ import Pricing from "@/components/landing-page/Pricing";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { getUser, getProducts } from "@/lib/supabase/queries";
+import { getProducts } from "@/lib/supabase/queries";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Navigation from "@/components/landing-page/Navigation";
@@ -22,12 +22,12 @@ export default async function Home() {
   const supabase = await createClient();
 
   // Here Promise.all() takes an array of promises and returns a single promise.  It's a performance optimization technique that runs all promises in parallel rather than sequentially. The results are destructured into three variables: user, products, and subscription
-  const [user, products] = await Promise.all([
-    getUser(supabase), // Gets the currently authenticated user
+  const [session, products] = await Promise.all([
+    supabase.auth.getSession(), // Gets the current session
     getProducts(supabase), // Gets all active products with their prices
   ]);
 
-  if (user) {
+  if (session.data.session?.user) {
     return redirect("/dashboard");
   }
 

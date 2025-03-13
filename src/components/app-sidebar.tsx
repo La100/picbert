@@ -63,14 +63,14 @@ const navMain =  [
 
 export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const supabase = await createClient()
-  const { data:userData, error } = await supabase.auth.getUser()
-  if (error || !userData?.user) {
+  const { data: { session }, error } = await supabase.auth.getSession()
+  if (error || !session?.user) {
     redirect('/login')
   }
   const user = {
-    name: userData.user.user_metadata.full_name,
-    email: userData.user.email ?? "",
-    picture: userData.user.user_metadata.picture ?? null,
+    name: session.user.user_metadata.full_name,
+    email: session.user.email ?? "",
+    picture: session.user.user_metadata.picture ?? null,
   }
 
   const subscription = await getSubscription(supabase);

@@ -13,10 +13,9 @@ interface CreditResponse {
 export async function getCredits(): Promise<CreditResponse> {
 
   const cacheOptions = {
-    cache: 'force-cache',
+    cache: 'no-store',
     next: {
-      tags: ['credits'],
-      revalidate: 300 // 5 minutes
+      tags: ['credits']
     }
   }
 

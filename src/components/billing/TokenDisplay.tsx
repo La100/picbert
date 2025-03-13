@@ -15,14 +15,20 @@ export default function TokenDisplay({ tokens }: TokenDisplayProps) {
   const { isMobile, setOpenMobile } = useSidebar()
   const { tokenCount, setTokenCount, refreshTokens } = useTokenStore()
   
-  // Inicjalizacja stanu przy pierwszym renderowaniu
+  // Always refresh tokens when component mounts to avoid cached values
   useEffect(() => {
-    if (tokenCount === null) {
-      setTokenCount(tokens);
-      // Odświeżanie przy montowaniu komponentu
+    // Initialize with props value
+    setTokenCount(tokens);
+    // Always refresh tokens on mount to get latest data
+    refreshTokens();
+    
+    // Set up interval to refresh tokens every 30 seconds while sidebar is open
+    const refreshInterval = setInterval(() => {
       refreshTokens();
-    }
-  }, [tokens, tokenCount, setTokenCount, refreshTokens]);
+    }, 30000);
+    
+    return () => clearInterval(refreshInterval);
+  }, [tokens, setTokenCount, refreshTokens]);
 
   const handleClick = () => {
     // Close the mobile sidebar when clicked
@@ -31,7 +37,7 @@ export default function TokenDisplay({ tokens }: TokenDisplayProps) {
     }
   }
 
-  // Użyj globalnego stanu tokenCount, jeśli istnieje, w przeciwnym razie użyj props tokens
+  // Use global state tokenCount if available, otherwise use props tokens
   const displayTokens = tokenCount !== null ? tokenCount : tokens;
 
   return (

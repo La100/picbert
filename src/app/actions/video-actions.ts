@@ -121,9 +121,9 @@ export async function storeVideo(
 
 export async function getVideos(page: number = 1, pageSize: number = 12) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
 
-  if (!user) {
+  if (!session?.user) {
     return {
       error: "User not authenticated",
       success: false,
@@ -135,7 +135,7 @@ export async function getVideos(page: number = 1, pageSize: number = 12) {
   let query = supabase
     .from("generated_videos")
     .select("*", { count: "exact" })
-    .eq("user_id", user.id)
+    .eq("user_id", session.user.id)
     .order("created_at", { ascending: false });
 
   if (page && pageSize) {
@@ -162,7 +162,7 @@ export async function getVideos(page: number = 1, pageSize: number = 12) {
       const { data: videoUrlData } = supabase
         .storage
         .from("generated_videos")
-        .getPublicUrl(`${user.id}/${video.video_name}`);
+        .getPublicUrl(`${session.user.id}/${video.video_name}`);
 
       // Obsługa input_image
       let imageUrl = video.input_image;
@@ -177,7 +177,7 @@ export async function getVideos(page: number = 1, pageSize: number = 12) {
         const { data: imageUrlData } = supabase
           .storage
           .from("generated_images")
-          .getPublicUrl(`${user.id}/${imageName}`);
+          .getPublicUrl(`${session.user.id}/${imageName}`);
           
         imageUrl = imageUrlData.publicUrl;
       } 
@@ -231,9 +231,9 @@ export const getCachedVideos = cache(async (page: number = 1, pageSize: number =
 
 export async function deleteVideo(id: string, videoName: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
 
-  if (!user) {
+  if (!session?.user) {
     return {
       error: "Unauthorized",
       success: false,
@@ -245,7 +245,7 @@ export async function deleteVideo(id: string, videoName: string) {
     // First check if the file exists in storage
     const { data: storageFiles } = await supabase.storage
       .from("generated_videos")
-      .list(user.id);
+      .list(session.user.id);
 
     const fileExists = storageFiles?.some(file => file.name === videoName);
 
@@ -254,7 +254,7 @@ export async function deleteVideo(id: string, videoName: string) {
       .from("generated_videos")
       .delete()
       .eq("id", id)
-      .eq("user_id", user.id);
+      .eq("user_id", session.user.id);
 
     if (dbError) {
       return { error: dbError.message, success: false, data: null };
@@ -264,7 +264,7 @@ export async function deleteVideo(id: string, videoName: string) {
     if (fileExists) {
       const { error: storageError } = await supabase.storage
         .from("generated_videos")
-        .remove([`${user.id}/${videoName}`]);
+        .remove([`${session.user.id}/${videoName}`]);
 
       if (storageError) {
         console.error("Storage deletion error:", storageError);
