@@ -13,11 +13,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import useVideoGenerateStore from "@/store/useVideoGenerateStore";
 import { fal } from "@/lib/fal";
 import { toast } from "sonner";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import {
   Select,
@@ -26,12 +26,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { queueVideoGeneration, getVideoRequestStatus } from "@/app/actions/video-actions";
 import { GalleryImagePicker } from "@/components/gallery/GalleryImagePicker";
 import Image from "next/image";
 
-import { checkSubscriptionStatus } from "@/app/actions/subscription-actions";
 import { getCredits } from "@/app/actions/credit-actions";
 import { VIDEO_TOKEN_COST_5_SEC, VIDEO_TOKEN_COST_10_SEC } from "@/lib/constants";
 
@@ -51,7 +51,6 @@ type FormValues = z.infer<typeof formSchema>;
 const VideoConfigurations = () => {
   const loading = useVideoGenerateStore((state) => state.loading);
   const setLoading = useVideoGenerateStore((state) => state.setLoading);
-  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
   const [isUploading, setIsUploading] = React.useState(false);
   const [tokenCount, setTokenCount] = useState<number | null>(null);
   const searchParams = useSearchParams();
@@ -97,9 +96,6 @@ const VideoConfigurations = () => {
 
   useEffect(() => {
     const checkStatus = async () => {
-      const { isSubscribed } = await checkSubscriptionStatus();
-      setIsSubscribed(isSubscribed);
-      
       const credits = await getCredits();
       if (credits.success && credits.data) {
         setTokenCount(credits.data.tokens || 0);
