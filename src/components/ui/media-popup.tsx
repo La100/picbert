@@ -162,6 +162,9 @@ export function MediaPopup({
                       controls
                       preload="metadata"
                       playsInline
+                      autoPlay
+                      loop
+                      muted
                       className="absolute inset-0 w-full h-full object-contain bg-transparent"
                       onLoadedData={() => setIsLoading(false)}
                       onLoadStart={() => setIsLoading(true)}
