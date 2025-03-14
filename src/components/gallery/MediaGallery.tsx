@@ -77,14 +77,12 @@ export function MediaGallery({ items, currentPage, totalCount, pageSize }: Media
               <div 
                 className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
               >
-                <Image
-                  src={item.input_image || ""}
-                  alt={item.prompt || "Video thumbnail"}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                  quality={80}
-                  priority={index < 4}
+                <video
+                  src={`${item.url}#t=0.1`}
+                  className="w-full h-full object-cover"
+                  preload="metadata"
+                  playsInline
+                  muted
                 />
               </div>
             </motion.div>

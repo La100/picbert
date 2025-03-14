@@ -26,7 +26,10 @@ export default async function VideosGalleryPage({ searchParams }: PageProps) {
   const pageSize = 12;
 
   const videos = await getCachedVideos(currentPage, pageSize);
-  const videosWithType = videos.data?.map(video => ({ ...video, type: 'video' as const })) || [];
+  const videosWithType = videos.data?.map(video => ({ 
+    ...video, 
+    type: 'video' as const 
+  })) || [];
 
   return (
     <div className="container mx-auto">
