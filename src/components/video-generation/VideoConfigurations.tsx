@@ -258,9 +258,9 @@ const VideoConfigurations = () => {
             <legend className="-ml-1 px-1 text-base font-medium">Video Generation</legend>
 
             <div className="flex justify-between items-center">
-              <div className="text-sm font-medium">Available Tokens: <span className="font-bold">{tokenCount || 0}</span></div>
+              <div className="text-sm font-medium ">Available Tokens: <span className="font-bold">{tokenCount }</span></div>
               <div className="text-sm bg-purple-50 text-purple-700 px-3 py-1 rounded-full font-medium">
-                Cost: {tokenCost} tokens for {selectedDuration}s video
+                Cost: {tokenCost} tokens
               </div>
             </div>
 

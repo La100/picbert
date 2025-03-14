@@ -41,11 +41,28 @@ export function MediaPopup({
     try {
       if (!url) return;
 
+      // Determine file extension based on URL or type
+      const getFileExtension = (): string => {
+        if (type === 'video') return 'mp4';
+        
+        // Check if URL contains extension information
+        if (url.toLowerCase().includes('.jpg') || url.toLowerCase().includes('.jpeg')) {
+          return 'jpg';
+        }
+        
+        return 'png'; // Default image extension
+      };
+      
+      const fileExtension = getFileExtension();
+      const mimeType = type === 'video' ? 'video/mp4' : 
+                      (fileExtension === 'jpg') ? 'image/jpeg' : 'image/png';
+
       if (navigator.share && /mobile|android|ios/i.test(navigator.userAgent)) {
         const response = await fetch(url);
         const blob = await response.blob();
-        const file = new File([blob], `file.${type === 'video' ? 'mp4' : 'png'}`, { 
-          type: type === 'video' ? 'video/mp4' : 'image/png' 
+        
+        const file = new File([blob], `file.${fileExtension}`, { 
+          type: mimeType 
         });
         
         await navigator.share({
@@ -58,7 +75,7 @@ export function MediaPopup({
         const downloadUrl = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
-        a.download = `file.${type === 'video' ? 'mp4' : 'png'}`;
+        a.download = `file.${fileExtension}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(downloadUrl);

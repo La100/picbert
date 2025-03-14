@@ -191,7 +191,7 @@ const Configurations = () => {
           <legend className="-ml-1 px-1 text-base font-medium">Image Generation</legend>
 
           <div className="flex justify-between items-center">
-            <div className="text-sm font-medium">Available Tokens: <span className="font-bold">{tokenCount || 0}</span></div>
+            <div className="text-sm font-medium">Available Tokens: <span className="font-bold">{tokenCount}</span></div>
             <div className="text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">
               Cost: {IMAGE_TOKEN_COST} tokens per image
             </div>
