@@ -383,7 +383,7 @@ const VideoConfigurations = () => {
                     <Textarea 
                       {...field} 
                       rows={6} 
-                      placeholder="Describe your imagination..."
+                    
                       className="bg-white font-medium"
                     />
                   </FormControl>

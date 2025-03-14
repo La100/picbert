@@ -24,9 +24,7 @@ import {
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import UpgradeBtn from "./billing/UpgradeBtn"
-import TokenDisplay from "./billing/TokenDisplay"
 import { getSubscription } from "@/lib/supabase/queries"
-import { getCredits } from "@/app/actions/credit-actions"
 
 const navMain =  [
     {
@@ -76,10 +74,6 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const subscription = await getSubscription(supabase);
   const currentPlanName = subscription?.prices.products.name || "Free";
   
-  // Get user tokens
-  const creditsResponse = await getCredits();
-  const userTokens = creditsResponse.data?.tokens || 0;
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -103,7 +97,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
       </SidebarContent>
       <SidebarFooter>
         {subscription?.status === 'active' 
-          ? <TokenDisplay tokens={userTokens} />
+          ? null
           : <UpgradeBtn />
         }
         <NavUser user={user} />

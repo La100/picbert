@@ -27,10 +27,8 @@ export default async function Dashboard() {
   }
 
   const { data: credits } = await getCredits();
-  const { data: images } = await getCachedImages();
-  const { data: videos } = await getCachedVideos();
-  const imageCount = images?.length || 0;
-  const videoCount = videos?.length || 0;
+  const { data: images, count: imageCount } = await getCachedImages();
+  const { data: videos, count: videoCount } = await getCachedVideos();
 
   return (
     <div className="container mx-auto flex-1 space-y-6">
