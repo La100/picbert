@@ -8,7 +8,7 @@ import { deleteVideo } from "@/app/actions/video-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { PaginationComponent } from "../ui/pagination";
-import Image from "next/image";
+
 import { EmptyState } from "../ui/empty-state";
 
 type VideoItem = {
