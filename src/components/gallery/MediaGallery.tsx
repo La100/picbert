@@ -8,7 +8,7 @@ import { deleteVideo } from "@/app/actions/video-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { PaginationComponent } from "../ui/pagination";
-
+import Image from "next/image";
 import { EmptyState } from "../ui/empty-state";
 
 type VideoItem = {
@@ -78,9 +78,9 @@ export function MediaGallery({ items, currentPage, totalCount, pageSize }: Media
                 className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
               >
                 <video
-                  src={`${item.url}#t=0.1`}
-                  className="w-full h-full object-cover"
+                  src={item.url || ""}
                   preload="metadata"
+                  className="absolute inset-0 w-full h-full object-cover"
                   playsInline
                   muted
                 />

@@ -28,7 +28,7 @@ export function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
               className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
             >
               <video
-                src={`${video.video_url}#t=0.1`}
+                src={video.video_url}
                 className="w-full h-full object-cover"
                 preload="metadata"
                 playsInline
