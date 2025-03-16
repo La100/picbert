@@ -81,7 +81,7 @@ export function MediaGallery({ items, currentPage, totalCount, pageSize }: Media
                   src={item.url || ""}
                   preload="metadata"
                   className="absolute inset-0 w-full h-full object-cover"
-                  playsInline
+                
                   muted
                 />
               </div>

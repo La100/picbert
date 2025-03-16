@@ -34,7 +34,7 @@ export default async function VideoLibraryPage() {
   const videos = hasActiveSubscription ? await listVideos() : [];
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto">
       {hasActiveSubscription ? (
         <VideoLibraryContent videos={videos} />
       ) : (
