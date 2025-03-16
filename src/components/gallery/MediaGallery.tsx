@@ -83,7 +83,7 @@ export function MediaGallery({ items, currentPage, totalCount, pageSize }: Media
                   poster={item.url || ""}
                   muted
                 >
-                  <source src={`${item.url || ""}#t=0.001`} type="video/mp4" />
+                  <source src={`${item.url || ""}`} type="video/mp4" />
                 </video>
               </div>
             </motion.div>
