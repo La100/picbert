@@ -63,7 +63,7 @@ export function Gallery({ images, currentPage, totalCount, pageSize = 12 }: Gall
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -77,18 +77,18 @@ export function Gallery({ images, currentPage, totalCount, pageSize = 12 }: Gall
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.1 }}
+              className="aspect-auto w-full"
             >
               <div
-                className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16]"
+                className="relative overflow-hidden rounded-lg cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] aspect-[9/16] w-full"
                 onClick={() => setSelectedImage(image)}
               >
                 <Image
                   src={image.url || "/placeholder-image.png"}
                   alt={image.prompt || "Generated image"}
                   fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                  quality={80}
+                  className="object-cover w-full h-full"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   priority={index < 4}
                   onError={() => {
                     const imgElement = document.querySelector(`[src="${image.url}"]`) as HTMLImageElement;
