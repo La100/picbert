@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import useVideoGenerateStore from "@/store/useVideoGenerateStore";
+import useTokenStore from "@/store/useTokenStore";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
@@ -51,6 +52,7 @@ type FormValues = z.infer<typeof formSchema>;
 const VideoConfigurations = () => {
   const loading = useVideoGenerateStore((state) => state.loading);
   const setLoading = useVideoGenerateStore((state) => state.setLoading);
+  const { refreshTokens } = useTokenStore();
   const [isUploading, setIsUploading] = React.useState(false);
   const [tokenCount, setTokenCount] = useState<number | null>(null);
   const searchParams = useSearchParams();
@@ -177,9 +179,8 @@ const VideoConfigurations = () => {
 
       const finalPrompt = values.prompt;
 
-      toast.info("Starting video generation. This process takes around 5 minutes...", {
-        duration: 10000,
-      });
+      // Show persistent loading toast
+      const toastId = toast.loading("Starting video generation. This process takes around 5 minutes...");
 
       // Queue the video generation
       const result = await queueVideoGeneration({
@@ -190,10 +191,12 @@ const VideoConfigurations = () => {
       });
 
       if (!result.success || result.error) {
+        toast.error(result.error || "Failed to queue video generation", { id: toastId });
         throw new Error(result.error || "Failed to queue video generation");
       }
 
       if (!result.data?.request_id) {
+        toast.error("No request ID returned", { id: toastId });
         throw new Error("No request ID returned");
       }
 
@@ -205,32 +208,43 @@ const VideoConfigurations = () => {
         if (status.error) {
           clearInterval(pollInterval);
           setLoading(false);
-          toast.error(status.error);
+          
+          // Check if this is the NSFW filter case
+          if (status.data?.error && typeof status.data.error === 'string' && status.data.error.includes("Content flagged by NSFW filter")) {
+            toast.error("Content was flagged by NSFW filter. Only 10 tokens have been charged.", { 
+              id: toastId,
+              duration: 6000 
+            });
+            
+            // Update token count after partial refund
+            refreshTokens();
+          } else {
+            toast.error(status.error, { id: toastId });
+          }
           return;
         }
 
         // Handle different statuses
         switch (status.data?.status) {
           case "processing":
-            toast.info("Processing your video...", { id: "video-status" });
+            toast.loading("Processing your video...", { id: toastId });
             break;
           case "completed":
             clearInterval(pollInterval);
             setLoading(false);
-            toast.success("Video generated successfully!");
-            // Instead of using revalidateTag, refresh the page or navigate
+            toast.success("Video generated successfully!", { id: toastId });
             router.refresh(); // This will refresh the current route
             break;
           case "failed":
             clearInterval(pollInterval);
             setLoading(false);
-            toast.error(String(status.error || "Failed to generate video"));
+            toast.error(String(status.error || "Failed to generate video"), { id: toastId });
             break;
           case "pending":
-            toast.info("Your video is queued...", { id: "video-status" });
+            toast.loading("Your video is queued...", { id: toastId });
             break;
           default:
-            toast.info("Checking video status...", { id: "video-status" });
+            toast.loading("Checking video status...", { id: toastId });
         }
       }, 5000); // Poll every 5 seconds
 
@@ -239,7 +253,7 @@ const VideoConfigurations = () => {
         clearInterval(pollInterval);
         if (loading) {
           setLoading(false);
-          toast.error("Video generation timed out. Please try again.");
+          toast.error("Video generation timed out. Please try again.", { id: toastId });
         }
       }, 10 * 60 * 1000);
 
