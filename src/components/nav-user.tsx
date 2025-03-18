@@ -58,12 +58,12 @@ export function NavUser({
               {user.picture ? (
                 <Avatar className="h-8 w-8 rounded-full">
                   <AvatarImage src={user.picture} alt={user.name} />
-                  <AvatarFallback className="rounded-full font-medium bg-primary text-primary-foreground text-xs">{user?.name && user?.name?.split(" ").map(name => name[0]).join("")}</AvatarFallback>
+                  <AvatarFallback className="rounded-full font-medium bg-primary text-primary-foreground text-sm">{user?.name && user?.name?.split(" ").map(name => name[0]).join("")}</AvatarFallback>
                 </Avatar>
               ) : null}
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate text-sm">{user.email}</span>
               </div>
               <Settings className="ml-auto size-4" />
             </SidebarMenuButton>

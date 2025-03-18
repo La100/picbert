@@ -17,7 +17,7 @@ export function PromptStarterSelector({ onSelect }: PromptStarterProps) {
             e.stopPropagation();
             onSelect(starter.prompt);
           }}
-          className="relative group overflow-hidden rounded-lg hover:ring-1 hover:ring-primary transition-all w-[100px] h-[100px]"
+          className="relative group overflow-hidden rounded-lg hover:ring-1 hover:ring-primary transition-all w-[100px] h-[179px]"
         >
           <div className="relative w-full h-full">
             <Image
@@ -25,7 +25,7 @@ export function PromptStarterSelector({ onSelect }: PromptStarterProps) {
               alt={starter.name}
               fill
               className="object-cover"
-              sizes="100px"
+           
             />
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <span className="text-white text-sm font-medium px-1 text-center">
