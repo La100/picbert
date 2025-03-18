@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import useVideoGenerateStore from "@/store/useVideoGenerateStore";
-import { fal } from "@/lib/fal";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
@@ -31,9 +30,10 @@ import {
 import { queueVideoGeneration, getVideoRequestStatus } from "@/app/actions/video-actions";
 import { GalleryImagePicker } from "@/components/gallery/GalleryImagePicker";
 import Image from "next/image";
-
+import { uploadInputImage } from "@/lib/supabase/queries";
 import { getCredits } from "@/app/actions/credit-actions";
 import { VIDEO_TOKEN_COST_5_SEC, VIDEO_TOKEN_COST_10_SEC } from "@/lib/constants";
+import { createClient } from "@/lib/supabase/client";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -108,7 +108,17 @@ const VideoConfigurations = () => {
   const handleFileUpload = useCallback(async (file: File) => {
     try {
       setIsUploading(true);
-      const url = await fal.storage.upload(file);
+      
+      // Get the current user ID
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+      
+      // Upload to inputimage bucket instead of FAL
+      const url = await uploadInputImage(user.id, file, file.name);
       form.setValue("input_image", url);
     } catch (error) {
       console.error("Upload error:", error);

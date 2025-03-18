@@ -164,11 +164,16 @@ export async function getVideos(page: number = 1, pageSize: number = 12) {
         .from("generated_videos")
         .getPublicUrl(`${session.user.id}/${video.video_name}`);
 
-      // Obsługa input_image
+      // Handle input_image
       let imageUrl = video.input_image;
       
-      // Jeśli input_image jest ścieżką do pliku w storage
-      if (video.input_image && !video.input_image.startsWith('http')) {
+      // If input_image is from the inputimage bucket
+      if (video.input_image && video.input_image.includes('inputimage')) {
+        // The URL is already correct - public bucket with RLS
+        imageUrl = video.input_image;
+      }
+      // If input_image is a path to a file in storage (generated_images bucket - legacy flow)
+      else if (video.input_image && !video.input_image.startsWith('http')) {
         // Extract image name from the input_image URL if it's a path
         const imageMatch = video.input_image.match(/\/([^\/]+?)(?:\?|$)/);
         const imageName = imageMatch ? imageMatch[1] : video.input_image;
@@ -181,9 +186,9 @@ export async function getVideos(page: number = 1, pageSize: number = 12) {
           
         imageUrl = imageUrlData.publicUrl;
       } 
-      // Jeśli input_image jest już pełnym URL-em
+      // If input_image is already a full URL (signed URL - legacy flow)
       else if (video.input_image && video.input_image.includes('supabase.co/storage/v1/object/sign')) {
-        // Zamień signed URL na public URL
+        // Convert signed URL to public URL
         const urlParts = video.input_image.split('/');
         const bucketIndex = urlParts.findIndex((part: string) => part === 'storage') + 2;
         const pathIndex = bucketIndex + 1;
