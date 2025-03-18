@@ -3,24 +3,18 @@ import { MediaGallery } from "@/components/gallery/MediaGallery";
 import { getCachedVideos } from "@/app/actions/video-actions";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { GallerySkeleton } from "@/components/gallery/GallerySkeleton";
 
 export const metadata: Metadata = {
   title: "Videos Gallery | Faces Factory",
   description: "Videos Gallery for Faces Factory",
 };
 
-const GalleryLoading = () => (
-  <div className="flex items-center justify-center h-[50vh]">
-    <LoadingSpinner size="lg" />
-  </div>
-);
-
 interface PageProps {
   searchParams: Promise<{ page?: string }>;
 }
 
-export default async function VideosGalleryPage({ searchParams }: PageProps) {
+async function VideoGalleryContent({ searchParams }: PageProps) {
   const params = await searchParams;
   const currentPage = Number(params.page) || 1;
   const pageSize = 12;
@@ -40,14 +34,20 @@ export default async function VideosGalleryPage({ searchParams }: PageProps) {
         </p>
       </header>
 
-      <Suspense fallback={<GalleryLoading />}>
-        <MediaGallery 
-          items={videosWithType}
-          currentPage={currentPage}
-          totalCount={videos.count || 0}
-          pageSize={pageSize}
-        />
-      </Suspense>
+      <MediaGallery 
+        items={videosWithType}
+        currentPage={currentPage}
+        totalCount={videos.count || 0}
+        pageSize={pageSize}
+      />
     </div>
+  );
+}
+
+export default function VideosGalleryPage(props: PageProps) {
+  return (
+    <Suspense fallback={<GallerySkeleton />}>
+      <VideoGalleryContent {...props} />
+    </Suspense>
   );
 } 

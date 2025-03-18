@@ -7,6 +7,8 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { getCachedImages } from "@/app/actions/image-actions";
 import { getCredits } from "@/app/actions/credit-actions";
 import { getCachedVideos } from "@/app/actions/video-actions";
+import { Suspense } from "react";
+import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 
 import { Metadata } from "next";
 
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
   description: "Dashboard for Faces Factory",
 };
 
-export default async function Dashboard() {
+async function DashboardContent() {
   const supabase = await createClient();
 
   const {
@@ -50,5 +52,13 @@ export default async function Dashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<DashboardSkeleton />}>
+      <DashboardContent />
+    </Suspense>
   );
 }

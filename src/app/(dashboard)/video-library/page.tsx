@@ -1,5 +1,7 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { VideoLibraryContent } from "@/components/video-library/VideoLibraryContent";
+import { GallerySkeleton } from "@/components/gallery/GallerySkeleton";
 import { LockedContent } from "@/components/ui/locked-content";
 import { createClient } from "@/lib/supabase/server";
 import { listVideos } from "@/lib/cloudflare/r2";
@@ -9,7 +11,7 @@ export const metadata: Metadata = {
   description: "Video Library for clients",
 };
 
-export default async function VideoLibraryPage() {
+async function VideoLibraryData() {
   // Create Supabase client
   const supabase = await createClient();
   
@@ -33,16 +35,22 @@ export default async function VideoLibraryPage() {
   // Fetch videos from R2 bucket (only if user has subscription to avoid unnecessary API calls)
   const videos = hasActiveSubscription ? await listVideos() : [];
 
+  return hasActiveSubscription ? (
+    <VideoLibraryContent videos={videos} />
+  ) : (
+    <LockedContent 
+      title="Video Library" 
+      description="Subscribe to access our exclusive video library content."
+    />
+  );
+}
+
+export default function VideoLibraryPage() {
   return (
     <div className="container mx-auto">
-      {hasActiveSubscription ? (
-        <VideoLibraryContent videos={videos} />
-      ) : (
-        <LockedContent 
-          title="Video Library" 
-          description="Subscribe to access our exclusive video library content."
-        />
-      )}
+      <Suspense fallback={<GallerySkeleton />}>
+        <VideoLibraryData />
+      </Suspense>
     </div>
   );
 } 

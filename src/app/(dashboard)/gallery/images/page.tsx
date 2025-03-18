@@ -3,24 +3,18 @@ import { Gallery } from "@/components/gallery/Gallery";
 import { getCachedImages } from "@/app/actions/image-actions";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { GallerySkeleton } from "@/components/gallery/GallerySkeleton";
 
 export const metadata: Metadata = {
   title: "Images Gallery | Faces Factory",
   description: "Images Gallery for Faces Factory",
 };
 
-const GalleryLoading = () => (
-  <div className="flex items-center justify-center h-[50vh]">
-    <LoadingSpinner size="lg" />
-  </div>
-);
-
 interface PageProps {
   searchParams: Promise<{ page?: string }>;
 }
 
-export default async function ImagesGalleryPage({ searchParams }: PageProps) {
+async function ImageGalleryContent({ searchParams }: PageProps) {
   const params = await searchParams;
   const currentPage = Number(params.page) || 1;
   const pageSize = 12;
@@ -36,14 +30,20 @@ export default async function ImagesGalleryPage({ searchParams }: PageProps) {
         </p>
       </header>
 
-      <Suspense fallback={<GalleryLoading />}>
-        <Gallery 
-          images={images.data || []} 
-          currentPage={currentPage}
-          totalCount={images.count || 0}
-          pageSize={pageSize}
-        />
-      </Suspense>
+      <Gallery 
+        images={images.data || []} 
+        currentPage={currentPage}
+        totalCount={images.count || 0}
+        pageSize={pageSize}
+      />
     </div>
+  );
+}
+
+export default function ImagesGalleryPage(props: PageProps) {
+  return (
+    <Suspense fallback={<GallerySkeleton />}>
+      <ImageGalleryContent {...props} />
+    </Suspense>
   );
 } 
