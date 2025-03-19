@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import EmailTemplate from '@/components/email-templates/EmailTemplate';
 import SubscriptionConfirmation from '@/components/email-templates/SubscriptionConfirmation';
+import SubscriptionCancellation from '@/components/email-templates/SubscriptionCancellation';
 import { ReactElement } from 'react';
 import * as React from 'react';
 
@@ -98,6 +99,31 @@ export async function sendMessageEmail({
     react: React.createElement(EmailTemplate, {
       userName,
       message,
+    }),
+  });
+}
+
+/**
+ * Send a subscription cancellation email
+ */
+export async function sendSubscriptionCancellationEmail({
+  to,
+  userName,
+  planName,
+  endDate,
+}: {
+  to: string;
+  userName: string;
+  planName: string;
+  endDate: string;
+}) {
+  return sendEmail({
+    to,
+    subject: 'Thank You for Your Time with Faces Factory',
+    react: React.createElement(SubscriptionCancellation, {
+      userName,
+      planName,
+      endDate,
     }),
   });
 } 

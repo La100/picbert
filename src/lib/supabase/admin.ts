@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 import type { Database, Tables, TablesInsert } from '@database.types';
 import { revalidateTag } from 'next/cache';
-import { sendSubscriptionConfirmationEmail } from '@/lib/email';
+import { sendSubscriptionConfirmationEmail, sendSubscriptionCancellationEmail } from '@/lib/email';
 import { format } from 'date-fns';
 
 type Product = Tables<'products'>;
@@ -370,6 +370,63 @@ const manageSubscriptionStatusChange = async (
       }
     } catch (error) {
       console.error('Error sending subscription confirmation email:', error);
+      // Don't throw error here to avoid disrupting the subscription process
+    }
+  }
+  
+  // Send cancellation email when subscription is cancelled or set to cancel at period end
+  if (subscription.cancel_at_period_end || subscription.status === 'canceled') {
+    try {
+      // Get user data from the users table
+      const { data: userData, error: userError } = await supabaseAdmin
+        .from('users')
+        .select('full_name')
+        .eq('id', uuid)
+        .single();
+        
+      if (userError) {
+        console.error('Error fetching user data for cancellation email:', userError);
+      } else {
+        // Get user email from auth
+        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(uuid);
+        
+        if (authError || !authUser) {
+          console.error('Error fetching auth user data:', authError || 'User not found');
+          return;
+        }
+        
+        const userEmail = authUser.user.email;
+        if (!userEmail) {
+          console.error('User email not found');
+          return;
+        }
+        
+        // Get product details
+        const product = subscription.items.data[0].price.product as Stripe.Product;
+        const planName = product.name || 'Premium Plan';
+        
+        // Format end date - the date when the subscription will actually end
+        const endDate = format(
+          new Date(subscriptionData.current_period_end as string), 
+          'MMMM d, yyyy'
+        );
+        
+        // Send cancellation email
+        const emailResult = await sendSubscriptionCancellationEmail({
+          to: userEmail,
+          userName: userData?.full_name || userEmail.split('@')[0] || 'Valued Customer',
+          planName,
+          endDate
+        });
+        
+        if (!emailResult.success) {
+          console.error('Failed to send subscription cancellation email:', emailResult.error);
+        } else {
+          console.log(`Subscription cancellation email sent to ${userEmail}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error sending subscription cancellation email:', error);
       // Don't throw error here to avoid disrupting the subscription process
     }
   }

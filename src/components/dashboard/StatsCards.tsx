@@ -23,7 +23,7 @@ export function StatsCards({
           <ImageIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{imageCount}</div>
+          <div className="text-4xl font-bold">{imageCount}</div>
         </CardContent>
       </Card>
       <Card>
@@ -32,7 +32,7 @@ export function StatsCards({
           <VideoIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{videoCount}</div>
+          <div className="text-4xl font-bold">{videoCount}</div>
         </CardContent>
       </Card>
       <Card>

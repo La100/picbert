@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { toast } from 'sonner'
 import { storeImages } from '@/app/actions/image-actions'
+import { createClient } from '@/lib/supabase/client'
 
 interface StoreResult {
   results: Array<{
@@ -68,10 +69,24 @@ const useGenerateStore = create<GenerateState>((set) => ({
 
       // Add IDs to the images from the store result
       const storeData = storeResult.data as unknown as StoreResult;
-      const imagesWithIds = imageUrls.map((img, index) => ({
-        ...img,
-        id: storeData.results[index]?.data?.[0]?.id
-      }))
+      const imagesWithIds = await Promise.all(imageUrls.map(async (img, index) => {
+        const storedImage = storeData.results[index];
+        if (!storedImage?.data?.[0]?.id) return img;
+        
+        // Get the bucket URL from Supabase
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const { data: urlData } = supabase
+          .storage
+          .from("generated_images")
+          .getPublicUrl(`${session?.user?.id}/${storedImage.fileName}`);
+
+        return {
+          ...img,
+          url: urlData.publicUrl,
+          id: storedImage.data[0].id
+        };
+      }));
       
       // Update the state with new images
       set({ images: imagesWithIds, loading: false, error: null })
