@@ -9,7 +9,7 @@ import * as React from 'react';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Default sender email
-const DEFAULT_FROM_EMAIL = 'notifications@facesfactory.com';
+const DEFAULT_FROM_EMAIL = 'support@facesfactory.com';
 
 /**
  * Send a generic email

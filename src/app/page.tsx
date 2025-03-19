@@ -11,6 +11,7 @@ import Features from "@/components/landing-page/Features";
 import Testimonials from "@/components/landing-page/Testimonials";
 import Faqs from "@/components/landing-page/Faqs";
 import Footer from "@/components/landing-page/Footer";
+import { CookieConsent } from "@/components/ui/cookie-consent";
 
 export const metadata: Metadata = {
   title: "Faces Factory",
@@ -60,6 +61,7 @@ export default async function Home() {
         </div>
       </section>
       <Footer />
+      <CookieConsent policyUrl="/privacy-policy" />
     </main>
   );
 }

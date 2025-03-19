@@ -1,11 +1,6 @@
 import { Metadata } from "next"
 import { ContactForm } from "@/components/contact/ContactForm"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+
 
 export const metadata: Metadata = {
   title: "Contact Us | Faces Factory",

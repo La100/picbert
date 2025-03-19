@@ -14,6 +14,9 @@ const Footer = () => {
         <Link className="text-xs hover:underline underline-offset-4" href="/privacy-policy">
           Privacy
         </Link>
+        <Link className="text-xs hover:underline underline-offset-4" href="/help">
+          Get Help
+        </Link>
       </nav>
     </footer>
   );

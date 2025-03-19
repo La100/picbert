@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Loader2, Coins } from "lucide-react";
 import { Tables } from "@database.types";
