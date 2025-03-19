@@ -121,11 +121,7 @@ export function NavUser({
                       Terms of Use
                     </DropdownMenuItem>
                   </Link>
-                  <Link href="/about" className="w-full">
-                    <DropdownMenuItem className="cursor-pointer">
-                      About Faces Factory
-                    </DropdownMenuItem>
-                  </Link>
+                 
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
               <Link href="/help" className="w-full cursor-pointer">

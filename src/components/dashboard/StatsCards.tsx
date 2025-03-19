@@ -17,7 +17,7 @@ export function StatsCards({
 }: StatsCardsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
+      <Card className="bg-gradient-to-br from-background to-muted/50 border border-primary/10 shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Images</CardTitle>
           <ImageIcon className="h-4 w-4 text-muted-foreground" />
@@ -26,7 +26,7 @@ export function StatsCards({
           <div className="text-4xl font-bold">{imageCount}</div>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="bg-gradient-to-bl from-background to-muted/50 border border-primary/10 shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Videos</CardTitle>
           <VideoIcon className="h-4 w-4 text-muted-foreground" />
@@ -35,7 +35,7 @@ export function StatsCards({
           <div className="text-4xl font-bold">{videoCount}</div>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="bg-gradient-to-tr from-background to-muted/50 border border-primary/10 shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Available Tokens</CardTitle>
           <ZapIcon className="h-4 w-4 text-muted-foreground" />

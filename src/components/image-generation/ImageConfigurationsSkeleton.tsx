@@ -10,7 +10,7 @@ export function ImageConfigurationsSkeleton() {
       </div>
 
       <div className="grid w-full max-w-2xl mx-auto items-start gap-6 xl:pt-20">
-        <Card className="p-6 space-y-6">
+        <Card className="p-6 space-y-6 bg-gradient-to-tl from-background to-muted/50 border border-primary/10 shadow-lg">
           <div className="flex justify-between items-center">
             <Skeleton className="h-5 w-[150px]" />
             <Skeleton className="h-6 w-[100px]" />

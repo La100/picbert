@@ -39,7 +39,7 @@ export function RecentVideos({ videos }: RecentVideosProps) {
 
   if (videos.length === 0) {
     return (
-      <Card>
+      <Card className="bg-gradient-to-bl from-background to-muted/50 border border-primary/10 shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Recent Video Generations</CardTitle>
         </CardHeader>
@@ -51,7 +51,7 @@ export function RecentVideos({ videos }: RecentVideosProps) {
   }
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-br from-background to-muted/50 border border-primary/10 shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <CardTitle className="text-base">Recent Video Generations</CardTitle>
         <Button asChild variant="ghost" size="sm" className="-mr-2">

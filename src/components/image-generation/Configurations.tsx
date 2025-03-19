@@ -187,7 +187,7 @@ const Configurations = () => {
           </Alert>
         )}
         
-        <fieldset className="grid gap-6 rounded-lg border p-4 bg-white">
+        <fieldset className="grid gap-6 rounded-lg border p-4 bg-gradient-to-tl from-background to-muted/50 border-primary/10 shadow-lg">
           <legend className="-ml-1 px-1 text-base font-medium">Image Generation</legend>
 
           <div className="flex justify-between items-center">
@@ -213,7 +213,7 @@ const Configurations = () => {
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger className="bg-white font-medium">
+                    <SelectTrigger className="font-medium">
                       <SelectValue placeholder="Select an aspect ratio" />
                     </SelectTrigger>
                   </FormControl>
@@ -234,7 +234,7 @@ const Configurations = () => {
               <FormItem>
                 <FormLabel className="font-medium">Prompt</FormLabel>
                 <FormControl>
-                  <Textarea {...field} rows={6} className="bg-white font-medium" />
+                  <Textarea {...field} rows={6} className="font-medium" />
                 </FormControl>
                 <FormMessage className="font-medium" />
               </FormItem>

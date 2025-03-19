@@ -32,8 +32,8 @@ async function DashboardContent() {
   return (
     <div className="container mx-auto flex-1 space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-4xl font-bold tracking-tight">
-          Welcome back, {session.user.user_metadata.full_name}
+        <h2 className="text-2xl font-bold ">
+          Welcome to Faces Factory
         </h2>
       </div>
       <div className="lg:col-span-2">

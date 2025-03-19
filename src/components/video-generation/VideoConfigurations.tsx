@@ -278,7 +278,7 @@ const VideoConfigurations = () => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="grid w-full max-w-2xl mx-auto items-start gap-6 xl:pt-20"
         >
-          <fieldset className="grid gap-6 rounded-lg border p-4 bg-white">
+          <fieldset className="grid gap-6 rounded-lg border p-4 bg-gradient-to-tr from-background to-muted/50 border-primary/10 shadow-lg">
             <legend className="-ml-1 px-1 text-base font-medium">Video Generation</legend>
 
             <div className="flex justify-between items-center">
@@ -314,7 +314,7 @@ const VideoConfigurations = () => {
                       variant="outline"
                       onClick={() => document.getElementById("image-upload")?.click()}
                       disabled={isUploading}
-                      className="flex items-center gap-2 bg-white font-medium"
+                      className="flex items-center gap-2 font-medium"
                     >
                       {isUploading ? (
                         <>
@@ -359,7 +359,7 @@ const VideoConfigurations = () => {
                     <FormLabel className="font-medium">Aspect Ratio</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-white font-medium">
+                        <SelectTrigger className="font-medium">
                           <SelectValue placeholder="Select aspect ratio" />
                         </SelectTrigger>
                       </FormControl>
@@ -382,7 +382,7 @@ const VideoConfigurations = () => {
                     <FormLabel className="font-medium">Duration</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-white font-medium">
+                        <SelectTrigger className="font-medium">
                           <SelectValue placeholder="Select duration" />
                         </SelectTrigger>
                       </FormControl>
@@ -407,8 +407,7 @@ const VideoConfigurations = () => {
                     <Textarea 
                       {...field} 
                       rows={6} 
-                    
-                      className="bg-white font-medium"
+                      className="font-medium"
                     />
                   </FormControl>
                   <FormMessage className="font-medium" />

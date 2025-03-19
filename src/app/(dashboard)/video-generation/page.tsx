@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 function VideoConfigurationsSkeleton() {
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <Skeleton className="h-[600px] w-full rounded-lg" />
+      <Skeleton className="h-[600px] w-full rounded-lg bg-gradient-to-tr from-background to-muted/50 border border-primary/10 shadow-lg" />
     </div>
   );
 }

@@ -19,7 +19,8 @@ type CheckoutResponse = {
 
 export async function checkoutWithStripe(
   price: Price,
-  redirectPath: string = '/dashboard'
+  redirectPath: string = '/dashboard',
+  quantity: number = 1
 ): Promise<CheckoutResponse> {
  
   try {
@@ -50,9 +51,12 @@ export async function checkoutWithStripe(
     // Calculate token amount based on subscription type
     const tokenAmount = (price.metadata as { tokens?: number })?.tokens ?? 0;
     
+    // Calculate total tokens based on quantity
+    const totalTokens = tokenAmount * quantity;
+    
     // No longer dividing tokens for yearly subscriptions
     // We'll use the same token amount as specified in the metadata
-    console.log(`Subscription: Allocating tokens: ${tokenAmount}`);
+    console.log(`Subscription: Allocating tokens: ${totalTokens}`);
 
     let params: Stripe.Checkout.SessionCreateParams = {
       allow_promotion_codes: true,
@@ -60,7 +64,7 @@ export async function checkoutWithStripe(
       customer,
       client_reference_id: user?.id,
       metadata: {
-        tokens: tokenAmount,
+        tokens: totalTokens,
       },
       customer_update: {
         address: 'auto'
@@ -68,7 +72,7 @@ export async function checkoutWithStripe(
       line_items: [
         {
           price: price.id,
-          quantity: 1
+          quantity: quantity
         }
       ],
       cancel_url: getURL(),

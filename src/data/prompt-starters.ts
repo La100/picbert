@@ -38,9 +38,9 @@ export const promptStarters: PromptStarter[] = [
   },
   {
     id: "starter_5",
-    name: "Applying lipstick",
-    prompt: "Soft, warm light on a woman's dewy face, applying lipstick.",
-    previewImageUrl: "https://api.facesfactory.com/storage/v1/object/public/prompstarters/Resize%20Images%20Online%20(1).jpg"
+    name: "Happy man",
+    prompt: "directed in the style of Wes Anderson, featuring a young, handsome model man with a soft, gentle expression. smiling",
+    previewImageUrl: "https://api.facesfactory.com/storage/v1/object/public/prompstarters//File%20(8).jpg"
   },
   {
     id: "starter_6",

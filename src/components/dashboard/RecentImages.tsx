@@ -26,7 +26,7 @@ interface RecentImagesProps {
 export function RecentImages({ images }: RecentImagesProps) {
   if (images.length === 0) {
     return (
-      <Card>
+      <Card className="bg-gradient-to-tr from-background to-muted/50 border border-primary/10 shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Recent Image Generations</CardTitle>
         </CardHeader>
@@ -38,7 +38,7 @@ export function RecentImages({ images }: RecentImagesProps) {
   }
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-tl from-background to-muted/50 border border-primary/10 shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <CardTitle className="text-lg">Recent Image Generations</CardTitle>
         <Button asChild variant="ghost" size="sm" className="-mr-2">

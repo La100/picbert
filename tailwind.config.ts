@@ -119,7 +119,17 @@ const config: Config = {
   				to: {
   					backgroundPosition: 'var(--bg-size) 0'
   				}
-  			}
+  			},
+              fadeIn: {
+                from: {
+                  opacity: '0',
+                  transform: 'scale(0.95)'
+                },
+                to: {
+                  opacity: '1',
+                  transform: 'scale(1)'
+                }
+              }
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
@@ -127,7 +137,8 @@ const config: Config = {
   			rainbow: 'rainbow var(--speed, 2s) infinite linear',
   			marquee: 'marquee var(--duration) infinite linear',
   			'marquee-vertical': 'marquee-vertical var(--duration) linear infinite',
-  			gradient: 'gradient 8s linear infinite'
+  			gradient: 'gradient 8s linear infinite',
+              fadeIn: 'fadeIn 0.5s ease-out forwards'
   		},
   		screens: {
   			xs: '480px'

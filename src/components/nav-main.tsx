@@ -61,7 +61,7 @@ export function NavMain({
             return (
               <ActiveLink href={item.url!} key={item.title}>
                 <SidebarMenuItem>
-                  <SidebarMenuButton tooltip={item.title} className="font-normal text-base">
+                  <SidebarMenuButton tooltip={item.title} className=" font-mono text-base  ">
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                   </SidebarMenuButton>

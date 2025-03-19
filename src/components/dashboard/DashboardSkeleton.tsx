@@ -11,7 +11,7 @@ export function DashboardSkeleton() {
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         {[...Array(3)].map((_, i) => (
-          <Card key={i}>
+          <Card key={i} className="bg-gradient-to-br from-background to-muted/50 border border-primary/10 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <Skeleton className="h-5 w-[100px]" />
               <Skeleton className="h-4 w-4" />
@@ -26,7 +26,7 @@ export function DashboardSkeleton() {
       {/* Recent Content Grid */}
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         {/* Recent Images */}
-        <Card>
+        <Card className="bg-gradient-to-tl from-background to-muted/50 border border-primary/10 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <Skeleton className="h-5 w-[200px]" />
             <Skeleton className="h-8 w-[100px]" />
@@ -41,7 +41,7 @@ export function DashboardSkeleton() {
         </Card>
 
         {/* Recent Videos */}
-        <Card>
+        <Card className="bg-gradient-to-br from-background to-muted/50 border border-primary/10 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <Skeleton className="h-5 w-[200px]" />
             <Skeleton className="h-8 w-[100px]" />
@@ -56,7 +56,7 @@ export function DashboardSkeleton() {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-gradient-to-tr from-background to-muted/50 border border-primary/10 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <Skeleton className="h-5 w-[150px]" />
           </CardHeader>
