@@ -18,6 +18,7 @@ import {
 import { signup, loginWithGoogle } from "@/app/actions/auth-actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { Turnstile } from "@marsidev/react-turnstile"
 
 const passwordValidationRegex = new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})');
 // The above regex ensures that the password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.
@@ -37,6 +38,9 @@ const formSchema = z.object({
   confirmPassword: z.string({
     required_error: 'Confirm password is required',
   }),
+  turnstileToken: z.string({
+    required_error: 'Please complete the CAPTCHA verification',
+  }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -48,6 +52,7 @@ export function SignupForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false)
+  const [turnstileToken, setTurnstileToken] = React.useState<string>("")
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -55,9 +60,16 @@ export function SignupForm() {
       email: "",
       password: "",
       confirmPassword: "",
+      turnstileToken: "",
     },
   })
   const toastId = React.useId();
+
+  React.useEffect(() => {
+    if (turnstileToken) {
+      form.setValue("turnstileToken", turnstileToken);
+    }
+  }, [turnstileToken, form]);
 
   async function onSubmit(values: FormValues) {
     setIsLoading(true)
@@ -65,6 +77,7 @@ export function SignupForm() {
     const formData = new FormData()
     formData.append("email", values.email)
     formData.append("password", values.password)
+    formData.append("turnstileToken", values.turnstileToken)
     const {success, error} = await signup(formData);
     if (!success) {
       toast.error(String(error), { id: toastId })
@@ -164,7 +177,28 @@ export function SignupForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <FormField
+            control={form.control}
+            name="turnstileToken"
+            render={() => (
+              <FormItem>
+                <FormLabel>Verification</FormLabel>
+                <FormControl>
+                  <div className="flex justify-center">
+                    <Turnstile 
+                      siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+                      onSuccess={(token) => setTurnstileToken(token)}
+                      options={{
+                        theme: 'light',
+                      }}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full" disabled={isLoading || !turnstileToken}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign Up with Email
           </Button>

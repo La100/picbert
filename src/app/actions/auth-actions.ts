@@ -30,18 +30,77 @@ export async function login(formData: FormData): Promise<AuthResponse> {
 export async function signup(formData: FormData): Promise<AuthResponse> {
   const supabase = await createClient();
 
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  // Get form data
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const turnstileToken = formData.get("turnstileToken") as string;
 
-  const { data: signupData, error } = await supabase.auth.signUp(data);
+  // Verify Turnstile token
+  if (!turnstileToken) {
+    return {
+      error: "CAPTCHA verification failed. Please try again.",
+      success: false,
+      data: null,
+    };
+  }
 
-  return {
-    error: error?.message || "There was an error signing up!",
-    success: !error,
-    data: signupData || null,
-  };
+  try {
+    // Verify the token with Cloudflare
+    const turnstileResponse = await verifyTurnstileToken(turnstileToken);
+    
+    if (!turnstileResponse.success) {
+      console.error("Turnstile verification failed:", turnstileResponse);
+      return {
+        error: "CAPTCHA verification failed. Please try again.",
+        success: false,
+        data: null,
+      };
+    }
+
+    // Proceed with signup
+    const { data: signupData, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    return {
+      error: error?.message || "There was an error signing up!",
+      success: !error,
+      data: signupData || null,
+    };
+  } catch (error) {
+    console.error("Error during signup:", error);
+    return {
+      error: "An unexpected error occurred during signup.",
+      success: false,
+      data: null,
+    };
+  }
+}
+
+// Function to verify Turnstile token with Cloudflare
+async function verifyTurnstileToken(token: string) {
+  const secretKey = process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY;
+  if (!secretKey) {
+    throw new Error("Cloudflare Turnstile secret key is not configured");
+  }
+
+  const formData = new URLSearchParams();
+  formData.append("secret", secretKey);
+  formData.append("response", token);
+
+  const response = await fetch(
+    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+    {
+      method: "POST",
+      body: formData,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
+
+  return await response.json();
 }
 
 export async function resetPassword(
