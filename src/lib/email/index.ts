@@ -6,7 +6,12 @@ import { ReactElement } from 'react';
 import * as React from 'react';
 
 // Initialize Resend with API key
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Make sure we're explicitly using the API key from environment variables
+const resendApiKey = process.env.RESEND_API_KEY;
+if (!resendApiKey) {
+  console.error('RESEND_API_KEY is not defined in environment variables');
+}
+const resend = new Resend(resendApiKey);
 
 // Default sender email
 const DEFAULT_FROM_EMAIL = 'support@facesfactory.com';

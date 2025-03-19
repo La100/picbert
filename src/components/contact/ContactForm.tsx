@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
-import { sendMessageEmail } from "@/lib/email"
 import {
   Form,
   FormControl,
@@ -49,15 +48,23 @@ export function ContactForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true)
     try {
-      const result = await sendMessageEmail({
-        to: "support@facesfactory.ai",
-        userName: values.name,
-        message: `From: ${values.email}\n\n${values.message}`,
-        subject: `Contact Form: ${values.subject}`,
-      })
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: "facesfactoryapp@gmail.com",
+          userName: values.name,
+          message: `From: ${values.email}\n\n${values.message}`,
+          subject: `Contact Form: ${values.subject}`,
+        }),
+      });
+
+      const result = await response.json();
 
       if (!result.success) {
-        throw new Error(result.error)
+        throw new Error(result.error);
       }
       
       toast.success("Message sent successfully! We'll get back to you soon.")
