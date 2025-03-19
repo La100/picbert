@@ -28,7 +28,7 @@ import {
 } from "../ui/select";
 
 
-import { queueVideoGeneration, getVideoRequestStatus } from "@/app/actions/video-actions";
+import { queueVideoGeneration, getVideoRequestStatus, getVideos } from "@/app/actions/video-actions";
 import { GalleryImagePicker } from "@/components/gallery/GalleryImagePicker";
 import Image from "next/image";
 import { uploadInputImage } from "@/lib/supabase/queries";
@@ -52,6 +52,7 @@ type FormValues = z.infer<typeof formSchema>;
 const VideoConfigurations = () => {
   const loading = useVideoGenerateStore((state) => state.loading);
   const setLoading = useVideoGenerateStore((state) => state.setLoading);
+  const generateVideo = useVideoGenerateStore((state) => state.generateVideo);
   const { refreshTokens } = useTokenStore();
   const [isUploading, setIsUploading] = React.useState(false);
   const [tokenCount, setTokenCount] = useState<number | null>(null);
@@ -233,6 +234,28 @@ const VideoConfigurations = () => {
             clearInterval(pollInterval);
             setLoading(false);
             toast.success("Video generated successfully!", { id: toastId });
+            
+            // Get the latest videos from the database
+            try {
+              const videoResult = await getVideos(1, 1); // Get the most recent video
+              if (videoResult.success && videoResult.data && videoResult.data.length > 0) {
+                const latestVideo = videoResult.data[0];
+                generateVideo({
+                  data: {
+                    video: {
+                      url: latestVideo.url as string,
+                      prompt: latestVideo.prompt as string,
+                      input_image: latestVideo.input_image as string,
+                      aspect_ratio: latestVideo.aspect_ratio as "16:9" | "9:16" | "1:1",
+                      duration: latestVideo.duration as "5" | "10"
+                    }
+                  }
+                });
+              }
+            } catch (err) {
+              console.error("Failed to fetch latest video:", err);
+            }
+            
             router.refresh(); // This will refresh the current route
             break;
           case "failed":

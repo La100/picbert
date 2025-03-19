@@ -110,7 +110,7 @@ export default function TopUpTokens({ user, product, price }: TopUpTokensProps) 
         <p className="text-muted-foreground mb-4">{product.description}</p>
         
         <div className="mb-6 text-center">
-          <span className="text-xl font-bold text-primary">{totalTokenAmount.toLocaleString()}tokens</span>
+          <span className="text-xl font-bold text-primary">{totalTokenAmount.toLocaleString()} tokens</span>
         </div>
         
         <div className="flex items-center justify-between mb-6">
