@@ -4,7 +4,6 @@ import * as React from "react"
 import {
   Image,
   ImagePlus,
-  Sparkles,
   SquareTerminal,
   Video,
   FileVideo,
@@ -25,6 +24,7 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import UpgradeBtn from "./billing/UpgradeBtn"
 import { getSubscription } from "@/lib/supabase/queries"
+import { SmileIcon } from "./icons/SmileIcon"
 
 const navMain =  [
     {
@@ -81,8 +81,8 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <Sparkles className="size-4" />
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-black text-white">
+                <SmileIcon className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-base leading-tight">
                 <span className="truncate font-medium">

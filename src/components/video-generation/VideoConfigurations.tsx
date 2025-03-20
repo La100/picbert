@@ -26,8 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-
-
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { queueVideoGeneration, getVideoRequestStatus, getVideos } from "@/app/actions/video-actions";
 import { GalleryImagePicker } from "@/components/gallery/GalleryImagePicker";
 import Image from "next/image";
@@ -35,6 +34,7 @@ import { uploadInputImage } from "@/lib/supabase/queries";
 import { getCredits } from "@/app/actions/credit-actions";
 import { VIDEO_TOKEN_COST_5_SEC, VIDEO_TOKEN_COST_10_SEC } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
+import { checkSubscriptionStatus } from "@/app/actions/subscription-actions";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -104,6 +104,7 @@ const VideoConfigurations = () => {
   const inputImageFromUrl = searchParams.get('input_image');
   const [selectedDuration, setSelectedDuration] = useState<"5" | "10">("5");
   const [tokenCost, setTokenCost] = useState<number>(VIDEO_TOKEN_COST_5_SEC);
+  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -142,9 +143,16 @@ const VideoConfigurations = () => {
 
   useEffect(() => {
     const checkStatus = async () => {
-      const credits = await getCredits();
-      if (credits.success && credits.data) {
-        setTokenCount(credits.data.tokens || 0);
+      try {
+        const { isSubscribed } = await checkSubscriptionStatus();
+        setIsSubscribed(isSubscribed);
+        
+        const credits = await getCredits();
+        if (credits.success && credits.data) {
+          setTokenCount(credits.data.tokens || 0);
+        }
+      } catch (error) {
+        console.error("Error checking status:", error);
       }
     };
     
@@ -334,12 +342,16 @@ const VideoConfigurations = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Generate Video from Image</h2>
-        <p className="text-sm text-muted-foreground">
-          Take your images to the next level with video generation.
-        </p>
-      </div>
+      {isSubscribed === false && (
+        <Alert className="bg-amber-50 border-amber-200">
+          <AlertTitle className="text-amber-800">Free Account Limitations</AlertTitle>
+          <AlertDescription className="text-amber-700">
+            Free users have limited tokens. You currently have {tokenCount || 0} tokens.
+            <br />
+            <a href="/billing" className="underline font-medium">Subscribe</a> to unlock more tokens and additional features.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Form {...form}>
         <form

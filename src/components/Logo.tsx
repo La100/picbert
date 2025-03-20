@@ -1,10 +1,13 @@
 import React from 'react'
-import { Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import { SmileIcon } from './icons/SmileIcon'
+
 const Logo = () => {
   return (
     <Link href="/" className="flex items-center gap-2">
-      <Sparkles className="size-8" strokeWidth={1.5} />
+      <div className="relative flex items-center justify-center p-1 overflow-hidden rounded-full bg-black">
+        <SmileIcon size={24} className="text-white" />
+      </div>
       <span className="text-lg font-semibold">Faces Factory</span>
     </Link>
   )

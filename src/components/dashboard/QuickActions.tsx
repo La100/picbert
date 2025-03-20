@@ -49,7 +49,7 @@ export function QuickActions() {
             
             <div className="flex flex-col items-center w-full max-w-[200px] mx-auto">
               <div className="bg-gray-200 rounded-md py-2 px-4 w-full text-center mb-2">
-                <span className="text-black font-medium">girl showing thumbs up</span>
+                <span className="text-black font-medium">showing thumbs up</span>
               </div>
               
               <div className="my-1 py-3">
