@@ -26,7 +26,7 @@ export const LockedContent = ({
   return (
     <div
       className={cn(
-        "relative w-full max-w-5xl mx-auto rounded-lg overflow-hidden bg-slate-50 shadow-sm border border-slate-200 text-slate-900",
+        "relative w-full max-w-5xl mx-auto rounded-lg overflow-hidden bg-slate-50 border border-slate-200 text-slate-900",
         className
       )}
     >
@@ -68,11 +68,8 @@ export const LockedContent = ({
           </div>
         </div>
         
-        {/* Semi-transparent overlay for better readability */}
-        <div className="absolute inset-0 bg-black/30 z-10"></div>
-        
         {/* Image grid - adjusted aspect ratios for mobile */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1">
+        <div className="grid grid-cols-2 sm:grid-cols-4">
           {displayImages.map((src, index) => (
             <div
               key={`preview-image-${index}`}

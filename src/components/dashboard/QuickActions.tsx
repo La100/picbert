@@ -1,13 +1,12 @@
 "use client";
 
-
 import {
   Card,
   CardContent,
-
 } from "@/components/ui/card";
-import { UsersIcon, Wand2Icon, VideoIcon } from "lucide-react";
+import { UsersIcon, Wand2Icon, VideoIcon, TrendingDownIcon } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export function QuickActions() {
   return (
@@ -17,7 +16,26 @@ export function QuickActions() {
           <CardContent className="flex flex-col items-center justify-center p-6 text-center h-full">
             <Wand2Icon className="h-8 w-8 mb-4" />
             <h3 className="font-semibold text-lg mb-2">Generate Image</h3>
-            <p className="text-sm text-muted-foreground">Create unique AI-generated images</p>
+            <p className="text-sm text-muted-foreground mb-4">Create unique AI-generated images</p>
+            
+            <div className="flex flex-col items-center w-full max-w-[200px] mx-auto">
+              <div className="bg-gray-200 rounded-md py-2 px-4 w-full text-center mb-2">
+                <span className="text-black font-medium">handsome guy</span>
+              </div>
+              
+              <div className="my-1 py-3">
+                <TrendingDownIcon className="h-12 w-12 rotate-[35deg]" />
+              </div>
+              
+              <div className="w-full aspect-square relative overflow-hidden rounded-md">
+                <Image 
+                  src="https://api.facesfactory.com/storage/v1/object/public/images//File%20(8).jpg" 
+                  alt="AI generated handsome guy" 
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </Link>
@@ -27,7 +45,32 @@ export function QuickActions() {
           <CardContent className="flex flex-col items-center justify-center p-6 text-center h-full">
             <VideoIcon className="h-8 w-8 mb-4" />
             <h3 className="font-semibold text-lg mb-2">Generate Video</h3>
-            <p className="text-sm text-muted-foreground">Create AI-powered videos</p>
+            <p className="text-sm text-muted-foreground mb-4">Create AI-powered videos</p>
+            
+            <div className="flex flex-col items-center w-full max-w-[200px] mx-auto">
+              <div className="bg-gray-200 rounded-md py-2 px-4 w-full text-center mb-2">
+                <span className="text-black font-medium">girl showing thumbs up</span>
+              </div>
+              
+              <div className="my-1 py-3">
+                <TrendingDownIcon className="h-12 w-12 rotate-[35deg]" />
+              </div>
+              
+              <div className="w-full aspect-square relative overflow-hidden rounded-md">
+                <video 
+                  src="https://api.facesfactory.com/storage/v1/object/public/images//Video1.mp4"
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  disablePictureInPicture
+                  disableRemotePlayback
+                  controlsList="nodownload"
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </Link>
@@ -37,7 +80,20 @@ export function QuickActions() {
           <CardContent className="flex flex-col items-center justify-center p-6 text-center h-full">
             <UsersIcon className="h-8 w-8 mb-4" />
             <h3 className="font-semibold text-lg mb-2">AI People Library</h3>
-            <p className="text-sm text-muted-foreground">Browse and manage AI characters</p>
+            <p className="text-sm text-muted-foreground mb-4">Browse and manage AI characters</p>
+            
+            <div className="flex flex-col items-center w-full max-w-[300px] mx-auto">
+              <div className="w-full aspect-square relative overflow-hidden rounded-md shadow-md border border-primary/10">
+                <Image 
+                  src="https://api.facesfactory.com/storage/v1/object/public/images//img1.png" 
+                  alt="AI characters collection" 
+                  fill
+                  priority
+                  quality={100}
+                  className="object-cover"
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </Link>

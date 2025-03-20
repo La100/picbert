@@ -30,7 +30,7 @@ const ActiveLink = ({
       onClick={handleClick}
       className={cn(
         className,
-        "rounded-none",
+        "rounded-md",
         pathname === href
           ? "text-primary bg-primary/5"
           : "text-muted-foreground "

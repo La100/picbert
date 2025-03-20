@@ -43,6 +43,49 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+const placeholderTexts = [
+  "European woman with warm smile",
+  "Young couple on sunny beach",
+  "Old asian lady in central park"
+];
+
+const useTextCycling = (texts: string[], interval: number = 3000) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [text, setText] = useState(texts[0]);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [typingSpeed, setTypingSpeed] = useState(100);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+
+    if (isDeleting) {
+      if (text === '') {
+        setIsDeleting(false);
+        setCurrentIndex((prev) => (prev + 1) % texts.length);
+        setTypingSpeed(100);
+      } else {
+        timeout = setTimeout(() => {
+          setText(text.slice(0, -1));
+        }, 50);
+      }
+    } else {
+      const fullText = texts[currentIndex];
+      if (text === fullText) {
+        timeout = setTimeout(() => {
+          setIsDeleting(true);
+        }, interval);
+      } else {
+        timeout = setTimeout(() => {
+          setText(fullText.slice(0, text.length + 1));
+        }, typingSpeed);
+      }
+    }
+
+    return () => clearTimeout(timeout);
+  }, [text, currentIndex, isDeleting, texts, interval, typingSpeed]);
+
+  return text;
+};
 
 const Configurations = () => {
   const generateImage = useGenerateStore((state) => state.generateImage);
@@ -79,6 +122,8 @@ const Configurations = () => {
   const handlePromptSelect = (prompt: string) => {
     form.setValue("prompt", prompt);
   };
+
+  const animatedPlaceholder = useTextCycling(placeholderTexts);
 
   async function onSubmit(values: FormValues) {
     try {
@@ -234,7 +279,7 @@ const Configurations = () => {
               <FormItem>
                 <FormLabel className="font-medium">Prompt</FormLabel>
                 <FormControl>
-                  <Textarea {...field} rows={6} className="font-medium" />
+                  <Textarea {...field} rows={6} className="font-medium" placeholder={animatedPlaceholder} />
                 </FormControl>
                 <FormMessage className="font-medium" />
               </FormItem>

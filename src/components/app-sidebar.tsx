@@ -76,7 +76,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
   
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="pt-5">
       <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
@@ -92,10 +92,10 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
               </div>
             </SidebarMenuButton>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="pt-10">
         <NavMain items={navMain} />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="pb-10">
         {subscription?.status === 'active' 
           ? null
           : <UpgradeBtn />

@@ -38,7 +38,7 @@ export function NavMain({
                       <SidebarMenuButton tooltip={item.title} className="font-normal text-base">
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
-                        <ChevronDown className="h-4 w-4" />
+                        <ChevronDown className="h-5 w-5" />
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   </CollapsibleTrigger>
@@ -61,7 +61,7 @@ export function NavMain({
             return (
               <ActiveLink href={item.url!} key={item.title}>
                 <SidebarMenuItem>
-                  <SidebarMenuButton tooltip={item.title} className=" font-mono text-base  ">
+                  <SidebarMenuButton tooltip={item.title} className="  text-base  ">
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                   </SidebarMenuButton>
