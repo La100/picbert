@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Circular face with gradient -->
-  <circle cx="256" cy="256" r="240" fill="url(#gradient)" />
+  <!-- Circular face with black background -->
+  <circle cx="256" cy="256" r="240" fill="#000000" />
   
   <!-- Eyes -->
-  <circle cx="176" cy="192" r="32" fill="#1F2937" />
-  <circle cx="336" cy="192" r="32" fill="#1F2937" />
+  <circle cx="176" cy="192" r="32" fill="#FFFFFF" />
+  <circle cx="336" cy="192" r="32" fill="#FFFFFF" />
   
   <!-- Smile -->
-  <path d="M160 320C160 320 192 384 256 384C320 384 352 320 352 320" stroke="#1F2937" stroke-width="24" stroke-linecap="round" />
-  
-  <!-- Gradient definition -->
-  <defs>
-    <linearGradient id="gradient" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#60A5FA" />
-      <stop offset="100%" stop-color="#7C3AED" />
-    </linearGradient>
-  </defs>
+  <path d="M160 320C160 320 192 384 256 384C320 384 352 320 352 320" stroke="#FFFFFF" stroke-width="24" stroke-linecap="round" />
 </svg> 

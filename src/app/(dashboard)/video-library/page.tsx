@@ -39,10 +39,7 @@ async function VideoLibraryData() {
   // Extract image URLs from prompt starters, ensure we have at least 8 unique images
   let previewImages = promptStarters.map(starter => starter.previewImageUrl);
   
-  // If we have less than 8 images, repeat some images to fill
-  while (previewImages.length < 8) {
-    previewImages = [...previewImages, ...previewImages].slice(0, 8);
-  }
+ 
 
   return hasActiveSubscription ? (
     <VideoLibraryContent videos={videos} />

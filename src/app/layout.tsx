@@ -24,6 +24,14 @@ export const metadata: Metadata = {
   title: "Faces Factory",
   description:
     "Faces Factory is a platform for creating and training AI models for image generation.",
+  icons: {
+    icon: [
+      {
+        url: "/face-smile-logo.svg",
+        type: "image/svg+xml",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

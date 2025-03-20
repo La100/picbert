@@ -95,7 +95,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
       <SidebarContent className="pt-10">
         <NavMain items={navMain} />
       </SidebarContent>
-      <SidebarFooter className="pb-10">
+      <SidebarFooter className="pb-5">
         {subscription?.status === 'active' 
           ? null
           : <UpgradeBtn />

@@ -44,7 +44,14 @@ export function NavUser({
     picture?: string
   }
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile, setOpenMobile } = useSidebar()
+
+  const handleClick = () => {
+    // Close the mobile sidebar when clicked
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -90,13 +97,13 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-                <Link href="/account-settings" className="w-full cursor-pointer">
+                <Link href="/account-settings" className="w-full cursor-pointer" onClick={handleClick}>
                 <DropdownMenuItem className="cursor-pointer">
                   <BadgeCheck />
                   Settings
                 </DropdownMenuItem>
               </Link>
-              <Link href="/billing" className="w-full cursor-pointer">
+              <Link href="/billing" className="w-full cursor-pointer" onClick={handleClick}>
               <DropdownMenuItem className="cursor-pointer">
                 <CreditCard />
                   Billing

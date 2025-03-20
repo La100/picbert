@@ -6,7 +6,7 @@ import { VideoData } from "@/lib/cloudflare/r2";
 import { PaginationComponent } from "@/components/ui/pagination";
 
 // Number of items per page
-const ITEMS_PER_PAGE = 15;
+const ITEMS_PER_PAGE = 24;
 
 interface VideoLibraryContentProps {
   videos: VideoData[];

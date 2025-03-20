@@ -80,7 +80,7 @@ export function QuickActions() {
           <CardContent className="flex flex-col items-center justify-center p-6 text-center h-full">
             <UsersIcon className="h-8 w-8 mb-4" />
             <h3 className="font-semibold text-lg mb-2">AI People Library</h3>
-            <p className="text-sm text-muted-foreground mb-4">Browse and manage AI characters</p>
+            <p className="text-sm text-muted-foreground mb-4">Browse and download AI poeple</p>
             
             <div className="flex flex-col items-center w-full max-w-[300px] mx-auto">
               <div className="w-full aspect-square relative overflow-hidden rounded-md shadow-md border border-primary/10">
