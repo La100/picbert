@@ -31,7 +31,7 @@ export const HeroSkeleton = () => {
         
         <div className="mt-8 md:mt-10">
           <div className="h-4 w-32 bg-gray-800/50 rounded-md mx-auto mb-3 animate-pulse"></div>
-          <div className="h-12 w-64 bg-blue-600/50 rounded-md mx-auto animate-pulse"></div>
+          <div className="h-12 w-64 bg-black-600/50 rounded-md mx-auto animate-pulse"></div>
         </div>
       </div>
 
@@ -55,7 +55,7 @@ const HeroSection = () => {
   return (
     <div className="w-full min-h-screen flex flex-col justify-between overflow-hidden px-4 md:px-6">
       {/* Hero Title Section */}
-      <div className="max-w-5xl mx-auto text-center flex-1 flex flex-col justify-center py-8 md:py-12">
+      <div className="max-w-5xl mx-auto text-center flex-1 flex flex-col justify-center py-12 ">
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-tight">
           <span className="block mb-2">Create AI-Generated</span>
           <span className="block">
@@ -64,7 +64,7 @@ const HeroSection = () => {
           </span>
         </h1>
         
-        <h2 className="text-2xl sm:text-4xl md:text-6xl font-light text-gray-400 mt-4 md:mt-2 leading-tight">
+        <h2 className="text-2xl sm:text-4xl md:text-4xl font-light text-gray-400 mt-4  leading-tight">
           <span className="block">Personalized. High Quality. Simple.</span>
         </h2>
         

@@ -1,11 +1,8 @@
 import { Suspense } from "react";
 import HeroSection, { HeroSkeleton } from "./HeroSection";
 
-// This is a server component that artificially delays loading
+// This is a server component that loads the hero section
 async function HeroLoader() {
-  // Simulate network delay for demo purposes
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  
   return <HeroSection />;
 }
 
