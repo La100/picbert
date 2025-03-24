@@ -6,7 +6,7 @@ import { getProducts } from "@/lib/supabase/queries";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Navigation from "@/components/landing-page/Navigation";
-import HeroWrapper from "@/components/landing-page/HeroWrapper";
+import HeroSection from "@/components/landing-page/HeroSection";
 import Faqs from "@/components/landing-page/Faqs";
 import Footer from "@/components/landing-page/Footer";
 import { CookieConsent } from "@/components/ui/cookie-consent";
@@ -33,7 +33,7 @@ export default async function Home() {
   return (
     <main className="flex flex-col min-h-screen items-center justify-center">
       <Navigation />
-      <HeroWrapper />
+      <HeroSection />
    
       <Pricing products={products ?? []} mostPopularProduct="pro" />
       <Faqs />

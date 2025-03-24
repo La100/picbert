@@ -56,7 +56,7 @@ const HeroSection = () => {
     <div className="w-full min-h-screen flex flex-col justify-between overflow-hidden px-4 md:px-6">
       {/* Hero Title Section */}
       <div className="max-w-5xl mx-auto text-center flex-1 flex flex-col justify-center py-12 ">
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-tight">
+        <h1 className="text-4xl sm:text-5xl md:text-5xl  mt-12 font-semibold tracking-tight leading-tight">
           <span className="block mb-2">Create AI-Generated</span>
           <span className="block">
             <span>Realistic </span>
