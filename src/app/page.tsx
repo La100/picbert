@@ -7,8 +7,7 @@ import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Navigation from "@/components/landing-page/Navigation";
 import HeroSection from "@/components/landing-page/HeroSection";
-import Features from "@/components/landing-page/Features";
-import Testimonials from "@/components/landing-page/Testimonials";
+
 import Faqs from "@/components/landing-page/Faqs";
 import Footer from "@/components/landing-page/Footer";
 import { CookieConsent } from "@/components/ui/cookie-consent";
