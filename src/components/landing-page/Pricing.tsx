@@ -124,7 +124,7 @@ const Pricing = ({
           </p>
         </div>
 
-        <div className="sm:space-y-0 grid-cols-1 grid sm:grid-cols-2 lg:grid-cols-2 gap-y-8 sm:gap-8 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3 place-items-center">
+        <div className="sm:space-y-0 grid grid-cols-1 lg:grid-cols-3 gap-y-8 sm:gap-8 lg:max-w-none lg:mx-0 place-items-center">
           {products.map((product) => {
             // console.log(product);
             const price = product?.prices?.find(

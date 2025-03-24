@@ -6,8 +6,7 @@ import { getProducts } from "@/lib/supabase/queries";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Navigation from "@/components/landing-page/Navigation";
-import HeroSection from "@/components/landing-page/HeroSection";
-
+import HeroWrapper from "@/components/landing-page/HeroWrapper";
 import Faqs from "@/components/landing-page/Faqs";
 import Footer from "@/components/landing-page/Footer";
 import { CookieConsent } from "@/components/ui/cookie-consent";
@@ -34,9 +33,8 @@ export default async function Home() {
   return (
     <main className="flex flex-col min-h-screen items-center justify-center">
       <Navigation />
-      <HeroSection />
+      <HeroWrapper />
    
-
       <Pricing products={products ?? []} mostPopularProduct="pro" />
       <Faqs />
 
@@ -44,7 +42,7 @@ export default async function Home() {
         <div className="container px-6 xs:px-8 sm:px-0 sm:mx-8 lg:mx-auto">
           <div className="flex flex-col items-center space-y-4 text-center">
             <h2 className="subHeading font-bold">
-              Ready to Transform Your Photos?
+              Ready to upgrade you content?
             </h2>
             <p className="subText mt-4 text-center">
               Join thousands of users who are already creating amazing
@@ -52,7 +50,7 @@ export default async function Home() {
             </p>
             <Link href="/login?state=signup">
               <Button className="rounded-md text-base h-12">
-                ✨ Create Your First AI Model ✨
+                ✨ Create Your First Realistic AI person ✨
               </Button>
             </Link>
           </div>

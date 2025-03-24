@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 
 const videos = [
   "https://api.facesfactory.com/storage/v1/object/public/images//1.mp4",
@@ -12,48 +13,93 @@ const videos = [
   "https://api.facesfactory.com/storage/v1/object/public/images//7.mp4"
 ];
 
-const HeroSection = () => {
-  // Oblicz całkowitą szerokość przesunięcia
-  const slideWidth = (280 + 16) * videos.length; // szerokość video + gap
-
+export const HeroSkeleton = () => {
   return (
-    <div className="w-full overflow-hidden">
-      {/* Hero Title Section */}
-      <div className="max-w-5xl mx-auto text-center py-10">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-          <span className="block">Find And Outreach</span>
-          <span className="block">
-            <span>1000s Of </span>
-            <span className="text-orange-500">Viral Creators</span>
-          </span>
-        </h1>
+    <div className="w-full min-h-screen flex flex-col justify-between overflow-hidden px-4 md:px-6">
+      {/* Skeleton Title Section */}
+      <div className="max-w-5xl mx-auto text-center flex-1 flex flex-col justify-center py-8 md:py-12">
+        <div className="h-12 md:h-16 bg-gray-800 rounded-md w-3/4 mx-auto mb-2 animate-pulse"></div>
+        <div className="h-12 md:h-16 bg-gray-800 rounded-md w-4/5 mx-auto animate-pulse"></div>
         
-        <h2 className="text-4xl md:text-6xl font-light text-gray-400 mt-2">
-          <span className="block">For Your Startup. On Autopilot</span>
-        </h2>
+        <div className="h-8 md:h-12 bg-gray-800/50 rounded-md w-2/3 mx-auto mt-4 animate-pulse"></div>
         
-        <div className="mt-8 flex justify-center items-center gap-2">
-          <span className="text-lg md:text-xl">The first</span>
-          <span className="border border-gray-800 rounded-full px-3 py-1 text-lg md:text-xl">AI Agents</span>
-          <span className="text-lg md:text-xl">to automate creator marketing</span>
+        <div className="mt-6 md:mt-8 flex flex-wrap justify-center items-center gap-2 px-4">
+          <div className="h-6 w-20 bg-gray-800 rounded-md animate-pulse"></div>
+          <div className="h-6 w-24 bg-gray-800 rounded-full animate-pulse"></div>
+          <div className="h-6 w-48 bg-gray-800 rounded-md animate-pulse"></div>
         </div>
         
-        <div className="mt-10">
-          <div className="text-sm text-gray-500 mb-2">89/100 spots left</div>
-          <a 
-            href="#" 
-            className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-10 py-3 rounded-md flex items-center justify-center gap-2 mx-auto w-64"
-          >
-            <span className="text-xl">🔍</span>
-            <span>Find Creators</span>
-          </a>
+        <div className="mt-8 md:mt-10">
+          <div className="h-4 w-32 bg-gray-800/50 rounded-md mx-auto mb-3 animate-pulse"></div>
+          <div className="h-12 w-64 bg-blue-600/50 rounded-md mx-auto animate-pulse"></div>
         </div>
       </div>
 
-      {/* Video Carousel - NAJPROSTSZE ROZWIĄZANIE */}
-      <div className="relative mt-16 pt-16">
+      {/* Skeleton Video Carousel */}
+      <div className="relative mt-auto -mx-4">
+        <div className="flex gap-2 md:gap-4 overflow-hidden">
+          {[...Array(7)].map((_, index) => (
+            <div key={index} className="flex-shrink-0 w-[200px] md:w-[280px]">
+              <div className="w-full aspect-[9/16] rounded-lg bg-gray-800 animate-pulse"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const HeroSection = () => {
+  const slideWidth = (280 + 16) * videos.length;
+
+  return (
+    <div className="w-full min-h-screen flex flex-col justify-between overflow-hidden px-4 md:px-6">
+      {/* Hero Title Section */}
+      <div className="max-w-5xl mx-auto text-center flex-1 flex flex-col justify-center py-8 md:py-12">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-tight">
+          <span className="block mb-2">Create AI-Generated</span>
+          <span className="block">
+            <span>Realistic </span>
+            <span className="italic">Human Content</span>
+          </span>
+        </h1>
+        
+        <h2 className="text-2xl sm:text-4xl md:text-6xl font-light text-gray-400 mt-4 md:mt-2 leading-tight">
+          <span className="block">Personalized. High Quality. Simple.</span>
+        </h2>
+        
+      
+        
+        <div className="mt-8 md:mt-10">
+          <div className="text-sm  mb-3">Free generation credits available</div>
+          <RainbowButton 
+            onClick={() => window.location.href="/login?state=signup"}
+            className="flex items-center justify-center gap-2 mx-auto w-full sm:w-64"
+          >
+            <span className="text-xl">🎬</span>
+            <span>Gain followers easy! </span>
+          </RainbowButton>
+          
+          {/* Social Media Icons */}
+          <div className="flex justify-center items-center gap-3 mt-6">
+            <span className=" mr-1">Perfect for content on  </span>
+            <a href="#" className="hover:scale-110 transition-transform">
+              <img src="/social/tiktok.avif" alt="TikTok" width="32" height="32" className="rounded-lg" />
+            </a>
+            <a href="#" className="hover:scale-110 transition-transform">
+              <img src="/social/instagram.avif" alt="Instagram" width="32" height="32" />
+            </a>
+            <a href="#" className="hover:scale-110 transition-transform">
+              <img src="/social/youtube.avif" alt="YouTube" width="32" height="32" />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Video Carousel */}
+      <div className="relative mt-auto -mx-4">
         <motion.div 
-          className="flex gap-4"
+          className="flex gap-2 md:gap-4"
           animate={{ 
             x: [-slideWidth/2, -slideWidth * 1.5]
           }}
@@ -68,9 +114,8 @@ const HeroSection = () => {
             willChange: "transform",
           }}
         >
-          {/* Potrójne powielenie dla płynności */}
           {[...videos, ...videos, ...videos].map((video, index) => (
-            <div key={index} className="flex-shrink-0 w-[280px]">
+            <div key={index} className="flex-shrink-0 w-[200px] md:w-[280px]">
               <video
                 src={video}
                 autoPlay

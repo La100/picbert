@@ -17,7 +17,7 @@ const Navigation = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -61,15 +61,15 @@ const Navigation = () => {
   return (
     <div
       className={cn(
-        "w-full bg-background/60 backdrop-blur-md fixed top-0 px-8 py-4 z-50 shadow-xl overflow-hidden",
+        "w-full fixed top-0 px-8 py-4 z-50 transition-all duration-300",
         isScrolled
-          ? "max-w-[90vw] bg-background shadow-md rounded-full container mx-auto transition-all duration-300 mt-4"
-          : ""
+          ? "bg-background/60 backdrop-blur-md shadow-xl max-w-[90vw] rounded-full container mx-auto mt-4"
+          : "bg-transparent"
       )}
     >
       <header
         className={cn(
-          `container mx-auto flex items-center`,
+          "container mx-auto flex items-center",
           isScrolled ? "rounded-full" : ""
         )}
       >
@@ -81,10 +81,10 @@ const Navigation = () => {
         </nav>
 
         {/* Mobile Navigation */}
-        <div className="ml-auto md:hidden overflow-hidden">
+        <div className="ml-auto md:hidden">
           <Sheet>
             <SheetTrigger asChild>
-                <Menu className="h-6 w-6" strokeWidth={1.5} />
+              <Menu className="h-6 w-6" strokeWidth={1.5} />
             </SheetTrigger>
             <SheetContent>
               <SheetTitle className="sr-only">Navigation</SheetTitle>
