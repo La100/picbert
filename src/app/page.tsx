@@ -36,8 +36,7 @@ export default async function Home() {
     <main className="flex flex-col min-h-screen items-center justify-center">
       <Navigation />
       <HeroSection />
-      <Features />
-      <Testimonials />
+   
 
       <Pricing products={products ?? []} mostPopularProduct="pro" />
       <Faqs />
