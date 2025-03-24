@@ -13,17 +13,18 @@ const videos = [
 ];
 
 const HeroSection = () => {
-  const allVideos = [...videos, ...videos, ...videos]; // Potrajamy dla płynności
+  // Duplicate videos array to create a seamless loop
+  const allVideos = [...videos, ...videos];
 
   return (
-    <div className="w-full overflow-hidden ">
+    <div className="w-full overflow-hidden">
       <motion.div 
         className="flex gap-4 mt-16 pt-16"
         animate={{
-          x: [0, -1960], // Przesunięcie o szerokość jednego zestawu video
+          x: [0, -((280 + 16) * videos.length)], // Calculate exact width to move (video width + gap)
         }}
         transition={{
-          duration: 20,
+          duration: 15,
           ease: "linear",
           repeat: Infinity,
           repeatType: "loop"
