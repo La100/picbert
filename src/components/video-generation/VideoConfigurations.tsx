@@ -95,7 +95,6 @@ const useTextCycling = (texts: string[], interval: number = 3000) => {
 const VideoConfigurations = () => {
   const loading = useVideoGenerateStore((state) => state.loading);
   const setLoading = useVideoGenerateStore((state) => state.setLoading);
-
   const { refreshTokens } = useTokenStore();
   const [isUploading, setIsUploading] = React.useState(false);
   const [tokenCount, setTokenCount] = useState<number | null>(null);

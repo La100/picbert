@@ -51,6 +51,29 @@ export const HeroSkeleton = () => {
 
 const HeroSection = () => {
   const slideWidth = (280 + 16) * videos.length;
+  const [isAllLoaded, setIsAllLoaded] = React.useState(false);
+  const loadedVideosRef = React.useRef(new Set<string>());
+
+  const handleVideoLoad = (videoUrl: string) => {
+    loadedVideosRef.current.add(videoUrl);
+    if (loadedVideosRef.current.size === videos.length) {
+      setIsAllLoaded(true);
+    }
+  };
+
+  // Preload videos
+  React.useEffect(() => {
+    videos.forEach(videoUrl => {
+      const video = document.createElement('video');
+      video.src = videoUrl;
+      video.onloadeddata = () => handleVideoLoad(videoUrl);
+      video.load();
+    });
+  }, []);
+
+  if (!isAllLoaded) {
+    return <HeroSkeleton />;
+  }
 
   return (
     <div className="w-full min-h-screen flex flex-col justify-between overflow-hidden px-4 md:px-6">
