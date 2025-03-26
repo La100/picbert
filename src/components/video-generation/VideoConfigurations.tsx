@@ -288,28 +288,8 @@ const VideoConfigurations = () => {
             setLoading(false);
             toast.success("Video generated successfully!", { id: toastId });
             
-            // Get the latest videos from the database
-            try {
-              const videoResult = await getVideos(1, 1); // Get the most recent video
-              if (videoResult.success && videoResult.data && videoResult.data.length > 0) {
-                const latestVideo = videoResult.data[0];
-                generateVideo({
-                  data: {
-                    video: {
-                      url: latestVideo.url as string,
-                      prompt: latestVideo.prompt as string,
-                      input_image: latestVideo.input_image as string,
-                      aspect_ratio: latestVideo.aspect_ratio as "16:9" | "9:16" | "1:1",
-                      duration: latestVideo.duration as "5" | "10"
-                    }
-                  }
-                });
-              }
-            } catch (err) {
-              console.error("Failed to fetch latest video:", err);
-            }
-            
-            router.refresh(); // This will refresh the current route
+            // Refresh the route to update the UI
+            router.refresh();
             break;
           case "failed":
             clearInterval(pollInterval);
