@@ -1,4 +1,4 @@
-import { BeakerIcon, ClockIcon, FireIcon, CheckIcon } from '@heroicons/react/24/solid';
+import { Beaker, Clock, Flame, Check } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -9,19 +9,19 @@ export default function Recipe() {
       id: 1,
       title: 'Choose Your Subject',
       description: 'Select the type of person or character you want to create.',
-      icon: BeakerIcon,
+      icon: Beaker,
     },
     {
       id: 2,
       title: 'Add Details & Customization',
       description: 'Specify features, style, setting, and other preferences.',
-      icon: FireIcon,
+      icon: Flame,
     },
     {
       id: 3,
       title: 'Generate & Refine',
       description: 'Our AI creates your images, which you can further refine if needed.',
-      icon: ClockIcon,
+      icon: Clock,
     },
   ];
 
@@ -66,15 +66,15 @@ export default function Recipe() {
                   <h4 className="font-medium text-gray-900">Results  Love:</h4>
                   <ul className="mt-4 space-y-3">
                     <li className="flex gap-2">
-                      <CheckIcon className="h-5 w-5 flex-shrink-0 text-green-500" aria-hidden="true" />
+                      <Check className="h-5 w-5 flex-shrink-0 text-green-500" aria-hidden="true" />
                       <span className="text-gray-700">Realistic, high-quality images</span>
                     </li>
                     <li className="flex gap-2">
-                      <CheckIcon className="h-5 w-5 flex-shrink-0 text-green-500" aria-hidden="true" />
+                      <Check className="h-5 w-5 flex-shrink-0 text-green-500" aria-hidden="true" />
                       <span className="text-gray-700">Unlimited variations and styles</span>
                     </li>
                     <li className="flex gap-2">
-                      <CheckIcon className="h-5 w-5 flex-shrink-0 text-green-500" aria-hidden="true" />
+                      <Check className="h-5 w-5 flex-shrink-0 text-green-500" aria-hidden="true" />
                       <span className="text-gray-700">Ready for immediate use in your projects</span>
                     </li>
                   </ul>
