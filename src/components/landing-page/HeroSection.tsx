@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 
@@ -51,6 +51,23 @@ export const HeroSkeleton = () => {
 
 const HeroSection = () => {
   const slideWidth = (280 + 16) * videos.length;
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    // Check if device is mobile based on screen width
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <div className="w-full min-h-screen flex flex-col justify-between overflow-hidden px-4 md:px-6">
@@ -67,8 +84,6 @@ const HeroSection = () => {
         <h2 className="text-2xl sm:text-4xl md:text-4xl font-light text-gray-400 mt-4  leading-tight">
           <span className="block">Personalized. High Quality. Simple.</span>
         </h2>
-        
-      
         
         <div className="mt-8 md:mt-10">
           <div className="text-sm  mb-3">Free generation credits available</div>
@@ -115,10 +130,11 @@ const HeroSection = () => {
           }}
         >
           {[...videos, ...videos, ...videos].map((video, index) => (
-            <div key={index} className="flex-shrink-0 w-[200px] md:w-[280px]">
+            <div key={index} className="flex-shrink-0 w-[200px] md:w-[280px] relative">
               <video
                 src={video}
-                autoPlay
+                autoPlay={!isMobile}
+                controls={isMobile}
                 loop
                 muted
                 playsInline
