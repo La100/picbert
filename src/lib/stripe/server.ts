@@ -58,6 +58,15 @@ export async function checkoutWithStripe(
     // We'll use the same token amount as specified in the metadata
     console.log(`Subscription: Allocating tokens: ${totalTokens}`);
 
+    // Calculate payment amount for the email
+    const unitAmount = (price.unit_amount || 0) / 100;
+    const totalAmount = unitAmount * quantity;
+    const currency = price.currency || 'USD';
+    const formattedAmount = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+    }).format(totalAmount);
+
     let params: Stripe.Checkout.SessionCreateParams = {
       allow_promotion_codes: true,
       billing_address_collection: 'required',
@@ -65,6 +74,7 @@ export async function checkoutWithStripe(
       client_reference_id: user?.id,
       metadata: {
         tokens: totalTokens,
+        payment_amount: formattedAmount
       },
       customer_update: {
         address: 'auto'

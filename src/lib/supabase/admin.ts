@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 import type { Database, Tables, TablesInsert } from '@database.types';
 import { revalidateTag } from 'next/cache';
-import { sendSubscriptionConfirmationEmail, sendSubscriptionCancellationEmail } from '@/lib/email';
+import { sendSubscriptionConfirmationEmail, sendSubscriptionCancellationEmail, sendTokenPurchaseConfirmationEmail } from '@/lib/email';
 import { format } from 'date-fns';
 
 type Product = Tables<'products'>;
@@ -495,6 +495,43 @@ const updateUserCredits = async (
       }
     }
 
+    // Get user information for sending email
+    const { data: userData, error: userError } = await supabaseAdmin
+      .auth.admin.getUserById(userId);
+
+    if (userError) {
+      console.error('Error getting user for email:', userError);
+    } else if (userData && userData.user) {
+      const userEmail = userData.user.email;
+      const userName = userData.user.user_metadata?.full_name || 'User';
+      
+      if (userEmail) {
+        // Get payment amount if available
+        let paymentAmount = "your payment";
+        if (metadata.payment_amount) {
+          paymentAmount = metadata.payment_amount;
+        }
+
+        // Send token purchase confirmation email
+        try {
+          const emailResult = await sendTokenPurchaseConfirmationEmail({
+            to: userEmail,
+            userName,
+            tokenAmount,
+            paymentAmount
+          });
+
+          if (!emailResult.success) {
+            console.error('Failed to send token purchase confirmation email:', emailResult.error);
+          } else {
+            console.log(`Token purchase confirmation email sent to ${userEmail}`);
+          }
+        } catch (error) {
+          console.error('Error sending token purchase confirmation email:', error);
+        }
+      }
+    }
+
     console.log(`Successfully updated tokens for user ${userId}: ${newTokenAmount}`);
   } catch (error) {
     console.error('Error updating user credits:', error);
@@ -590,6 +627,45 @@ const allocateTokensForSubscription = async (
       throw new Error(`Credits update failed: ${updateError.message}`);
     } else {
       console.log(`Updated credits for user: ${userId} from ${currentTokens} to ${newTokens} tokens`);
+    }
+    
+    // Get user information for sending email
+    const { data: userData, error: userError } = await supabaseAdmin
+      .auth.admin.getUserById(userId);
+
+    if (userError) {
+      console.error('Error getting user for email:', userError);
+    } else if (userData && userData.user) {
+      const userEmail = userData.user.email;
+      const userName = userData.user.user_metadata?.full_name || 'User';
+      
+      if (userEmail) {
+        // Format payment amount from subscription
+        const unitAmount = (subscription.items.data[0].price.unit_amount || 0) / 100;
+        const currency = subscription.items.data[0].price.currency || 'USD';
+        const formattedAmount = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: currency,
+        }).format(unitAmount);
+
+        // Send token purchase confirmation email
+        try {
+          const emailResult = await sendTokenPurchaseConfirmationEmail({
+            to: userEmail,
+            userName,
+            tokenAmount: monthlyTokens,
+            paymentAmount: `your ${product.name} subscription (${formattedAmount})`
+          });
+
+          if (!emailResult.success) {
+            console.error('Failed to send token allocation confirmation email:', emailResult.error);
+          } else {
+            console.log(`Token allocation confirmation email sent to ${userEmail}`);
+          }
+        } catch (error) {
+          console.error('Error sending token allocation confirmation email:', error);
+        }
+      }
     }
     
     revalidateTag('credits');

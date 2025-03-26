@@ -131,4 +131,30 @@ export async function sendSubscriptionCancellationEmail({
       endDate,
     }),
   });
+}
+
+/**
+ * Send a token purchase confirmation email
+ */
+export async function sendTokenPurchaseConfirmationEmail({
+  to,
+  userName,
+  tokenAmount,
+  paymentAmount,
+}: {
+  to: string;
+  userName: string;
+  tokenAmount: number;
+  paymentAmount: string;
+}) {
+  const message = `Thank you for your token purchase! You have successfully added ${tokenAmount} tokens to your account for ${paymentAmount}.`;
+  
+  return sendEmail({
+    to,
+    subject: 'Token Purchase Confirmation',
+    react: React.createElement(EmailTemplate, {
+      userName,
+      message,
+    }),
+  });
 } 
