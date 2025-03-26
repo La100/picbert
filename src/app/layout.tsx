@@ -24,6 +24,25 @@ export const metadata: Metadata = {
   title: "Faces Factory",
   description:
     "Faces Factory is a platform for creating and training AI models for image generation.",
+  openGraph: {
+    title: "Faces Factory",
+    description: "Faces Factory is a platform for creating and training AI models for image generation.",
+    images: [
+      {
+        url: "/collage.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Faces Factory Preview",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Faces Factory",
+    description: "Faces Factory is a platform for creating and training AI models for image generation.",
+    images: ["/collage.jpg"],
+    creator: "@facesFactory",
+  },
   icons: {
     icon: [
       {

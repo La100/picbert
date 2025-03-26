@@ -4,12 +4,35 @@ import AnimatedGradientText from '../ui/animated-gradient-text'
 import { cn } from '@/lib/utils'
 
 const faqs = [
-  {question: "How does Faces Factory work?", answer: "Faces Factory uses advanced machine learning algorithms to analyze and understand your photos. It then generates new images based on your features and the scenarios you choose, creating realistic and personalized results."},
-  {question: "Is my data safe with Faces Factory?", answer: "Yes, we take data privacy very seriously. All uploaded photos and generated images are encrypted and stored securely. We never share your personal data or images with third parties without your explicit consent."},
-  {question: "How many photos do I need for best results?", answer: "For optimal results, we recommend providing a clear reference photo that shows your features well. The better the quality and clarity of your reference photo, the more accurate and realistic the generated images will be."},
-  {question: "Can I use Faces Factory for commercial purposes?", answer: "Yes, our Pro and Enterprise plans include commercial usage rights for the images you generate. However, please note that you should always respect copyright and usage rights when using generated images."},
-  {question: "How often do you update the AI system?", answer: "We continuously work on improving our AI technology. Updates are released regularly to enhance image quality, add new features, and optimize performance. All users automatically benefit from these improvements."},
-  {question: "What are the differences between the free and paid plans?", answer: "The free plan allows you to generate up to 5 images per day. The Pro plan includes unlimited image generation, higher resolution output, and access to additional features. The Enterprise plan is tailored for businesses and offers custom integrations and dedicated support."},
+  {
+    question: "What is Faces Factory?",
+    answer: "Faces Factory is an AI-powered platform that creates realistic human content for your social media. Upload your photos, and our advanced AI will generate personalized, high-quality videos and images ideal for TikTok, Instagram, and YouTube."
+  },
+  {
+    question: "How many tokens do I get with each plan?",
+    answer: "Our Hobby plan includes 1000 tokens per month, the Pro plan offers 2500 tokens monthly, and the Business plan provides 5000 tokens per month. Each token can be used to generate content."
+  },
+  {
+    question: "What can I create with Faces Factory?",
+    answer: "You can create a wide variety of AI-generated realistic human content including professional shots, trendy street-style looks, and customized videos."
+  },
+  {
+    question: "Do I need to be a professional photographer or editor?",
+    answer: "Not at all! Faces Factory is designed to be user-friendly. Our AI handles all the technical aspects of creating high-quality content, so you can focus on growing your social media presence."
+  },
+  {
+    question: "Can I use the content commercially?",
+    answer: "Yes, our Pro and Business plans include a commercial license. The Hobby plan is limited to personal use only. Make sure to check our terms of service for specific usage guidelines."
+  },
+  {
+    question: "How fast can I generate content?",
+    answer: "Image takes a few seconds to generate, and video around 5 minutes to generate."
+  },
+ 
+  {
+    question: "What kind of support do you offer?",
+    answer: "All plans include standard email support. The Business plan includes express email support, priority feature requests, and a dedicated account manager to help you get the most out of Faces Factory."
+  }
 ]
 
 const Question = ({question, answer}: {question: string, answer: string}) => {

@@ -38,7 +38,7 @@ const navMain =  [
       icon: Users,
     },                          
     {
-      title: "Generate Images",
+      title: "Create a Person",
       url: "/image-generation",
       icon: ImagePlus,
     },

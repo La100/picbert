@@ -4,6 +4,7 @@ import { Database } from "@database.types";
 import { randomUUID } from "crypto";
 import { revalidateTag } from "next/cache";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+
 import { fal } from "@/lib/fal";
 import { processTokenOperation } from "./token-actions";
 import { VIDEO_TOKEN_COST_5_SEC, VIDEO_TOKEN_COST_10_SEC } from "@/lib/constants";
@@ -365,6 +366,18 @@ export async function queueVideoGeneration(
       data: requestData,
     };
   } catch (error) {
+    // If there's an error with fal.ai or any other part of video generation, refund the tokens
+    const tokenCost = data.duration === "5" ? VIDEO_TOKEN_COST_5_SEC : VIDEO_TOKEN_COST_10_SEC;
+    
+    try {
+      // Import directly inside the catch block to avoid circular dependencies
+      const { addTokens } = await import('./token-actions');
+      await addTokens(tokenCost);
+      console.log(`Refunded ${tokenCost} tokens due to video generation error`);
+    } catch (refundError) {
+      console.error("Failed to refund tokens:", refundError);
+    }
+    
     return {
       error: error instanceof Error ? error.message : "Failed to queue video generation",
       success: false,
@@ -425,6 +438,19 @@ export async function getVideoRequestStatus(requestId: string): Promise<VideoRes
         default:
           newStatus = "failed";
           errorMessage = "Generation failed";
+          
+          // Refund tokens if the generation failed
+          try {
+            // Determine token cost based on video duration
+            const tokenCost = data.duration === "5" ? VIDEO_TOKEN_COST_5_SEC : VIDEO_TOKEN_COST_10_SEC;
+            
+            // Import token actions directly to avoid circular dependencies
+            const { addTokens } = await import('./token-actions');
+            await addTokens(tokenCost);
+            console.log(`Refunded ${tokenCost} tokens due to failed video generation`);
+          } catch (refundError) {
+            console.error("Failed to refund tokens:", refundError);
+          }
       }
 
       // Update status in database
