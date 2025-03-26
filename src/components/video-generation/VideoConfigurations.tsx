@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { queueVideoGeneration, getVideoRequestStatus, getVideos } from "@/app/actions/video-actions";
+import { queueVideoGeneration, getVideoRequestStatus } from "@/app/actions/video-actions";
 import { GalleryImagePicker } from "@/components/gallery/GalleryImagePicker";
 import Image from "next/image";
 import { uploadInputImage } from "@/lib/supabase/queries";
@@ -95,7 +95,7 @@ const useTextCycling = (texts: string[], interval: number = 3000) => {
 const VideoConfigurations = () => {
   const loading = useVideoGenerateStore((state) => state.loading);
   const setLoading = useVideoGenerateStore((state) => state.setLoading);
-  const generateVideo = useVideoGenerateStore((state) => state.generateVideo);
+
   const { refreshTokens } = useTokenStore();
   const [isUploading, setIsUploading] = React.useState(false);
   const [tokenCount, setTokenCount] = useState<number | null>(null);
