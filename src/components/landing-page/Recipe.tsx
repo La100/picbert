@@ -63,7 +63,7 @@ export default function Recipe() {
                 </div>
                 
                 <div className="mt-8 pt-6 border-t border-gray-200">
-                  <h4 className="font-medium text-gray-900">Results You'll Love:</h4>
+                  <h4 className="font-medium text-gray-900">Results  Love:</h4>
                   <ul className="mt-4 space-y-3">
                     <li className="flex gap-2">
                       <CheckIcon className="h-5 w-5 flex-shrink-0 text-green-500" aria-hidden="true" />
