@@ -43,11 +43,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const placeholderTexts = [
-  "European woman with warm smile",
-  "Young couple on sunny beach",
-  "Old asian lady in central park"
-];
+
 
 const useTextCycling = (texts: string[], interval: number = 3000) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -123,7 +119,7 @@ const Configurations = () => {
     form.setValue("prompt", prompt);
   };
 
-  const animatedPlaceholder = useTextCycling(placeholderTexts);
+
 
   async function onSubmit(values: FormValues) {
     try {
@@ -279,7 +275,7 @@ const Configurations = () => {
               <FormItem>
                 <FormLabel className="font-medium">Prompt</FormLabel>
                 <FormControl>
-                  <Textarea {...field} rows={6} className="font-medium" placeholder={animatedPlaceholder} />
+                  <Textarea {...field} rows={6} className="font-medium"  />
                 </FormControl>
                 <FormMessage className="font-medium" />
               </FormItem>

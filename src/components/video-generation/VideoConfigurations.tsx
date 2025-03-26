@@ -49,10 +49,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const placeholderTexts = [
-  "Girl showing thumbs up, smiling",
-  "Woman being shocked"
-];
+
 
 const useTextCycling = (texts: string[], interval: number = 3000) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -181,7 +178,7 @@ const VideoConfigurations = () => {
     }
   }, [form]);
 
-  const animatedPlaceholder = useTextCycling(placeholderTexts);
+ 
 
   async function onSubmit(values: FormValues) {
     try {
@@ -338,7 +335,7 @@ const VideoConfigurations = () => {
           className="grid w-full max-w-2xl mx-auto items-start gap-6 xl:pt-20"
         >
           <fieldset className="grid gap-6 rounded-lg border p-4 bg-gradient-to-tr from-background to-muted/50 border-primary/10 shadow-lg">
-            <legend className="-ml-1 px-1 text-base font-medium">Video Generation</legend>
+            <legend className="-ml-1 px-1 text-base font-medium">Video Generation - around 5 minutes</legend>
 
             <div className="flex justify-between items-center">
               <div className="text-sm font-medium ">Available Tokens: <span className="font-bold">{tokenCount }</span></div>
@@ -463,7 +460,7 @@ const VideoConfigurations = () => {
                 <FormItem>
                   <FormLabel className="font-medium">Prompt</FormLabel>
                   <FormControl>
-                    <Textarea {...field} rows={6} className="font-medium" placeholder={animatedPlaceholder} />
+                    <Textarea {...field} rows={6} className="font-medium"  />
                   </FormControl>
                   <FormMessage className="font-medium" />
                 </FormItem>
