@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 
 const videos = [
@@ -15,7 +15,7 @@ const videos = [
 
 export const HeroSkeleton = () => {
   return (
-    <div className="w-full min-h-screen flex flex-col justify-between overflow-hidden px-4 md:px-6">
+    <div className="w-full min-h-screen flex flex-col justify-between overflow-hidden px-4 mt-12 md:px-6">
       {/* Skeleton Title Section */}
       <div className="max-w-5xl mx-auto text-center flex-1 flex flex-col justify-center py-8 md:py-12">
         <div className="h-12 md:h-16 bg-gray-800 rounded-md w-3/4 mx-auto mb-2 animate-pulse"></div>
@@ -49,6 +49,30 @@ export const HeroSkeleton = () => {
   );
 };
 
+const VideoItem = ({ video, index }: { video: string; index: number }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ 
+        duration: 0.5,
+        delay: index * 0.2, // Stagger effect
+        ease: "easeOut"
+      }}
+      className="flex-shrink-0 w-[200px] md:w-[280px]"
+    >
+      <video
+        src={video}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="w-full aspect-[9/16] rounded-lg object-cover"
+      />
+    </motion.div>
+  );
+};
+
 const VideoCarousel = ({ videoUrls }: { videoUrls: string[] }) => {
   const slideWidth = (280 + 16) * videoUrls.length;
   
@@ -69,18 +93,11 @@ const VideoCarousel = ({ videoUrls }: { videoUrls: string[] }) => {
         willChange: "transform",
       }}
     >
-      {[...videoUrls, ...videoUrls, ...videoUrls].map((video, index) => (
-        <div key={index} className="flex-shrink-0 w-[200px] md:w-[280px]">
-          <video
-            src={video}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full aspect-[9/16] rounded-lg object-cover"
-          />
-        </div>
-      ))}
+      <AnimatePresence>
+        {[...videoUrls, ...videoUrls, ...videoUrls].map((video, index) => (
+          <VideoItem key={video + index} video={video} index={index % videoUrls.length} />
+        ))}
+      </AnimatePresence>
     </motion.div>
   );
 };
@@ -128,6 +145,8 @@ const HeroSection = () => {
         try {
           await loadVideo(videoUrl);
           if (mounted) {
+            // Add small delay between loading videos for smoother appearance
+            await new Promise(resolve => setTimeout(resolve, 200));
             setLoadedVideos(prev => [...prev, videoUrl]);
           }
         } catch (error) {

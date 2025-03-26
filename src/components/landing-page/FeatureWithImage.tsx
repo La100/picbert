@@ -6,7 +6,7 @@ export default function FeatureComparison() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto mb-10 max-w-2xl text-center lg:text-left lg:mx-0">
           <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-            Create more, spend less
+            Create more,<br /> spend less
           </h2>
          
         </div>

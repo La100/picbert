@@ -30,13 +30,13 @@ export default function Recipe() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="flex justify-center order-2 lg:order-1">
-            <div className="relative w-full max-w-md aspect-[9/16] rounded-xl overflow-hidden ">
+            <div className="relative mx-10  aspect-[9/16] rounded-xl overflow-hidden ">
               <Image
                 src="https://api.facesfactory.com/storage/v1/object/public/images//landing.png"
                 alt="AI-Generated Image"
                 width={450}
                 height={760}
-                className="object-cover w-full h-full"
+                className="object-cover "
               />
               
             </div>
