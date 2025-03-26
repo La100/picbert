@@ -108,7 +108,7 @@ export function SignupForm() {
         type="button" 
         disabled={isGoogleLoading} 
         onClick={handleGoogleLogin}
-        className="w-full py-6 text-base font-medium bg-blue-600 hover:bg-blue-700 relative"
+        className="w-full py-6 text-base font-medium bg-blue-600 hover:bg-blue-700 relative mt-8 lg:mt-0"
       >
         <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center justify-center bg-white rounded-sm w-8 h-8">
           <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -190,6 +190,7 @@ export function SignupForm() {
                       onSuccess={(token) => setTurnstileToken(token)}
                       options={{
                         theme: 'light',
+                        size: 'flexible',
                       }}
                     />
                   </div>
