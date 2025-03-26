@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 
 const videos = [
@@ -15,7 +15,7 @@ const videos = [
 
 export const HeroSkeleton = () => {
   return (
-    <div className="w-full min-h-screen flex flex-col justify-between overflow-hidden px-4 mt-12 md:px-6">
+    <div className="w-full min-h-screen flex flex-col justify-between overflow-hidden px-4 md:px-6">
       {/* Skeleton Title Section */}
       <div className="max-w-5xl mx-auto text-center flex-1 flex flex-col justify-center py-8 md:py-12">
         <div className="h-12 md:h-16 bg-gray-800 rounded-md w-3/4 mx-auto mb-2 animate-pulse"></div>
@@ -49,125 +49,8 @@ export const HeroSkeleton = () => {
   );
 };
 
-const VideoItem = ({ video, index }: { video: string; index: number }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ 
-        duration: 0.5,
-        delay: index * 0.2, // Stagger effect
-        ease: "easeOut"
-      }}
-      className="flex-shrink-0 w-[200px] md:w-[280px]"
-    >
-      <video
-        src={video}
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="w-full aspect-[9/16] rounded-lg object-cover"
-      />
-    </motion.div>
-  );
-};
-
-const VideoCarousel = ({ videoUrls }: { videoUrls: string[] }) => {
-  const slideWidth = (280 + 16) * videoUrls.length;
-  
-  return (
-    <motion.div 
-      className="flex gap-2 md:gap-4"
-      animate={{ 
-        x: [-slideWidth/2, -slideWidth * 1.5]
-      }}
-      transition={{
-        x: {
-          repeat: Infinity,
-          duration: 30,
-          ease: "linear",
-        },
-      }}
-      style={{ 
-        willChange: "transform",
-      }}
-    >
-      <AnimatePresence>
-        {[...videoUrls, ...videoUrls, ...videoUrls].map((video, index) => (
-          <VideoItem key={video + index} video={video} index={index % videoUrls.length} />
-        ))}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
-
 const HeroSection = () => {
-  const [loadedVideos, setLoadedVideos] = React.useState<string[]>([]);
-  const [isInitialLoaded, setIsInitialLoaded] = React.useState(false);
-  const initialVideosCount = 3; // Start with 3 videos
-
-  // Progressive video loading
-  React.useEffect(() => {
-    let mounted = true;
-
-    const loadVideo = async (videoUrl: string) => {
-      return new Promise<string>((resolve, reject) => {
-        const video = document.createElement('video');
-        video.src = videoUrl;
-        video.onloadeddata = () => resolve(videoUrl);
-        video.onerror = reject;
-        video.load();
-      });
-    };
-
-    // Load initial batch of videos
-    const loadInitialVideos = async () => {
-      try {
-        const initialVideos = videos.slice(0, initialVideosCount);
-        const loadedInitial = await Promise.all(
-          initialVideos.map(loadVideo)
-        );
-        if (mounted) {
-          setLoadedVideos(loadedInitial);
-          setIsInitialLoaded(true);
-        }
-      } catch (error) {
-        console.error('Error loading initial videos:', error);
-      }
-    };
-
-    // Load remaining videos progressively
-    const loadRemainingVideos = async () => {
-      const remainingVideos = videos.slice(initialVideosCount);
-      for (const videoUrl of remainingVideos) {
-        if (!mounted) break;
-        try {
-          await loadVideo(videoUrl);
-          if (mounted) {
-            // Add small delay between loading videos for smoother appearance
-            await new Promise(resolve => setTimeout(resolve, 200));
-            setLoadedVideos(prev => [...prev, videoUrl]);
-          }
-        } catch (error) {
-          console.error('Error loading video:', videoUrl, error);
-        }
-      }
-    };
-
-    loadInitialVideos().then(() => {
-      // Start loading remaining videos only after initial ones are loaded
-      loadRemainingVideos();
-    });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (!isInitialLoaded) {
-    return <HeroSkeleton />;
-  }
+  const slideWidth = (280 + 16) * videos.length;
 
   return (
     <div className="w-full min-h-screen flex flex-col justify-between overflow-hidden px-4 md:px-6">
@@ -184,6 +67,8 @@ const HeroSection = () => {
         <h2 className="text-2xl sm:text-4xl md:text-4xl font-light text-gray-400 mt-4  leading-tight">
           <span className="block">Personalized. High Quality. Simple.</span>
         </h2>
+        
+      
         
         <div className="mt-8 md:mt-10">
           <div className="text-sm  mb-3">Free generation credits available</div>
@@ -213,7 +98,35 @@ const HeroSection = () => {
 
       {/* Video Carousel */}
       <div className="relative mt-auto -mx-4">
-        <VideoCarousel videoUrls={loadedVideos} />
+        <motion.div 
+          className="flex gap-2 md:gap-4"
+          animate={{ 
+            x: [-slideWidth/2, -slideWidth * 1.5]
+          }}
+          transition={{
+            x: {
+              repeat: Infinity,
+              duration: 30,
+              ease: "linear",
+            },
+          }}
+          style={{ 
+            willChange: "transform",
+          }}
+        >
+          {[...videos, ...videos, ...videos].map((video, index) => (
+            <div key={index} className="flex-shrink-0 w-[200px] md:w-[280px]">
+              <video
+                src={video}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full aspect-[9/16] rounded-lg object-cover"
+              />
+            </div>
+          ))}
+        </motion.div>
       </div>
     </div>
   );
