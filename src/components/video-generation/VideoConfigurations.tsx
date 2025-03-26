@@ -282,7 +282,7 @@ const VideoConfigurations = () => {
           <h2 className="text-xl font-semibold text-purple-800 mb-2">Video Processing</h2>
           <p className="text-purple-700 mb-4">
             Your video is taking longer than expected to process. 
-            It will appear in your gallery once it's ready.
+            It will appear in your gallery soon.
           </p>
           <Button
             onClick={() => router.push('/videos')}
