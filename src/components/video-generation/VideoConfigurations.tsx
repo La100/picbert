@@ -51,43 +51,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 
 
-const useTextCycling = (texts: string[], interval: number = 3000) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [text, setText] = useState(texts[0]);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [typingSpeed, setTypingSpeed] = useState(100);
 
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-
-    if (isDeleting) {
-      if (text === '') {
-        setIsDeleting(false);
-        setCurrentIndex((prev) => (prev + 1) % texts.length);
-        setTypingSpeed(100);
-      } else {
-        timeout = setTimeout(() => {
-          setText(text.slice(0, -1));
-        }, 50);
-      }
-    } else {
-      const fullText = texts[currentIndex];
-      if (text === fullText) {
-        timeout = setTimeout(() => {
-          setIsDeleting(true);
-        }, interval);
-      } else {
-        timeout = setTimeout(() => {
-          setText(fullText.slice(0, text.length + 1));
-        }, typingSpeed);
-      }
-    }
-
-    return () => clearTimeout(timeout);
-  }, [text, currentIndex, isDeleting, texts, interval, typingSpeed]);
-
-  return text;
-};
 
 const VideoConfigurations = () => {
   const loading = useVideoGenerateStore((state) => state.loading);
