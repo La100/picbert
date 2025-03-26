@@ -70,7 +70,7 @@ export function NavUser({
               ) : null}
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-[450]">{user.email}</span>
+                <span className="truncate font-normal">{user.email}</span>
               </div>
               <Settings className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -91,7 +91,7 @@ export function NavUser({
                 ) : null}
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate text-normal">{user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
