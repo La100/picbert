@@ -4,6 +4,10 @@ import { AccountForm } from "@/components/account/AccountForm";
 import { DataDeletionSettings } from "@/components/account/DataDeletionSettings";
 import { Metadata } from 'next'
 import { redirect } from "next/navigation";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { History } from "lucide-react";
 
 
 export const metadata: Metadata = {
@@ -30,6 +34,27 @@ export default async function AccountSettingsPage() {
 
       <div className="grid gap-8">
         <AccountForm user={user} />
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Requests History</CardTitle>
+            <CardDescription>
+              View history of your image and video generation requests
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4 text-sm text-muted-foreground">
+              Access your complete history of image and video generation requests, including status, prompts, and results.
+            </p>
+            <Button asChild>
+              <Link href="/requests-history" className="flex items-center gap-2">
+                <History className="h-4 w-4" />
+                <span>View Requests History</span>
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+        
         <DataDeletionSettings user={user} />
       </div>
     </div>

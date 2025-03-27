@@ -65,9 +65,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: storeResult.error }, { status: 500 });
     }
 
+    // Generate the bucket URL for the video
+    let bucketVideoUrl = body.payload.video.url; // Default to fal.ai URL as fallback
+    
+    if (storeResult.data && storeResult.data.video_name) {
+      // Get public URL from Supabase bucket
+      const { data: urlData } = supabase
+        .storage
+        .from("generated_videos")
+        .getPublicUrl(`${requestData.user_id}/${storeResult.data.video_name}`);
+        
+      if (urlData?.publicUrl) {
+        bucketVideoUrl = urlData.publicUrl;
+      }
+    }
+
     await supabase
       .from("video_requests")
-      .update({ status: "completed" })
+      .update({ 
+        status: "completed",
+        url: bucketVideoUrl  // Use Supabase bucket URL
+      })
       .eq("request_id", body.request_id);
 
     return NextResponse.json({ success: true });

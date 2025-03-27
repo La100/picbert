@@ -7,6 +7,7 @@ import {
   LogOut,
   HelpCircle,
   Info,
+  History,
 } from "lucide-react"
 
 import {
@@ -101,6 +102,12 @@ export function NavUser({
                 <DropdownMenuItem className="cursor-pointer">
                   <BadgeCheck />
                   Settings
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/requests-history" className="w-full cursor-pointer" onClick={handleClick}>
+                <DropdownMenuItem className="cursor-pointer">
+                  <History className="size-4 mr-2" />
+                  Requests History
                 </DropdownMenuItem>
               </Link>
               <Link href="/billing" className="w-full cursor-pointer" onClick={handleClick}>

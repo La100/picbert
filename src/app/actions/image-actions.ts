@@ -344,3 +344,37 @@ export async function checkAndUpdateCredits(): Promise<{
     };
   }
 }
+
+export async function storeImageRequest(data: {
+  prompt: string;
+  aspect_ratio: string;
+  user_id: string;
+  request_id: string;
+}): Promise<ImageResponse> {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("image_requests")
+    .insert([{
+      user_id: data.user_id,
+      request_id: data.request_id,
+      prompt: data.prompt,
+     
+      aspect_ratio: data.aspect_ratio,
+      status: 'pending'
+    }]);
+
+  if (error) {
+    return {
+      error: error.message,
+      success: false,
+      data: null
+    };
+  }
+
+  return {
+    error: null,
+    success: true,
+    data: null
+  };
+}

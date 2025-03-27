@@ -30,6 +30,8 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { checkSubscriptionStatus } from "@/app/actions/subscription-actions";
 import { getCredits } from "@/app/actions/credit-actions";
 import { IMAGE_TOKEN_COST } from "@/lib/constants";
+import { createClient } from "@/lib/supabase/client";
+import { storeImageRequest } from "@/app/actions/image-actions";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -42,10 +44,6 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
-
-
-
-
 
 const Configurations = () => {
   const generateImage = useGenerateStore((state) => state.generateImage);
@@ -83,52 +81,54 @@ const Configurations = () => {
     form.setValue("prompt", prompt);
   };
 
-
-
   async function onSubmit(values: FormValues) {
     try {
       setLoading(true);
       
-      // Check if user has enough tokens for image generation
+      // Get user ID
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("User not authenticated");
+        setLoading(false);
+        return;
+      }
+
+      // Check tokens...
       if (tokenCount !== null && tokenCount < IMAGE_TOKEN_COST) {
         toast.error(`Not enough tokens. Image generation requires ${IMAGE_TOKEN_COST} tokens.`);
         setLoading(false);
         return;
       }
 
-      // Deduct tokens first
-      fetch('/api/credits/deduct', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ amount: IMAGE_TOKEN_COST }),
-        cache: 'no-store',
-      })
-      .then(response => {
-        if (!response.ok) {
-          return response.text().then(errorText => {
-            throw new Error(errorText || 'Failed to deduct tokens');
-          });
-        }
-        return response.json();
-      })
-      .then(deductData => {
-        // Update local token count
-        setTokenCount(deductData.tokensRemaining);
-        
-        // Update global token state
-        return import('@/store/useTokenStore').then(module => {
-          const useTokenStore = module.default;
-          useTokenStore.getState().setTokenCount(deductData.tokensRemaining);
+      // Create request ID
+      const request_id = crypto.randomUUID();
+
+      try {
+        // Store request first
+        const initialResult = await storeImageRequest({
+          user_id: user.id,
+          request_id,
+          prompt: values.prompt,
+          aspect_ratio: values.aspect_ratio
         });
-      })
-      .catch(() => {
-        toast.error('Failed to deduct tokens due to network error');
+        
+        console.log("Initial store result:", initialResult);
+        
+        if (!initialResult.success) {
+          toast.error(`Failed to create image request: ${initialResult.error}`);
+          setLoading(false);
+          return;
+        }
+      } catch (storeError) {
+        console.error("Error storing initial request:", storeError);
+        toast.error("Failed to initialize image generation");
         setLoading(false);
         return;
-      });
+      }
 
+      // Rest of the existing code...
       const finalPrompt = values.selfie 
         ? values.prompt + ", selfie, full body visible, 4k high resolution"
         : values.prompt;
@@ -138,23 +138,88 @@ const Configurations = () => {
           prompt: finalPrompt,
           aspect_ratio: values.aspect_ratio,
           raw: true,
-          enable_safety_checker:false,
+          enable_safety_checker: false,
         },
         logs: true,
       });
 
       if (!output.data?.images?.[0]?.url) {
+        // Update request status to error
+        try {
+          const updateResult = await supabase
+            .from("image_requests")
+            .update({ status: 'error', error: "No image URL in response" })
+            .eq('request_id', request_id);
+            
+          console.log("Error update result:", updateResult);
+        } catch (updateError) {
+          console.error("Failed to update error status:", updateError);
+        }
+        
         throw new Error("No image URL in response");
       }
 
       // Check for NSFW content
       if (output.data.has_nsfw_concepts?.[0] === true) {
+        // Update request status to error
+        try {
+          const nsfwUpdateResult = await supabase
+            .from("image_requests")
+            .update({ 
+              status: 'error', 
+              error: "The generated image was flagged as NSFW content." 
+            })
+            .eq('request_id', request_id);
+            
+          console.log("NSFW update result:", nsfwUpdateResult);
+        } catch (nsfwError) {
+          console.error("Failed to update NSFW error status:", nsfwError);
+        }
+        
         toast.error("The generated image was flagged as NSFW content. Please try a different prompt.");
         setLoading(false);
         return;
       }
 
       const image = output.data.images[0];
+      
+      // Update request with output image and status
+      try {
+        console.log("Updating image request with data:", {
+          status: 'completed',
+          request_id
+        });
+        
+        // Najpierw aktualizujemy tylko status, co powinno zadziałać zawsze
+        const statusUpdateResult = await supabase
+          .from("image_requests")
+          .update({ 
+            status: 'completed'
+          })
+          .eq('request_id', request_id);
+          
+        console.log("Status update result:", statusUpdateResult);
+        
+        // Spróbujmy zaktualizować dodatkowe pola, jeśli to się nie powiedzie, kontynuujemy
+        try {
+          const additionalDataResult = await supabase
+            .from("image_requests")
+            .update({ 
+              output_image: image.url,
+              width: image.width || 0,
+              height: image.height || 0
+            })
+            .eq('request_id', request_id);
+            
+          console.log("Additional data update result:", additionalDataResult);
+        } catch (additionalDataError) {
+          console.warn("Could not update additional fields, continuing anyway:", additionalDataError);
+        }
+      } catch (finalUpdateError) {
+        console.error("Failed to update image request with result:", finalUpdateError);
+        // We'll continue anyway to show the image to the user
+      }
+
       const imageData = [{
         url: image.url,
         width: image.width ?? 0,
