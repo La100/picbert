@@ -35,6 +35,7 @@ import { getCredits } from "@/app/actions/credit-actions";
 import { VIDEO_TOKEN_COST_5_SEC, VIDEO_TOKEN_COST_10_SEC } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
 import { checkSubscriptionStatus } from "@/app/actions/subscription-actions";
+import { deductTokens } from "@/app/actions/token-actions";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -48,10 +49,6 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
-
-
-
-
 
 const VideoConfigurations = () => {
   const loading = useVideoGenerateStore((state) => state.loading);
@@ -142,8 +139,6 @@ const VideoConfigurations = () => {
     }
   }, [form]);
 
- 
-
   async function onSubmit(values: FormValues) {
     try {
       setLoading(true);
@@ -158,39 +153,21 @@ const VideoConfigurations = () => {
         return;
       }
 
-      // Deduct tokens first
-      fetch('/api/credits/deduct', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ amount: cost }),
-        cache: 'no-store',
-      })
-      .then(response => {
-        if (!response.ok) {
-          return response.text().then(errorText => {
-            throw new Error(errorText || 'Failed to deduct tokens');
-          });
-        }
-        return response.json();
-      })
-      .then(deductData => {
-        // Update local token count
-        setTokenCount(deductData.tokensRemaining);
-        
-        // Update global token state
-        return import('@/store/useTokenStore').then(module => {
-          const useTokenStore = module.default;
-          useTokenStore.getState().setTokenCount(deductData.tokensRemaining);
-        });
-      })
-      .catch(() => {
-        toast.error('Failed to deduct tokens due to network error');
+      // Deduct tokens directly using the server action
+      const deductResult = await deductTokens(cost);
+      console.log("Token deduction result:", deductResult);
+      
+      if (!deductResult.success) {
+        toast.error(deductResult.error || 'Failed to deduct tokens');
         setLoading(false);
         return;
-      });
-
+      }
+      
+      // Update local token count
+      if (deductResult.tokensRemaining !== null) {
+        setTokenCount(deductResult.tokensRemaining);
+      }
+      
       const finalPrompt = values.prompt;
 
       // Show persistent loading toast

@@ -32,6 +32,7 @@ import { getCredits } from "@/app/actions/credit-actions";
 import { IMAGE_TOKEN_COST } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
 import { storeImageRequest } from "@/app/actions/image-actions";
+import { deductTokens } from "@/app/actions/token-actions";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -228,6 +229,16 @@ const Configurations = () => {
         prompt: values.prompt,
         aspect_ratio: values.aspect_ratio,
       }];
+
+      // Deduct tokens after successful generation
+      const deductResult = await deductTokens(IMAGE_TOKEN_COST);
+      console.log("Token deduction result:", deductResult);
+      
+      if (deductResult.success && deductResult.tokensRemaining !== null) {
+        setTokenCount(deductResult.tokensRemaining);
+      } else {
+        console.error("Token deduction failed but generation succeeded:", deductResult.error);
+      }
 
       await generateImage({
         ...values,
