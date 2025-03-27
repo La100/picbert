@@ -106,26 +106,43 @@ export async function getUserRequests(page: number = 1, limit: number = 10): Pro
       
       // If request is completed and we have generated images
       if (request.status === 'completed' && generatedImages && generatedImages.length > 0) {
-        // Try to find matching image by prompt and creation time (within 5 minutes)
-        const requestDate = new Date(request.created_at);
-        const matchingImage = generatedImages.find(img => {
-          const promptMatch = img.prompt === request.prompt;
-          const imgDate = new Date(img.created_at);
-          const timeDiff = Math.abs(imgDate.getTime() - requestDate.getTime());
-          const minutesDiff = timeDiff / (1000 * 60);
-          
-          return promptMatch && minutesDiff < 5; // Within 5 minutes
-        });
-
-        if (matchingImage) {
+        // First try to match by request_id, which is the most reliable method
+        const matchingImageByRequestId = generatedImages.find(img => 
+          img.request_id === request.request_id
+        );
+        
+        if (matchingImageByRequestId) {
           // Get public URL from bucket
           const { data: urlData } = supabase
             .storage
             .from("generated_images")
-            .getPublicUrl(`${session.user.id}/${matchingImage.image_name}`);
+            .getPublicUrl(`${session.user.id}/${matchingImageByRequestId.image_name}`);
 
           if (urlData?.publicUrl) {
             imageUrl = urlData.publicUrl;
+          }
+        } else {
+          // Fallback to the previous method of matching by prompt and time
+          const requestDate = new Date(request.created_at);
+          const matchingImage = generatedImages.find(img => {
+            const promptMatch = img.prompt === request.prompt;
+            const imgDate = new Date(img.created_at);
+            const timeDiff = Math.abs(imgDate.getTime() - requestDate.getTime());
+            const minutesDiff = timeDiff / (1000 * 60);
+            
+            return promptMatch && minutesDiff < 5; // Within 5 minutes
+          });
+
+          if (matchingImage) {
+            // Get public URL from bucket
+            const { data: urlData } = supabase
+              .storage
+              .from("generated_images")
+              .getPublicUrl(`${session.user.id}/${matchingImage.image_name}`);
+
+            if (urlData?.publicUrl) {
+              imageUrl = urlData.publicUrl;
+            }
           }
         }
       }

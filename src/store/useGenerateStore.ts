@@ -67,6 +67,7 @@ const useGenerateStore = create<GenerateState>((set) => ({
         prompt: values.prompt,
         aspect_ratio: values.aspect_ratio,
         raw: values.raw,
+        requestId: values.requestId // Add the requestId to each image
       }))
 
       console.log("Storing images...");

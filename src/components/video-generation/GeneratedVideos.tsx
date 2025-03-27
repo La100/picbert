@@ -17,7 +17,7 @@ const GeneratedVideos = () => {
 
   return (
     <div className="space-y-4 w-full max-w-2xl">
-      <h3 className="text-lg font-semibold mb-4">Generated Video</h3>
+      
       <AnimatePresence mode="wait">
         {loading && !mostRecentVideo ? (
           <motion.div

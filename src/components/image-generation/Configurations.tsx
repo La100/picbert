@@ -228,6 +228,7 @@ const Configurations = () => {
         safety_checker: true,
         prompt: values.prompt,
         aspect_ratio: values.aspect_ratio,
+        request_id: request_id
       }];
 
       // Deduct tokens after successful generation

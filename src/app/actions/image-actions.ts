@@ -19,6 +19,7 @@ interface ImageResponse {
 
 type StoreImageInput = {
   url: string;
+  requestId?: string;
 } & Database["public"]["Tables"]["generated_images"]["Insert"];
 
 export async function storeImages(
@@ -99,6 +100,7 @@ export async function storeImages(
           image_name: fileName,
           width,
           height,
+          request_id: img.requestId
         }])
         .select();
 

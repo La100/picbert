@@ -56,9 +56,7 @@ const GeneratedImages = () => {
         transition={{ duration: 0.3 }}
         className="w-full"
       >
-        <div className="w-full max-w-4xl mx-auto mb-8">
-          <h2 className="text-3xl text-center font-medium">Generated Image</h2>
-        </div>
+        
         
         <div className="w-full max-w-2xl mx-auto">
           {loading && (
