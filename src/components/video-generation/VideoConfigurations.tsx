@@ -49,6 +49,10 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+
+
+
+
 const VideoConfigurations = () => {
   const loading = useVideoGenerateStore((state) => state.loading);
   const setLoading = useVideoGenerateStore((state) => state.setLoading);
@@ -61,7 +65,6 @@ const VideoConfigurations = () => {
   const [selectedDuration, setSelectedDuration] = useState<"5" | "10">("5");
   const [tokenCost, setTokenCost] = useState<number>(VIDEO_TOKEN_COST_5_SEC);
   const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
-  const [showGeneratedVideosView, setShowGeneratedVideosView] = useState<boolean>(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -138,6 +141,8 @@ const VideoConfigurations = () => {
       setIsUploading(false);
     }
   }, [form]);
+
+ 
 
   async function onSubmit(values: FormValues) {
     try {
@@ -264,7 +269,8 @@ const VideoConfigurations = () => {
         clearInterval(pollInterval);
         if (loading) {
           setLoading(false);
-          setShowGeneratedVideosView(true);
+          toast.success("Your video is taking longer than expected. Please check your videos gallery soon.", { id: toastId, duration: 8000 });
+          router.push('/videos');
         }
       }, 10 * 60 * 1000);
 
@@ -273,27 +279,6 @@ const VideoConfigurations = () => {
       toast.error("Failed to generate video. Please try again.");
       setLoading(false);
     }
-  }
-
-  if (showGeneratedVideosView) {
-    return (
-      <div className="space-y-8">
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 text-center">
-          <h2 className="text-xl font-semibold text-purple-800 mb-2">Video Processing</h2>
-          <p className="text-purple-700 mb-4">
-            Your video is taking longer than expected to process. 
-            It will appear in your gallery soon.
-          </p>
-          <Button
-            onClick={() => router.push('/videos')}
-            variant="default"
-            className="font-medium"
-          >
-            Go to Videos Gallery
-          </Button>
-        </div>
-      </div>
-    );
   }
 
   return (

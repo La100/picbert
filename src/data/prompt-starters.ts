@@ -7,10 +7,10 @@ export interface PromptStarter {
 
 export const promptStarters: PromptStarter[] = [
   {
-    id: "corporate",
-    name: "Corporate Girl",
-    prompt: "A bespectacled white 20year old woman model with warm skin tone, focused expression, on corporate sales conference, soft natural light casting a warm glow, film grain visible, muted color palette, in a Wes Anderson-esque symmetrical",
-    previewImageUrl: "https://api.facesfactory.com/storage/v1/object/public/prompstarters/obrazek%20JPEG.jpeg"
+    id: "starter",
+    name: "Guy drinking coffee",
+    prompt: "A bespectacled a young man with warm skin tone, focused expression, in coffe shop holding a mug. soft natural light casting a warm glow, film grain visible, muted color palette, in a Wes Anderson-esque symmetrical composition.",
+    previewImageUrl: "https://api.facesfactory.com/storage/v1/object/public/prompstarters/starter2.jpg"
   },
   {
     id: "starter_1",
@@ -46,7 +46,7 @@ export const promptStarters: PromptStarter[] = [
     id: "starter_6",
     name: "Woman in the mountains",
     prompt: "A bespectacled white woman with warm skin tone, focused expression, on a hike in mountains, soft natural light casting a warm glow, film grain visible, muted color palette, in a Wes Anderson-esque symmetrical composition.",
-    previewImageUrl: "https://api.facesfactory.com/storage/v1/object/public/prompstarters/Resize%20Images%20Online.jpg"
+    previewImageUrl: "https://api.facesfactory.com/storage/v1/object/public/prompstarters/starter.jpg"
   },
   {
     id: "starter_7",

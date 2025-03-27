@@ -4,7 +4,7 @@ import useGenerateStore from "@/store/useGenerateStore";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Download, Video } from "lucide-react";
-import { LoadingAnimation } from "../shared/LoadingAnimation";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface GeneratedImage {
@@ -57,7 +57,13 @@ const GeneratedImages = () => {
           <CardContent className="p-1">
             <div className="relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px]">
               {loading ? (
-                <LoadingAnimation />
+                <div className="w-48 h-48">
+                  <DotLottieReact
+                    src="/animations/animation.json"
+                    autoplay
+                    loop
+                  />
+                </div>
               ) : (
                 <>
                   <motion.img

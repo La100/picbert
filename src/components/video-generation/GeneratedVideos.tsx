@@ -3,7 +3,7 @@ import React from "react";
 import useVideoGenerateStore from "@/store/useVideoGenerateStore";
 import { Card, CardContent } from "../ui/card";
 import { cn } from "@/lib/utils";
-import { LoadingAnimation } from "../shared/LoadingAnimation";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const GeneratedVideos = () => {
@@ -33,7 +33,13 @@ const GeneratedVideos = () => {
                 <div 
                   className="relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px] aspect-[9/16]"
                 >
-                  <LoadingAnimation />
+                  <div className="w-48 h-48">
+                    <DotLottieReact
+                      src="/animations/animation.json"
+                      autoplay
+                      loop
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
