@@ -92,6 +92,7 @@ export async function storeVideo(
         aspect_ratio: data.aspect_ratio,
         duration: data.duration,
         video_name: fileName,
+        url: supabase.storage.from("generated_videos").getPublicUrl(`${userId}/${fileName}`).data.publicUrl
       }])
       .select();
 
@@ -105,6 +106,13 @@ export async function storeVideo(
 
     revalidateTag("gallery-videos");
     revalidateTag("dashboard-videos");
+
+    if (dbData && dbData.length > 0 && dbData[0].id) {
+      await supabase
+        .from("generated_videos")
+        .update({ url: supabase.storage.from("generated_videos").getPublicUrl(`${userId}/${fileName}`).data.publicUrl })
+        .eq("id", dbData[0].id);
+    }
 
     return {
       error: null,
@@ -159,11 +167,17 @@ export async function getVideos(page: number = 1, pageSize: number = 12) {
   // Użyj getPublicUrl zamiast createSignedUrl
   const videosWithUrls = (data || []).map((video) => {
     try {
-      // Get public URL for video
-      const { data: videoUrlData } = supabase
-        .storage
-        .from("generated_videos")
-        .getPublicUrl(`${session.user.id}/${video.video_name}`);
+      // Jeśli mamy już URL, użyj go
+      let videoUrl = video.url;
+      
+      // Jeśli nie ma URL, wygeneruj go
+      if (!videoUrl) {
+        const { data: videoUrlData } = supabase
+          .storage
+          .from("generated_videos")
+          .getPublicUrl(`${session.user.id}/${video.video_name}`);
+        videoUrl = videoUrlData.publicUrl;
+      }
 
       // Handle input_image
       let imageUrl = video.input_image;
@@ -209,7 +223,7 @@ export async function getVideos(page: number = 1, pageSize: number = 12) {
 
       return {
         ...video,
-        url: videoUrlData.publicUrl,
+        url: videoUrl,
         input_image: imageUrl,
       };
     } catch (e) {

@@ -24,7 +24,7 @@ export default function Recipe() {
             Two Simple Steps
           </h2>
           <p className="text-lg text-muted-foreground">
-            Create your content in minutes
+            Example of what can you do with videos
           </p>
         </div>
 
