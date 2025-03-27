@@ -8,7 +8,7 @@ import {
   Video,
   FileVideo,
   Users,
-  History,
+
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"

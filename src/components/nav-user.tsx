@@ -106,7 +106,7 @@ export function NavUser({
               </Link>
               <Link href="/requests-history" className="w-full cursor-pointer" onClick={handleClick}>
                 <DropdownMenuItem className="cursor-pointer">
-                  <History className="size-4 mr-2" />
+                  <History className="size-4" />
                   Requests History
                 </DropdownMenuItem>
               </Link>
