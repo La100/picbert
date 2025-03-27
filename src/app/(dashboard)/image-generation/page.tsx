@@ -1,8 +1,7 @@
-import Configurations from "@/components/image-generation/Configurations";
-import GeneratedImages from "@/components/image-generation/GeneratedImages";
 import { ImageConfigurationsSkeleton } from "@/components/image-generation/ImageConfigurationsSkeleton";
 import { Metadata } from 'next'
 import { Suspense } from 'react'
+import ImageGenerationClientWrapper from "@/components/image-generation/ImageGenerationClientWrapper";
 
 export const maxDuration = 30;
 
@@ -15,11 +14,8 @@ export default function ImageGenerationPage() {
   return (
     <section className="container mx-auto flex flex-col gap-8">
       <Suspense fallback={<ImageConfigurationsSkeleton />}>
-        <Configurations />
+        <ImageGenerationClientWrapper />
       </Suspense>
-      <div className="w-full flex justify-center">
-        <GeneratedImages />
-      </div>
     </section>
   );
 }

@@ -415,7 +415,7 @@ export async function getVideoRequestStatus(requestId: string): Promise<VideoRes
     }
 
     // If request is still pending, check fal.ai status
-    if (data.status === "pending") {
+    if (data.status === "pending" || data.status === "processing") {
       const status = await fal.queue.status("fal-ai/kling-video/v1.6/pro/image-to-video", {
         requestId,
         logs: true,

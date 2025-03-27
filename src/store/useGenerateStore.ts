@@ -19,10 +19,17 @@ interface GenerateState {
     width: number;
     height: number;
     id?: string;
+    requestId?: string;
   } & GenerateFormValues>
   error: string | null
   setLoading: (loading: boolean) => void
-  generateImage: (values: GenerateFormValues & { data: { images: Array<{ url: string; width: number; height: number }> } }) => Promise<void>
+  generateImage: (values: GenerateFormValues & { 
+    data: { 
+      images: Array<{ url: string; width: number; height: number }> 
+    },
+    requestId?: string
+  }) => Promise<void>
+  clearImages: () => void
 }
 
 interface GenerateFormValues {
@@ -36,10 +43,17 @@ const useGenerateStore = create<GenerateState>((set) => ({
   images: [],
   error: null,
   setLoading: (loading: boolean) => set({ loading }),
+  
+  clearImages: () => set({ images: [] }),
 
-  generateImage: async (values: GenerateFormValues & { data: { images: Array<{ url: string; width: number; height: number }> } }) => {
+  generateImage: async (values: GenerateFormValues & { 
+    data: { images: Array<{ url: string; width: number; height: number }> },
+    requestId?: string 
+  }) => {
     try {
-      set({ error: null, images: [] })
+      // Instead of clearing the images array, we'll keep existing ones
+      // and add the new one at the beginning
+      set(() => ({ error: null, loading: true }))
       const toastId = toast.loading('Processing generated image...')
 
       // Credits are already checked and deducted in the Configurations component
@@ -63,7 +77,7 @@ const useGenerateStore = create<GenerateState>((set) => ({
       if (!storeResult.success) {
         console.error("Failed to store images:", storeResult.error)
         toast.error("Failed to save image to your gallery. Please try again.", { id: toastId })
-        set({ error: storeResult.error || 'Failed to store image', loading: false })
+        set(() => ({ error: storeResult.error || 'Failed to store image', loading: false }))
         return
       }
 
@@ -84,17 +98,25 @@ const useGenerateStore = create<GenerateState>((set) => ({
         return {
           ...img,
           url: urlData.publicUrl,
-          id: storedImage.data[0].id
+          id: storedImage.data[0].id,
+          requestId: values.requestId // Save the request ID with the image
         };
       }));
       
-      // Update the state with new images
-      set({ images: imagesWithIds, loading: false, error: null })
+      // Update the state with new images added to the beginning of the array
+      set((state) => ({ 
+        images: [...imagesWithIds, ...state.images], 
+        loading: false, 
+        error: null 
+      }))
       toast.success("Image processed and saved to your gallery", { id: toastId })
 
     } catch (error) {
       console.error("Error in generateImage:", error)
-      set({ error: 'Failed to process image. Please try again.', loading: false, images: [] })
+      set(() => ({ 
+        error: 'Failed to process image. Please try again.', 
+        loading: false 
+      }))
       toast.error("Failed to process image. Please try again.")
     }
   },

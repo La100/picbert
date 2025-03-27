@@ -28,7 +28,7 @@ const GeneratedVideos = () => {
             transition={{ duration: 0.3 }}
             className="w-full"
           >
-            <Card className="w-full max-w-2xl mx-auto">
+            <Card className="w-full max-w-2xl mx-auto  mx-auto border bg-gradient-to-tl from-background to-muted/50 border-primary/10 shadow-lg">
               <CardContent className="p-1">
                 <div 
                   className="relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px] aspect-[9/16]"

@@ -243,6 +243,7 @@ const Configurations = () => {
       await generateImage({
         ...values,
         data: { images: imageData },
+        requestId: request_id
       });
     } catch (error) {
       console.error("Failed to generate image:", error);
