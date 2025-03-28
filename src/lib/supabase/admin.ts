@@ -511,7 +511,8 @@ const updateUserCredits = async (
       const userEmail = userData.user.email;
       const userName = userData.user.user_metadata?.full_name || 'User';
       
-      if (userEmail) {
+      // Only send email if this is a direct token purchase (not from subscription)
+      if (userEmail && metadata.source === 'top_up') {
         // Get payment amount if available
         let paymentAmount = "your payment";
         if (metadata.payment_amount) {
@@ -535,6 +536,8 @@ const updateUserCredits = async (
         } catch (error) {
           console.error('Error sending token purchase confirmation email:', error);
         }
+      } else {
+        console.log(`Skipping token purchase email for subscription-based tokens`);
       }
     }
 

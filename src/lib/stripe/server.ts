@@ -74,7 +74,8 @@ export async function checkoutWithStripe(
       client_reference_id: user?.id,
       metadata: {
         tokens: totalTokens,
-        payment_amount: formattedAmount
+        payment_amount: formattedAmount,
+        source: price.type === 'one_time' ? 'top_up' : 'subscription'
       },
       customer_update: {
         address: 'auto'
