@@ -63,7 +63,7 @@ export async function sendSubscriptionConfirmationEmail({
   startDate,
   endDate,
   paymentAmount,
-  tokensAmount,
+  tokens,
 }: {
   to: string;
   userName: string;
@@ -71,9 +71,10 @@ export async function sendSubscriptionConfirmationEmail({
   startDate: string;
   endDate: string;
   paymentAmount: string;
-  tokensAmount?: number;
+  tokens?: number;
 }) {
-  return sendEmail({
+  console.log(`Attempting to send subscription confirmation email to ${to} for plan ${planName}`);
+  const result = await sendEmail({
     to,
     subject: 'Your Subscription is Confirmed!',
     react: React.createElement(SubscriptionConfirmation, {
@@ -82,9 +83,11 @@ export async function sendSubscriptionConfirmationEmail({
       startDate,
       endDate,
       paymentAmount,
-      tokensAmount,
+      tokens,
     }),
   });
+  console.log(`Subscription confirmation email result:`, result);
+  return result;
 }
 
 /**

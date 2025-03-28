@@ -299,7 +299,7 @@ const manageSubscriptionStatusChange = async (
     );
     
   // Send confirmation email for new subscriptions only
-  if (createAction && uuid)
+  if (createAction && uuid) {
     try {
       // Get user data from the users table
       const { data: userData, error: userError } = await supabaseAdmin
@@ -329,15 +329,16 @@ const manageSubscriptionStatusChange = async (
         const product = subscription.items.data[0].price.product as Stripe.Product;
         const planName = product.name || 'Premium Plan';
         
+        // Get tokens from product metadata
+        const priceMetadata = subscription.items.data[0].price.metadata as { tokens?: string };
+        const productMetadata = product.metadata as { tokens?: string };
+        const tokens = parseInt(priceMetadata?.tokens || productMetadata?.tokens || '0', 10);
+        
         // Get price details and format payment amount
         const price = subscription.items.data[0].price;
         const currency = price.currency || 'usd';
         const unitAmount = price.unit_amount || 0;
         const interval = price.recurring?.interval || 'month';
-        
-        // Get tokens from product metadata
-        const productMetadata = product.metadata as { tokens?: string };
-        const tokensAmount = parseInt(productMetadata?.tokens || '0', 10);
         
         // Format payment amount with currency symbol
         const paymentAmount = new Intl.NumberFormat('en-US', {
@@ -356,7 +357,7 @@ const manageSubscriptionStatusChange = async (
           'MMMM d, yyyy'
         );
         
-        // Send confirmation email with tokens information
+        // Send confirmation email
         const emailResult = await sendSubscriptionConfirmationEmail({
           to: userEmail,
           userName: userData?.full_name || userEmail.split('@')[0] || 'Valued Customer',
@@ -364,7 +365,7 @@ const manageSubscriptionStatusChange = async (
           startDate,
           endDate,
           paymentAmount,
-          tokensAmount: tokensAmount
+          tokens: tokens > 0 ? tokens : undefined
         });
         
         if (!emailResult.success) {
@@ -377,6 +378,7 @@ const manageSubscriptionStatusChange = async (
       console.error('Error sending subscription confirmation email:', error);
       // Don't throw error here to avoid disrupting the subscription process
     }
+  }
   
   // Send cancellation email when subscription is cancelled or set to cancel at period end
   if (subscription.cancel_at_period_end || subscription.status === 'canceled') {
@@ -495,14 +497,58 @@ const updateUserCredits = async (
         .insert([{ user_id: userId, tokens: newTokenAmount }]);
 
       if (insertError) {
-        throw new Error(`Error updating user credits: ${insertError.message}`);
+        throw new Error(`Error inserting user credits: ${insertError.message}`);
       }
     }
+
+    // Get user information for sending email
+    const { data: userData, error: userError } = await supabaseAdmin
+      .auth.admin.getUserById(userId);
+
+    if (userError) {
+      console.error('Error getting user for email:', userError);
+    } else if (userData && userData.user) {
+      const userEmail = userData.user.email;
+      const userName = userData.user.user_metadata?.full_name || 'User';
+      
+      if (userEmail) {
+        // Get payment amount if available
+        let paymentAmount = "your payment";
+        if (metadata.payment_amount) {
+          paymentAmount = metadata.payment_amount;
+        }
+
+        // Send token purchase confirmation email
+        try {
+          const emailResult = await sendTokenPurchaseConfirmationEmail({
+            to: userEmail,
+            userName,
+            tokenAmount,
+            paymentAmount
+          });
+
+          if (!emailResult.success) {
+            console.error('Failed to send token purchase confirmation email:', emailResult.error);
+          } else {
+            console.log(`Token purchase confirmation email sent to ${userEmail}`);
+          }
+        } catch (error) {
+          console.error('Error sending token purchase confirmation email:', error);
+        }
+      }
+    }
+
+    console.log(`Successfully updated tokens for user ${userId}: ${newTokenAmount}`);
   } catch (error) {
     console.error('Error updating user credits:', error);
+    throw error;
   }
 };
 
+/**
+ * Allocate tokens for a yearly subscription
+ * This function is called when an invoice.payment_succeeded event is received for a yearly subscription
+ */
 const allocateTokensForSubscription = async (
   subscriptionId: string,
   customerId: string
@@ -589,10 +635,36 @@ const allocateTokensForSubscription = async (
       console.log(`Updated credits for user: ${userId} from ${currentTokens} to ${newTokens} tokens`);
     }
     
+    // Get user information for sending email
+    const { data: userData, error: userError } = await supabaseAdmin
+      .auth.admin.getUserById(userId);
+
+    if (userError) {
+      console.error('Error getting user for email:', userError);
+    } else if (userData && userData.user) {
+      const userEmail = userData.user.email;
+      
+      if (userEmail) {
+        // Log token allocation without sending email
+        console.log(`Tokens allocated for subscription: ${monthlyTokens} (no separate email sent)`);
+      }
+    }
+    
     revalidateTag('credits');
     
   } catch (error) {
     console.error('Error allocating monthly tokens for subscription:', error);
     throw error;
   }
+};
+
+export {
+  upsertProductRecord,
+  upsertPriceRecord,
+  deleteProductRecord,
+  deletePriceRecord,
+  createOrRetrieveCustomer,
+  manageSubscriptionStatusChange,
+  updateUserCredits,
+  allocateTokensForSubscription
 };
