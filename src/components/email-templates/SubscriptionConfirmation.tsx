@@ -6,6 +6,7 @@ interface SubscriptionConfirmationProps {
   startDate: string;
   endDate: string;
   paymentAmount: string;
+  tokensAmount?: number;
 }
 
 const SubscriptionConfirmation: React.FC<Readonly<SubscriptionConfirmationProps>> = ({
@@ -14,6 +15,7 @@ const SubscriptionConfirmation: React.FC<Readonly<SubscriptionConfirmationProps>
   startDate,
   endDate,
   paymentAmount,
+  tokensAmount,
 }) => (
   <div style={{ fontFamily: "Arial, sans-serif", color: "#333", maxWidth: "600px", margin: "0 auto" }}>
     <div style={{ padding: "20px", backgroundColor: "#f9f9f9", borderRadius: "8px", marginBottom: "20px" }}>
@@ -36,9 +38,15 @@ const SubscriptionConfirmation: React.FC<Readonly<SubscriptionConfirmationProps>
         <p style={{ margin: "8px 0", fontSize: "14px" }}>
           <strong>Next Billing Date:</strong> {endDate}
         </p>
+        {tokensAmount && (
+          <p style={{ margin: "8px 0", fontSize: "14px" }}>
+            <strong>Monthly Tokens:</strong> {tokensAmount.toLocaleString()} tokens
+          </p>
+        )}
       </div>
       <p style={{ fontSize: "16px", lineHeight: "1.5" }}>
-        You now have access to all the features included in your subscription plan. If you have any questions or need assistance, please dont hesitate to contact our support team.
+        You now have access to all the features included in your subscription plan{tokensAmount ? `, including ${tokensAmount.toLocaleString()} tokens per month` : ''}.
+        If you have any questions or need assistance, please dont hesitate to contact our support team.
       </p>
       <p style={{ fontSize: "16px", lineHeight: "1.5", marginTop: "24px" }}>
         Thank you for choosing our service!

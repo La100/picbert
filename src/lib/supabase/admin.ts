@@ -298,8 +298,8 @@ const manageSubscriptionStatusChange = async (
       subscription.default_payment_method as Stripe.PaymentMethod
     );
     
-  // Send confirmation email for new subscriptions or when subscription is updated to active status
-  if ((createAction || subscription.status === 'active') && uuid) {
+  // Send confirmation email for new subscriptions only
+  if (createAction && uuid)
     try {
       // Get user data from the users table
       const { data: userData, error: userError } = await supabaseAdmin
@@ -335,6 +335,10 @@ const manageSubscriptionStatusChange = async (
         const unitAmount = price.unit_amount || 0;
         const interval = price.recurring?.interval || 'month';
         
+        // Get tokens from product metadata
+        const productMetadata = product.metadata as { tokens?: string };
+        const tokensAmount = parseInt(productMetadata?.tokens || '0', 10);
+        
         // Format payment amount with currency symbol
         const paymentAmount = new Intl.NumberFormat('en-US', {
           style: 'currency',
@@ -352,14 +356,15 @@ const manageSubscriptionStatusChange = async (
           'MMMM d, yyyy'
         );
         
-        // Send confirmation email
+        // Send confirmation email with tokens information
         const emailResult = await sendSubscriptionConfirmationEmail({
           to: userEmail,
           userName: userData?.full_name || userEmail.split('@')[0] || 'Valued Customer',
           planName,
           startDate,
           endDate,
-          paymentAmount
+          paymentAmount,
+          tokensAmount: tokensAmount
         });
         
         if (!emailResult.success) {
@@ -372,7 +377,6 @@ const manageSubscriptionStatusChange = async (
       console.error('Error sending subscription confirmation email:', error);
       // Don't throw error here to avoid disrupting the subscription process
     }
-  }
   
   // Send cancellation email when subscription is cancelled or set to cancel at period end
   if (subscription.cancel_at_period_end || subscription.status === 'canceled') {
@@ -491,58 +495,14 @@ const updateUserCredits = async (
         .insert([{ user_id: userId, tokens: newTokenAmount }]);
 
       if (insertError) {
-        throw new Error(`Error inserting user credits: ${insertError.message}`);
+        throw new Error(`Error updating user credits: ${insertError.message}`);
       }
     }
-
-    // Get user information for sending email
-    const { data: userData, error: userError } = await supabaseAdmin
-      .auth.admin.getUserById(userId);
-
-    if (userError) {
-      console.error('Error getting user for email:', userError);
-    } else if (userData && userData.user) {
-      const userEmail = userData.user.email;
-      const userName = userData.user.user_metadata?.full_name || 'User';
-      
-      if (userEmail) {
-        // Get payment amount if available
-        let paymentAmount = "your payment";
-        if (metadata.payment_amount) {
-          paymentAmount = metadata.payment_amount;
-        }
-
-        // Send token purchase confirmation email
-        try {
-          const emailResult = await sendTokenPurchaseConfirmationEmail({
-            to: userEmail,
-            userName,
-            tokenAmount,
-            paymentAmount
-          });
-
-          if (!emailResult.success) {
-            console.error('Failed to send token purchase confirmation email:', emailResult.error);
-          } else {
-            console.log(`Token purchase confirmation email sent to ${userEmail}`);
-          }
-        } catch (error) {
-          console.error('Error sending token purchase confirmation email:', error);
-        }
-      }
-    }
-
-    console.log(`Successfully updated tokens for user ${userId}: ${newTokenAmount}`);
   } catch (error) {
     console.error('Error updating user credits:', error);
-    throw error;
   }
 };
 
-/**
- * Allocate tokens for a yearly subscription
- * This function is called when an invoice.payment_succeeded event is received for a yearly subscription
- */
 const allocateTokensForSubscription = async (
   subscriptionId: string,
   customerId: string
@@ -629,60 +589,10 @@ const allocateTokensForSubscription = async (
       console.log(`Updated credits for user: ${userId} from ${currentTokens} to ${newTokens} tokens`);
     }
     
-    // Get user information for sending email
-    const { data: userData, error: userError } = await supabaseAdmin
-      .auth.admin.getUserById(userId);
-
-    if (userError) {
-      console.error('Error getting user for email:', userError);
-    } else if (userData && userData.user) {
-      const userEmail = userData.user.email;
-      const userName = userData.user.user_metadata?.full_name || 'User';
-      
-      if (userEmail) {
-        // Format payment amount from subscription
-        const unitAmount = (subscription.items.data[0].price.unit_amount || 0) / 100;
-        const currency = subscription.items.data[0].price.currency || 'USD';
-        const formattedAmount = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: currency,
-        }).format(unitAmount);
-
-        // Send token purchase confirmation email
-        try {
-          const emailResult = await sendTokenPurchaseConfirmationEmail({
-            to: userEmail,
-            userName,
-            tokenAmount: monthlyTokens,
-            paymentAmount: `your ${product.name} subscription (${formattedAmount})`
-          });
-
-          if (!emailResult.success) {
-            console.error('Failed to send token allocation confirmation email:', emailResult.error);
-          } else {
-            console.log(`Token allocation confirmation email sent to ${userEmail}`);
-          }
-        } catch (error) {
-          console.error('Error sending token allocation confirmation email:', error);
-        }
-      }
-    }
-    
     revalidateTag('credits');
     
   } catch (error) {
     console.error('Error allocating monthly tokens for subscription:', error);
     throw error;
   }
-};
-
-export {
-  upsertProductRecord,
-  upsertPriceRecord,
-  deleteProductRecord,
-  deletePriceRecord,
-  createOrRetrieveCustomer,
-  manageSubscriptionStatusChange,
-  updateUserCredits,
-  allocateTokensForSubscription
 };
