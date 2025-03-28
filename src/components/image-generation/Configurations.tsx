@@ -140,6 +140,7 @@ const Configurations = () => {
           aspect_ratio: values.aspect_ratio,
           raw: true,
           enable_safety_checker: false,
+         safety_tolerance:"6"
         },
         logs: true,
       });
