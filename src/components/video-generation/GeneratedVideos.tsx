@@ -75,6 +75,7 @@ const GeneratedVideos = () => {
                       autoPlay
                       loop
                       muted
+                      playsInline
                       className="w-full h-full object-contain"
                     />
                   ) : (

@@ -21,6 +21,7 @@ interface VideoGenerateStore {
   loading: boolean;
   error: string | null;
   setLoading: (loading: boolean) => void;
+  setVideo: (video: Video) => void;
   generateVideo: (data: VideoGenerateData) => Promise<void>;
 }
 
@@ -29,6 +30,10 @@ const useVideoGenerateStore = create<VideoGenerateStore>((set) => ({
   loading: false,
   error: null,
   setLoading: (loading) => set({ loading }),
+  setVideo: (video) => set((state) => ({ 
+    videos: [video, ...state.videos],
+    loading: false 
+  })),
   generateVideo: async (data) => {
     try {
       set({ error: null });
@@ -48,12 +53,16 @@ const useVideoGenerateStore = create<VideoGenerateStore>((set) => ({
         throw new Error(result.error);
       }
 
-      // Update the state by adding the new video to the beginning of the array
+      // Update the state with the stored video URL
       set((state) => ({ 
-        videos: [data.data.video, ...state.videos], 
-        loading: false, 
+        videos: [{
+          ...data.data.video,
+          url: result.data?.url as string || data.data.video.url
+        }, ...state.videos],
+        loading: false,
         error: null 
       }));
+      
       toast.success("Video processed successfully", { id: toastId });
     } catch (error) {
       console.error(error);

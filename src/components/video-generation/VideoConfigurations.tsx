@@ -225,6 +225,18 @@ const VideoConfigurations = () => {
             setLoading(false);
             toast.success("Video generated successfully!", { id: toastId });
             
+            // Update the store with the completed video URL
+            if (status.data?.url) {
+              const videoData = {
+                url: status.data.url as string,
+                prompt: values.prompt,
+                input_image: values.input_image,
+                aspect_ratio: values.aspect_ratio as "16:9" | "9:16" | "1:1",
+                duration: values.duration as "5" | "10"
+              };
+              useVideoGenerateStore.getState().setVideo(videoData);
+            }
+            
             // Refresh the route to update the UI
             router.refresh();
             break;
@@ -239,7 +251,7 @@ const VideoConfigurations = () => {
           default:
             toast.loading("Checking video status...", { id: toastId });
         }
-      }, 5000); // Poll every 5 seconds
+      }, 5000);
 
       // Clean up interval after 10 minutes (failsafe)
       setTimeout(() => {
