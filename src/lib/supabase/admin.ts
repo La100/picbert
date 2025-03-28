@@ -299,7 +299,7 @@ const manageSubscriptionStatusChange = async (
     );
     
   // Send confirmation email for new subscriptions only
-  if (createAction && uuid) {
+  if (createAction && uuid && subscription.status === 'active') {
     try {
       // Get user data from the users table
       const { data: userData, error: userError } = await supabaseAdmin

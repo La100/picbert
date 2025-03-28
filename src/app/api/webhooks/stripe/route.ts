@@ -89,10 +89,11 @@ export async function POST(req: Request) {
           const checkoutSession = event.data.object as Stripe.Checkout.Session;
           if (checkoutSession.mode === 'subscription') {
             const subscriptionId = checkoutSession.subscription;
+            // Don't send email here, it will be sent in customer.subscription.created
             await manageSubscriptionStatusChange(
               subscriptionId as string,
               checkoutSession.customer as string,
-              true
+              false // Set to false to prevent sending email here
             );
           }
 
