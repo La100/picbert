@@ -233,30 +233,35 @@ const VideoConfigurations = () => {
             toast.loading("Processing your video...", { id: toastId });
             break;
           case "completed":
+            // Check if we have both completed status and URL
+            if (status.data?.status === "completed" && !status.data?.url) {
+              // If status is completed but URL is null, keep polling
+              toast.loading("Video processing complete, waiting for URL...", { id: toastId });
+              break;
+            }
+            
             clearInterval(pollInterval);
             setLoading(false);
             
-            // Update the video state with the completed video URL
-            if (status.data?.url) {
-              console.log("Received video URL:", status.data.url);
-              const videoData = {
-                url: status.data.url as string,
+            // Log the full response to debug
+            console.log("Video generation completed. Full response:", status.data);
+            
+            const videoUrl = status.data?.url as string;
+            
+            if (videoUrl) {
+              const videoData: GeneratedVideo = {
+                url: videoUrl,
                 prompt: values.prompt,
                 input_image: values.input_image,
-                aspect_ratio: values.aspect_ratio as "16:9" | "9:16" | "1:1",
-                duration: values.duration as "5" | "10"
+                aspect_ratio: values.aspect_ratio,
+                duration: values.duration
               };
-              console.log("Setting video data:", videoData);
+              console.log("Setting video data with URL:", videoData);
               setCurrentVideo(videoData);
-              
-              // Show success message
               toast.success("Video generated successfully!", { id: toastId });
-              
-              // Log current video state after setting
-              console.log("Current video state after setting:", videoData);
             } else {
-              console.log("No video URL received in completed status");
-              toast.success("Video generated successfully!", { id: toastId });
+              console.error("No URL found in completed status. Response:", status.data);
+              toast.error("Video URL not found in response. Please try refreshing the page in a few moments.", { id: toastId });
             }
             break;
           case "failed":
@@ -431,7 +436,7 @@ const VideoConfigurations = () => {
               name="prompt"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-medium">Prompt</FormLabel>
+                  <FormLabel className="font-medium">Prompt:</FormLabel>
                   <FormControl>
                     <Textarea {...field} rows={6} className="font-medium"  />
                   </FormControl>
@@ -472,9 +477,9 @@ const VideoConfigurations = () => {
                 className={cn(
                   "relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px]",
                   {
-                    "aspect-video": currentVideo.aspect_ratio === "16:9",
-                    "aspect-[9/16]": currentVideo.aspect_ratio === "9:16", 
-                    "aspect-square": currentVideo.aspect_ratio === "1:1",
+                    "aspect-video": currentVideo?.aspect_ratio === "16:9",
+                    "aspect-[9/16]": currentVideo?.aspect_ratio === "9:16", 
+                    "aspect-square": currentVideo?.aspect_ratio === "1:1",
                   }
                 )}
               >
