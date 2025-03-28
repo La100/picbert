@@ -14,8 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import useVideoGenerateStore from "@/store/useVideoGenerateStore";
-import useTokenStore from "@/store/useTokenStore";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
@@ -36,6 +34,10 @@ import { VIDEO_TOKEN_COST_5_SEC, VIDEO_TOKEN_COST_10_SEC } from "@/lib/constants
 import { createClient } from "@/lib/supabase/client";
 import { checkSubscriptionStatus } from "@/app/actions/subscription-actions";
 import { deductTokens } from "@/app/actions/token-actions";
+import { Card, CardContent } from "../ui/card";
+import { cn } from "@/lib/utils";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -50,18 +52,26 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+interface GeneratedVideo {
+  url: string;
+  prompt: string;
+  input_image: string;
+  aspect_ratio: "16:9" | "9:16" | "1:1";
+  duration: "5" | "10";
+}
+
 const VideoConfigurations = () => {
-  const loading = useVideoGenerateStore((state) => state.loading);
-  const setLoading = useVideoGenerateStore((state) => state.setLoading);
-  const { refreshTokens } = useTokenStore();
-  const [isUploading, setIsUploading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const [currentVideo, setCurrentVideo] = useState<GeneratedVideo | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [tokenCount, setTokenCount] = useState<number | null>(null);
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const inputImageFromUrl = searchParams.get('input_image');
   const [selectedDuration, setSelectedDuration] = useState<"5" | "10">("5");
   const [tokenCost, setTokenCost] = useState<number>(VIDEO_TOKEN_COST_5_SEC);
   const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const inputImageFromUrl = searchParams.get('input_image');
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -74,7 +84,7 @@ const VideoConfigurations = () => {
   });
 
   // Effect to handle URL parameters
-  React.useEffect(() => {
+  useEffect(() => {
     if (inputImageFromUrl) {
       form.setValue("input_image", inputImageFromUrl);
     }
@@ -208,7 +218,10 @@ const VideoConfigurations = () => {
             });
             
             // Update token count after partial refund
-            refreshTokens();
+            const credits = await getCredits();
+            if (credits.success && credits.data) {
+              setTokenCount(credits.data.tokens || 0);
+            }
           } else {
             toast.error(status.error, { id: toastId });
           }
@@ -223,9 +236,8 @@ const VideoConfigurations = () => {
           case "completed":
             clearInterval(pollInterval);
             setLoading(false);
-            toast.success("Video generated successfully!", { id: toastId });
             
-            // Update the store with the completed video URL
+            // Update the video state with the completed video URL
             if (status.data?.url) {
               const videoData = {
                 url: status.data.url as string,
@@ -234,11 +246,19 @@ const VideoConfigurations = () => {
                 aspect_ratio: values.aspect_ratio as "16:9" | "9:16" | "1:1",
                 duration: values.duration as "5" | "10"
               };
-              useVideoGenerateStore.getState().setVideo(videoData);
+              setCurrentVideo(videoData);
+              
+              // Show success message
+              toast.success("Video generated successfully!", { id: toastId });
+              
+              // Delay the refresh to ensure the video is visible
+              setTimeout(() => {
+                router.refresh();
+              }, 1000);
+            } else {
+              toast.success("Video generated successfully!", { id: toastId });
+              router.refresh();
             }
-            
-            // Refresh the route to update the UI
-            router.refresh();
             break;
           case "failed":
             clearInterval(pollInterval);
@@ -292,7 +312,7 @@ const VideoConfigurations = () => {
             <legend className="-ml-1 px-1 text-base font-medium">Video Generation - around 5 minutes</legend>
 
             <div className="flex justify-between items-center">
-              <div className="text-sm font-medium ">Available Tokens: <span className="font-bold">{tokenCount }</span></div>
+              <div className="text-sm font-medium ">Available Tokens: <span className="font-bold">{tokenCount}</span></div>
               <div className="text-sm bg-purple-50 text-purple-700 px-3 py-1 rounded-full font-medium">
                 Cost: {tokenCost} tokens
               </div>
@@ -443,6 +463,84 @@ const VideoConfigurations = () => {
           </fieldset>
         </form>
       </Form>
+
+      {/* Generated Video Display */}
+      {(loading || currentVideo) && (
+        <div className="space-y-4 w-full max-w-2xl mx-auto">
+          <AnimatePresence mode="wait">
+            {loading && !currentVideo ? (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                <Card className="w-full max-w-2xl mx-auto border bg-gradient-to-tl from-background to-muted/50 border-primary/10 shadow-lg">
+                  <CardContent className="p-1">
+                    <div 
+                      className="relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px] aspect-[9/16]"
+                    >
+                      <div className="w-48 h-48">
+                        <DotLottieReact
+                          src="/animations/animation.json"
+                          autoplay
+                          loop
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ) : currentVideo ? (
+              <motion.div
+                key={currentVideo.url}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                <Card className="w-full max-w-2xl mx-auto border bg-gradient-to-tl from-background to-muted/50 border-primary/10 shadow-lg">
+                  <CardContent className="p-1">
+                    <div 
+                      className={cn(
+                        "relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px]",
+                        {
+                          "aspect-video": currentVideo.aspect_ratio === "16:9",
+                          "aspect-[9/16]": currentVideo.aspect_ratio === "9:16", 
+                          "aspect-square": currentVideo.aspect_ratio === "1:1",
+                        }
+                      )}
+                    >
+                      {currentVideo.url ? (
+                        <motion.video
+                          key={currentVideo.url}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.3 }}
+                          src={currentVideo.url}
+                          controls
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-muted-foreground">
+                          Loading video...
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }

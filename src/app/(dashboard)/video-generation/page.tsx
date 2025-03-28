@@ -1,5 +1,4 @@
 import VideoConfigurations from "@/components/video-generation/VideoConfigurations";
-import GeneratedVideos from "@/components/video-generation/GeneratedVideos";
 import { Metadata } from 'next'
 import { Suspense } from 'react'
 import { Skeleton } from "@/components/ui/skeleton";
@@ -7,27 +6,26 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const maxDuration = 30;
 
 export const metadata: Metadata = {
-  title: "Video Generation | Faces Factory",
-  description: "Video generation for Faces Factory",
+  title: 'Video Generation - Faces Factory',
+  description: 'Generate videos from your images.',
 }
 
 function VideoConfigurationsSkeleton() {
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <Skeleton className="h-[600px] w-full rounded-lg bg-gradient-to-tr from-background to-muted/50 border border-primary/10 shadow-lg" />
+    <div className="space-y-6">
+      <div className="w-full max-w-2xl mx-auto">
+        <Skeleton className="h-[600px] w-full" />
+      </div>
     </div>
   );
 }
 
 export default function VideoGenerationPage() {
   return (
-    <section className="container mx-auto flex flex-col gap-8 ">
+    <section className="container mx-auto flex flex-col gap-8">
       <Suspense fallback={<VideoConfigurationsSkeleton />}>
         <VideoConfigurations />
       </Suspense>
-      <div className="w-full flex justify-center">
-        <GeneratedVideos />
-      </div>
     </section>
   );
 } 
