@@ -37,7 +37,6 @@ import { deductTokens } from "@/app/actions/token-actions";
 import { Card, CardContent } from "../ui/card";
 import { cn } from "@/lib/utils";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: "Prompt is required" }),
@@ -239,6 +238,7 @@ const VideoConfigurations = () => {
             
             // Update the video state with the completed video URL
             if (status.data?.url) {
+              console.log("Received video URL:", status.data.url);
               const videoData = {
                 url: status.data.url as string,
                 prompt: values.prompt,
@@ -246,18 +246,17 @@ const VideoConfigurations = () => {
                 aspect_ratio: values.aspect_ratio as "16:9" | "9:16" | "1:1",
                 duration: values.duration as "5" | "10"
               };
+              console.log("Setting video data:", videoData);
               setCurrentVideo(videoData);
               
               // Show success message
               toast.success("Video generated successfully!", { id: toastId });
               
-              // Delay the refresh to ensure the video is visible
-              setTimeout(() => {
-                router.refresh();
-              }, 1000);
+              // Log current video state after setting
+              console.log("Current video state after setting:", videoData);
             } else {
+              console.log("No video URL received in completed status");
               toast.success("Video generated successfully!", { id: toastId });
-              router.refresh();
             }
             break;
           case "failed":
@@ -464,81 +463,52 @@ const VideoConfigurations = () => {
         </form>
       </Form>
 
-      {/* Generated Video Display */}
-      {(loading || currentVideo) && (
-        <div className="space-y-4 w-full max-w-2xl mx-auto">
-          <AnimatePresence mode="wait">
-            {loading && !currentVideo ? (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="w-full"
+      {/* Simple Video Display */}
+      {currentVideo?.url && (
+        <div className="w-full max-w-2xl mx-auto">
+          <Card className="border bg-gradient-to-tl from-background to-muted/50 border-primary/10 shadow-lg">
+            <CardContent className="p-1">
+              <div 
+                className={cn(
+                  "relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px]",
+                  {
+                    "aspect-video": currentVideo.aspect_ratio === "16:9",
+                    "aspect-[9/16]": currentVideo.aspect_ratio === "9:16", 
+                    "aspect-square": currentVideo.aspect_ratio === "1:1",
+                  }
+                )}
               >
-                <Card className="w-full max-w-2xl mx-auto border bg-gradient-to-tl from-background to-muted/50 border-primary/10 shadow-lg">
-                  <CardContent className="p-1">
-                    <div 
-                      className="relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px] aspect-[9/16]"
-                    >
-                      <div className="w-48 h-48">
-                        <DotLottieReact
-                          src="/animations/animation.json"
-                          autoplay
-                          loop
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ) : currentVideo ? (
-              <motion.div
-                key={currentVideo.url}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="w-full"
-              >
-                <Card className="w-full max-w-2xl mx-auto border bg-gradient-to-tl from-background to-muted/50 border-primary/10 shadow-lg">
-                  <CardContent className="p-1">
-                    <div 
-                      className={cn(
-                        "relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px]",
-                        {
-                          "aspect-video": currentVideo.aspect_ratio === "16:9",
-                          "aspect-[9/16]": currentVideo.aspect_ratio === "9:16", 
-                          "aspect-square": currentVideo.aspect_ratio === "1:1",
-                        }
-                      )}
-                    >
-                      {currentVideo.url ? (
-                        <motion.video
-                          key={currentVideo.url}
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.3 }}
-                          src={currentVideo.url}
-                          controls
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-muted-foreground">
-                          Loading video...
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+                <video
+                  src={currentVideo.url}
+                  controls
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Loading indicator */}
+      {loading && (
+        <div className="w-full max-w-2xl mx-auto">
+          <Card className="border bg-gradient-to-tl from-background to-muted/50 border-primary/10 shadow-lg">
+            <CardContent className="p-1">
+              <div className="relative flex items-center justify-center rounded-lg overflow-hidden min-h-[400px] aspect-[9/16]">
+                <div className="w-48 h-48">
+                  <DotLottieReact
+                    src="/animations/animation.json"
+                    autoplay
+                    loop
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
