@@ -45,7 +45,7 @@ const SubscriptionConfirmation: React.FC<Readonly<SubscriptionConfirmationProps>
         )}
       </div>
       <p style={{ fontSize: "16px", lineHeight: "1.5" }}>
-        You now have access to all the features included in your subscription plan. {tokens && `We&apos;ve also added ${tokens} tokens to your account.`} If you have any questions or need assistance, please don&apos;t hesitate to contact our support team.
+        You now have access to all the features included in your subscription plan. {tokens && `We also added ${tokens} tokens to your account.`} If you have any questions or need assistance, please don&apos;t hesitate to contact our support team.
       </p>
       <p style={{ fontSize: "16px", lineHeight: "1.5", marginTop: "24px" }}>
         Thank you for choosing our service!

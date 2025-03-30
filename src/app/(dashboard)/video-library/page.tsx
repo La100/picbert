@@ -49,7 +49,7 @@ async function VideoLibraryData() {
   ) : (
     <LockedContent 
       title="Unlock Our Premium AI Video Library"
-      description="Subscribe now to access our exclusive collection of AI-generated videos. Browse through a variety of AI-created faces with lifelike expressions and movements."
+      description="Subscribe now to access our exclusive collection of 200 AI-generated videos. Browse through a variety of AI-created faces with lifelike expressions and movements."
       previewImages={previewImages}
       className="mt-8"
     />
