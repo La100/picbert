@@ -21,10 +21,10 @@ export default function Recipe() {
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-6">
-            Two Simple Steps
+            Add these videos to your content!
           </h2>
           <p className="text-lg text-muted-foreground">
-            Example of what can you do with videos
+            Idea of this app is easy. Mix your own videos with AI generated ones, and get more views!
           </p>
         </div>
 

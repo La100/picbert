@@ -8,7 +8,7 @@ import {
   Video,
   FileVideo,
   Users,
-
+  ShoppingBag
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -20,6 +20,7 @@ import {
   SidebarHeader,
   SidebarMenuButton,
   SidebarRail,
+  SidebarMenuBadge,
 } from "@/components/ui/sidebar"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
@@ -57,6 +58,13 @@ const navMain =  [
       title: "Your Videos",
       url: "/gallery/videos",
       icon: Video,
+    },
+    {
+      title: "Add product to image",
+      icon: ShoppingBag,
+      isActive: false,
+      isDisabled: true,
+      badge: "Coming soon",
     },
   ]
 

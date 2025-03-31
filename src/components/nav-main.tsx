@@ -5,6 +5,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuBadge,
 } from "@/components/ui/sidebar";
 import ActiveLink from "./dashboard/ActiveLink";
 import { ChevronDown } from "lucide-react";
@@ -18,6 +19,8 @@ export function NavMain({
     url?: string;
     icon?: LucideIcon;
     isActive?: boolean;
+    isDisabled?: boolean;
+    badge?: string;
     items?: {
       title: string;
       url: string;
@@ -55,6 +58,29 @@ export function NavMain({
                     ))}
                   </CollapsibleContent>
                 </Collapsible>
+              );
+            }
+
+            // If item is disabled, render it without link
+            if (item.isDisabled) {
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <div className="flex flex-col">
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      className="font-[450] text-base opacity-60 cursor-not-allowed"
+                      aria-disabled="true"
+                    >
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                    {item.badge && (
+                      <SidebarMenuBadge className="bg-primary/10 text-primary rounded-md text-xs ml-9  relative w-fit">
+                        {item.badge}
+                      </SidebarMenuBadge>
+                    )}
+                  </div>
+                </SidebarMenuItem>
               );
             }
 
