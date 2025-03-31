@@ -20,7 +20,7 @@ import {
   SidebarHeader,
   SidebarMenuButton,
   SidebarRail,
-  SidebarMenuBadge,
+  
 } from "@/components/ui/sidebar"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
