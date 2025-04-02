@@ -26,10 +26,7 @@ const nextConfig:NextConfig = {
         protocol: "https",
         hostname: "fal.media",
       },
-      {
-        protocol: "https",
-        hostname: "api.facesfactory.com", // This has been replaced with vjvlsiuqjfotifoyqivh.supabase.co
-      },
+     
       {
         protocol: "https",
         hostname: "vjvlsiuqjfotifoyqivh.supabase.co", // Update this to your supabase url
