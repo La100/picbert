@@ -28,7 +28,7 @@ const nextConfig:NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "api.facesfactory.com", // Update this to your supabase url
+        hostname: "api.facesfactory.com", // This has been replaced with vjvlsiuqjfotifoyqivh.supabase.co
       },
       {
         protocol: "https",

@@ -32,7 +32,7 @@ export default function Recipe() {
           <div className="flex justify-center order-2 lg:order-1">
             <div className="relative mx-10  aspect-[9/16] rounded-xl overflow-hidden ">
               <Image
-                src="https://api.facesfactory.com/storage/v1/object/public/images//landing.png"
+                src="https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/images//landing.png"
                 alt="AI-Generated Image"
                 width={450}
                 height={760}

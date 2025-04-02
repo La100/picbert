@@ -202,6 +202,22 @@ const VideoConfigurations = () => {
 
       // Start polling for status
       const requestId = result.data.request_id as string;
+      
+      // Update request with token usage
+      try {
+        const supabase = createClient();
+        const tokenUpdateResult = await supabase
+          .from("video_requests")
+          .update({ 
+            tokens_used: cost
+          })
+          .eq('request_id', requestId);
+          
+        console.log("Token usage update result:", tokenUpdateResult);
+      } catch (tokenUpdateError) {
+        console.warn("Could not update token usage, continuing anyway:", tokenUpdateError);
+      }
+
       const pollInterval = setInterval(async () => {
         const status = await getVideoRequestStatus(requestId);
         

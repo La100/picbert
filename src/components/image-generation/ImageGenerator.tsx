@@ -272,6 +272,20 @@ const ImageGenerator = () => {
       
       if (deductResult.success && deductResult.tokensRemaining !== null) {
         setTokenCount(deductResult.tokensRemaining);
+        
+        // Update request with token usage
+        try {
+          const tokenUpdateResult = await supabase
+            .from("image_requests")
+            .update({ 
+              tokens_used: IMAGE_TOKEN_COST
+            })
+            .eq('request_id', request_id);
+            
+          console.log("Token usage update result:", tokenUpdateResult);
+        } catch (tokenUpdateError) {
+          console.warn("Could not update token usage, continuing anyway:", tokenUpdateError);
+        }
       } else {
         console.error("Token deduction failed but generation succeeded:", deductResult.error);
       }

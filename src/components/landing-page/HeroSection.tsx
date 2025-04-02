@@ -4,13 +4,13 @@ import { motion } from "framer-motion";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 
 const videos = [
-  "https://api.facesfactory.com/storage/v1/object/public/images//1.mp4",
-  "https://api.facesfactory.com/storage/v1/object/public/images//3.mp4",
-  "https://api.facesfactory.com/storage/v1/object/public/images//4.mp4",
-  "https://api.facesfactory.com/storage/v1/object/public/images//5.mp4",
-  "https://api.facesfactory.com/storage/v1/object/public/images//2.mp4",
-  "https://api.facesfactory.com/storage/v1/object/public/images//6.mp4",
-  "https://api.facesfactory.com/storage/v1/object/public/images//7.mp4"
+  "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/images//1.mp4",
+  "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/images//3.mp4",
+  "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/images//4.mp4",
+  "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/images//5.mp4",
+  "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/images//2.mp4",
+  "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/images//6.mp4",
+  "https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/images//7.mp4"
 ];
 
 export const HeroSkeleton = () => {

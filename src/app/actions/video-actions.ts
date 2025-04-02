@@ -361,7 +361,8 @@ export async function queueVideoGeneration(
         input_image: data.input_image,
         aspect_ratio: data.aspect_ratio,
         duration: data.duration,
-        status: "pending"
+        status: "pending",
+        tokens_used: data.duration === "5" ? VIDEO_TOKEN_COST_5_SEC : VIDEO_TOKEN_COST_10_SEC
       }])
       .select()
       .single();

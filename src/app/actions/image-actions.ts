@@ -361,9 +361,9 @@ export async function storeImageRequest(data: {
       user_id: data.user_id,
       request_id: data.request_id,
       prompt: data.prompt,
-     
       aspect_ratio: data.aspect_ratio,
-      status: 'pending'
+      status: 'pending',
+      tokens_used: IMAGE_TOKEN_COST
     }]);
 
   if (error) {

@@ -29,7 +29,7 @@ export function QuickActions() {
               
               <div className="w-full aspect-square relative overflow-hidden rounded-md">
                 <Image 
-                  src="https://api.facesfactory.com/storage/v1/object/public/images//File%20(8).jpg" 
+                  src="https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/images//File%20(8).jpg" 
                   alt="AI generated handsome guy" 
                   fill
                   className="object-cover"
@@ -58,7 +58,7 @@ export function QuickActions() {
               
               <div className="w-full aspect-square relative overflow-hidden rounded-md">
                 <video 
-                  src="https://api.facesfactory.com/storage/v1/object/public/images//Video1.mp4"
+                  src="https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/images//Video1.mp4"
                   className="w-full h-full object-cover"
                   autoPlay
                   muted
@@ -85,7 +85,7 @@ export function QuickActions() {
             <div className="flex flex-col items-center w-full max-w-[300px] mx-auto">
               <div className="w-full aspect-square relative overflow-hidden rounded-md shadow-md border border-primary/10">
                 <Image 
-                  src="https://api.facesfactory.com/storage/v1/object/public/images//img1.png" 
+                  src="https://vjvlsiuqjfotifoyqivh.supabase.co/storage/v1/object/public/images//img1.png" 
                   alt="AI characters collection" 
                   fill
                   priority

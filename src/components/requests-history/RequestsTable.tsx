@@ -37,6 +37,7 @@ export interface Request {
   output_image?: string;
   url?: string;
   error?: string;
+  tokens_used?: number;
 }
 
 interface RequestsTableProps {
@@ -83,6 +84,7 @@ const RequestsTable = ({ requests }: RequestsTableProps) => {
               <TableHead>Prompt</TableHead>
               <TableHead>Settings</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Tokens</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -174,6 +176,15 @@ const RequestsTable = ({ requests }: RequestsTableProps) => {
                   >
                     {request.status}
                   </Badge>
+                </TableCell>
+                <TableCell>
+                  {request.tokens_used ? (
+                    <span className="text-sm font-medium">
+                      {request.tokens_used}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">-</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   {request.status === "completed" && (
