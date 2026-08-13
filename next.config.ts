@@ -2,6 +2,28 @@
 import type { NextConfig } from 'next'
 
 const nextConfig:NextConfig = {
+  async redirects() {
+    const pausedDestination = '/?service=paused'
+
+    return [
+      '/api/:path*',
+      '/auth/:path*',
+      '/login',
+      '/reset-password',
+      '/dashboard/:path*',
+      '/image-generation/:path*',
+      '/video-generation/:path*',
+      '/video-library/:path*',
+      '/gallery/:path*',
+      '/billing/:path*',
+      '/account-settings/:path*',
+      '/requests-history/:path*',
+    ].map((source) => ({
+      source,
+      destination: pausedDestination,
+      permanent: false,
+    }))
+  },
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
